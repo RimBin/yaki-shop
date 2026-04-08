@@ -1,0 +1,80 @@
+import Link from 'next/link';
+import { getLocale } from 'next-intl/server';
+import type { Product } from '@/lib/products.supabase';
+import { toLocalePath, type AppLocale } from '@/i18n/paths';
+import SeoImage from '@/components/ui/SeoImage';
+import { buildProductImageSeo } from '@/lib/seo/images';
+
+interface RelatedProductsProps {
+  products: Product[];
+}
+
+export default async function RelatedProducts({ products }: RelatedProductsProps) {
+  if (!products || products.length === 0) {
+    return null;
+  }
+
+  const locale = await getLocale();
+  const currentLocale: AppLocale = locale === 'lt' ? 'lt' : 'en';
+
+  return (
+    <section className="w-full py-12">
+      <h2 className="font-['DM_Sans'] text-2xl font-medium tracking-[-0.5px] mb-8">
+        Panašūs produktai
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {products.map((product) => {
+          const productName = currentLocale === 'en' ? (product.nameEn ?? product.name) : product.name;
+          const imageSeo = buildProductImageSeo(currentLocale, {
+            name: productName,
+            shortDescription: product.description,
+          });
+
+          return (
+          <Link
+            key={product.id}
+            href={toLocalePath(`/products/${currentLocale === 'en' ? (product.slugEn ?? product.slug) : product.slug}`, currentLocale)}
+            className="group block"
+          >
+            <div className="relative aspect-square bg-[#EAEAEA] rounded-[24px] overflow-hidden mb-4 group-hover:shadow-lg transition-shadow">
+              <SeoImage
+                src={product.image || '/images/ui/wood/imgSpruce.png'}
+                alt={imageSeo.alt}
+                title={imageSeo.title}
+                description={imageSeo.description}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              />
+
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="px-4 py-2 bg-white rounded-full font-['Outfit'] text-xs text-[#161616] shadow-lg">
+                  Peržiūrėti
+                </span>
+              </div>
+            </div>
+
+            <h3 className="font-['DM_Sans'] font-medium text-[#161616] mb-1 group-hover:text-[#535353] transition-colors">
+              {productName}
+            </h3>
+
+            {product.description && (
+              <p className="font-['Outfit'] text-sm text-[#7C7C7C] mb-2 line-clamp-2">
+                {product.description}
+              </p>
+            )}
+
+            <div className="flex items-baseline gap-2">
+              <span className="font-['DM_Sans'] font-medium text-lg text-[#161616]">
+                €{product.price.toFixed(0)}
+              </span>
+              <span className="font-['Outfit'] text-xs text-[#7C7C7C]">nuo</span>
+            </div>
+          </Link>
+        );})}
+      </div>
+    </section>
+  );
+}

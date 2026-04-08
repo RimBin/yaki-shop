@@ -1,0 +1,2834 @@
+{
+  "nav": {
+    "products": "Products",
+    "solutions": "Solutions",
+    "projects": "Projects",
+    "configurator3d": "3D Shou Sugi Ban",
+    "blog": "Blog",
+    "euProjects": "EU projects",
+    "about": "About us",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "home": "Home",
+    "account": "Account"
+  },
+  "chatbot": {
+    "button": "Chat",
+    "title": "Chat with Yakiwood",
+    "subtitle": "Ask about products, pricing, delivery, or your order",
+    "welcome": "Hi! I'm the Yakiwood assistant. I can help with products, exact prices, delivery, and ordering.",
+    "note": "Note: please do not share sensitive personal data (e.g., personal ID). This chat may be used to improve support.",
+    "handoff": "Need a human? Contact us",
+    "conversationLabel": "Conversation",
+    "quickQuestions": "Quick questions",
+    "cartAdded": "Added to cart.",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "clear": "Clear",
+    "typing": "Typing...",
+    "aria": {
+      "open": "Open chat",
+      "close": "Close chat"
+    },
+    "errors": {
+      "generic": "Couldn't reply right now. Please try again later.",
+      "network": "Network error. Please try again later."
+    },
+    "suggestions": {
+      "price": "Show products and pricing",
+      "delivery": "Delivery price and timeline",
+      "payment": "Payment methods",
+      "returns": "Returns and warranty",
+      "cart": "How do I place an order?",
+      "productionTime": "How long do production and delivery take?",
+      "maintenance": "How do I maintain the surface?"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Insights on Shou Sugi Ban, design tips, and practical guidance.",
+    "readMore": "Read more",
+    "readTime": "{minutes} min read",
+    "empty": "No articles yet.",
+    "back": "Back to blog",
+    "related": "Related articles",
+    "ctaTitle": "Ready to",
+    "ctaHighlight": "build",
+    "ctaSubtitle": "Tell us about your project and we will prepare a tailored offer.",
+    "ctaPrimary": "Get an offer",
+    "ctaSecondary": "View products"
+  },
+  "orderConfirmationPage": {
+    "loading": "Loading...",
+    "errorTitle": "Error",
+    "backHome": "Back to home",
+    "title": "Thank you for your order!",
+    "messagePaid": "Your payment was processed successfully. You'll receive a confirmation email and invoice shortly.",
+    "messagePaysera": "Your order has been created. We'll confirm the payment once we receive Paysera confirmation. You'll receive a confirmation email shortly.",
+    "paypalIdLabel": "PayPal ID",
+    "orderIdLabel": "Order ID",
+    "sessionIdLabel": "Session ID",
+    "summaryTitle": "Order summary",
+    "summaryTotal": "Total",
+    "summaryEmpty": "We couldn't find the order details. Please check your email for confirmation.",
+    "variantLabel": "Variant",
+    "qtyLabel": "Qty",
+    "priceLabel": "Price",
+    "nextStepsTitle": "What happens next?",
+    "nextStep1": "Order is confirmed after successful payment. Custom-made production starts within 24-48 hours; in-stock UK warehouse items dispatch in 2-3 working days.",
+    "nextStep2": "Delivery is available across mainland UK. Northern Ireland, Highlands, and offshore areas may have additional delivery charges.",
+    "nextStep3": "Delivery is kerbside only. Please be present, inspect goods on arrival, and report any damage within 48 hours with photos.",
+    "nextStep4": "Custom-made products cannot be cancelled once production begins. Standard (non-custom) goods may be cancelled within 14 days of delivery.",
+    "viewOrders": "View orders",
+    "continueShopping": "Continue shopping",
+    "supportTitle": "Have questions about your order?",
+    "supportLink": "Contact us"
+  },
+  "common": {
+    "cart": "Cart",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+      "invalidRole": "Invalid role name (use letters, numbers, _ or -)",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "kraunasi": "Loading...",
+    "valiuta": "€",
+    "checkout": {
+      "title": "Checkout",
+      "contact": {
+        "title": "Contact information",
+        "haveAccountLogin": "Have an account? Log in",
+        "fullName": "Full name ",
+        "companyNameOptional": "Company name (optional)",
+        "email": "Email ",
+        "phone": "Phone number "
+      },
+      "delivery": {
+        "title": "Delivery information",
+        "country": "Country ",
+        "city": "City ",
+        "address": "Address ",
+        "postalCode": "Postal code ",
+        "deliverDifferentAddress": "Deliver to a different address?",
+        "notesOptional": "Order notes (optional)"
+      },
+      "payment": {
+        "title": "Payment method",
+        "stripeCard": "Card payment (Stripe)",
+        "cardNumber": "Card number ",
+        "expiryDate": "Expiry date ",
+        "cvc": "CVC ",
+        "saveInfo": "Save this information for next time",
+        "creditDebitCard": "Credit / debit card"
+      },
+      "terms": {
+        "agreeTo": "I agree to the <terms>Terms and conditions</terms> and <privacy>Privacy policy</privacy>",
+        "terms": "Terms and conditions",
+        "privacy": "Privacy policy"
+      },
+      "actions": {
+        "backToCart": "Back to cart",
+        "submitOrder": "Place order",
+        "processing": "Processing..."
+      },
+      "summary": {
+        "title": "Your order ({count})",
+        "remove": "Remove",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "total": "Total",
+        "includingTaxes": "Including taxes",
+        "colorLabel": "Color:",
+        "finishLabel": "Finish:",
+        "profileLabel": "Profile:",
+        "quantity": "Qty: {count} pcs"
+      },
+      "success": {
+        "withNumber": "Order {orderNumber} created. We'll contact you about the next steps.",
+        "withoutNumber": "Order created. We'll contact you about the next steps.",
+        "passwordResetEmailSent": "We've sent you an email with a password reset link."
+      },
+      "errors": {
+        "orderCreateFailed": "Failed to create the order",
+        "orderIdMissing": "Failed to get the order ID",
+        "paymentSessionFailed": "Failed to create a payment session",
+        "paymentUrlMissing": "Payment URL missing",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "success": "Success!",
+    "error": "Error",
+    "tryAgain": "Try again",
+    "viewAll": "View all",
+    "viewDetails": "View details",
+    "learnMore": "Learn more",
+    "readMore": "Read more",
+    "showMore": "Show more",
+    "rodytiDaugiau": "Show more",
+    "showLess": "Show less",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "confirm": "Confirm",
+    "currency": "€",
+    "from": "From",
+    "to": "To",
+    "or": "or",
+    "and": "and"
+  },
+  "header": {
+    "fastDelivery": "Fast delivery",
+    "moneyBack": "Money back guarantee",
+    "ecoFriendly": "Eco-friendly",
+    "cart": "Cart",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "mobileMenu": {
+    "ctaGetInTouch": "Get in touch"
+  },
+  "footer": {
+    "navigation": "Navigation",
+    "legal": "Legal",
+    "followUs": "Follow us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy",
+    "cookieSettings": "Cookie preferences",
+    "copyright": "© 2024 Yakiwood. All rights reserved.",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "workingHours": "Working hours",
+    "mondayFriday": "Monday - Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "shared": {
+      "columns": {
+        "information": "Information",
+        "clientCare": "Client care",
+        "social": "Social",
+        "account": "Account"
+      },
+      "links": {
+        "about": "About us",
+        "contacts": "Contacts",
+        "projects": "Projects",
+        "blog": "Blog",
+        "faqs": "FAQs",
+        "policies": "Policies",
+        "terms": "Terms & conditions",
+        "cookiePolicy": "Cookie policy",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "myAccount": "My account",
+        "shipping": "Shipping",
+        "refundPolicy": "Refund policy"
+      },
+      "paymentsAlt": "Payment methods",
+      "copyright": "© {year} YAKIWOOD, LLC. All rights reserved"
+    }
+  },
+  "hero": {
+    "mainHeading": "Timeless beauty, enhanced by fire - ",
+    "brandName": "Yakiwood",
+    "description": "Discover the elegance and durability of burnt wood, crafted using the ancient Japanese Shou Sugi Ban technique.",
+    "from": "From",
+    "buyNow": "Buy now",
+    "shopNow": "Shop now",
+    "exploreProducts": "Explore products",
+    "exploreCatalog": "Explore catalog",
+    "productName": "Shou sugi Ban Planks",
+    "solutions": "Solutions",
+    "colors": "Colors"
+  },
+  "home": {
+    "products": {
+      "eyebrow": "Products",
+      "headline": {
+        "prefix": "Choose your ",
+        "emphasis": "perfect",
+        "suffix": " wood finish"
+      },
+      "cta": {
+        "offer": "Get an offer",
+        "catalog": "View catalog"
+      },
+      "labels": {
+        "colors": "Colors"
+      },
+      "aria": {
+        "prevImage": "Previous image",
+        "nextImage": "Next image",
+        "selectColor": "Select {label} ({index}/{total})"
+      },
+      "finishes": {
+        "natural": "Natural",
+        "silver": "Silver",
+        "carbon": "Carbon",
+        "carbonLight": "Carbon light",
+        "graphite": "Graphite",
+        "latte": "Latte",
+        "darkBrown": "Dark brown",
+        "black": "Black"
+      },
+      "items": {
+        "spruce": {
+          "title": "Spruce wood",
+          "description": "Lightweight yet strong, spruce wood offers a smooth texture and a natural, clean finish. Its versatility and durability make it an excellent choice for both interior and exterior applications."
+        },
+        "larch": {
+          "title": "Larch wood",
+          "description": "Naturally durable and resilient, larch wood is well-suited for outdoor use. Its dense grain and rich tone make it a reliable choice for long-lasting facades and surfaces."
+        },
+        "thermo": {
+          "title": "Thermo",
+          "description": "Thermally modified wood offers better dimensional stability, a more even tone, and a practical finish range for facades and terraces when you want a cleaner, less textured look."
+        }
+      }
+    },
+    "whyUs": {
+      "eyebrow": "Yakiwood",
+      "headline": "We are experts in the preparation of <italic>burnt wood</italic>, with many years of <italic>successful</italic> experience in preparing wood for facades, terraces, fences and interiors, and we guarantee a <italic>high quality</italic> and long-lasting <italic>result</italic>.",
+      "description": "Shou Sugi Ban is not just a striking look - it is a proven way to improve durability and reduce maintenance over time.",
+      "benefits": {
+        "aesthetics": {
+          "title": "Beautiful natural aesthetics",
+          "description": "Deep tones and expressive texture that stand out in any project.",
+          "alt": "Textured burnt wood surface"
+        },
+        "look": {
+          "title": "Premium look",
+          "description": "A modern, architectural finish that adds value and character.",
+          "alt": "Modern burnt wood facade"
+        },
+        "eco": {
+          "title": "Eco-friendly",
+          "description": "Natural processing and long lifespan mean fewer replacements.",
+          "alt": "Eco-friendly wood"
+        },
+        "versatile": {
+          "title": "Versatile",
+          "description": "Suitable for facades, terraces, fences, and interiors.",
+          "alt": "Burnt wood used in multiple applications"
+        }
+      }
+    },
+    "solutions": {
+      "eyebrow": "Purpose",
+      "headline": {
+        "prefix": "Versatile ",
+        "emphasis": "solutions",
+        "suffix": " for every project"
+      },
+      "cta": {
+        "offer": "Get an offer",
+        "learnMore": "Find out more"
+      },
+      "items": {
+        "terrace": {
+          "title": "Terrace",
+          "description": "Outdoor spaces designed to endure. Our fire-treated decking offers natural texture, slip resistance, and longevity."
+        },
+        "facade": {
+          "title": "Facade",
+          "description": "Turn any building into a landmark with burnt wood cladding that combines aesthetics with long-term protection."
+        },
+        "fence": {
+          "title": "Fence",
+          "description": "Private, elegant, and built to last - charred wood fencing that withstands every season."
+        },
+        "interior": {
+          "title": "Interior",
+          "description": "Bring depth, warmth, and texture indoors with premium Shou Sugi Ban wall panels."
+        }
+      }
+    },
+    "projects": {
+      "eyebrow": "Projects",
+      "headline": {
+        "prefix": "Inspiring ",
+        "emphasis": "projects"
+      },
+      "description": "People who choose charred wood often share positive feedback and real project experience. They notice not only the distinctive look, but also the functionality and long-term durability.",
+      "viewAll": "View all projects",
+      "fallback": {
+        "project": "Project",
+        "title": "Project title",
+        "location": "Location"
+      }
+    },
+    "steps": {
+      "eyebrow": "Process",
+      "headline": {
+        "prefix": "Simple & fast",
+        "emphasis": "ordering",
+        "suffix": "process"
+      },
+      "cta": {
+        "label": "Shop now",
+        "aria": "Shop now"
+      },
+      "items": {
+        "1": {
+          "title": "Choose product",
+          "description": "Select wood type, finish, and quantity based on your project needs."
+        },
+        "2": {
+          "title": "Request an offer",
+          "description": "Send a quick request and receive a tailored price and timeline."
+        },
+        "3": {
+          "title": "Production",
+          "description": "We craft your order using the Shou Sugi Ban technique and quality control."
+        },
+        "4": {
+          "title": "Delivery",
+          "description": "We deliver your products safely to your specified location."
+        }
+      }
+    },
+    "aboutUs": {
+      "eyebrow": "About",
+      "headline": {
+        "prefix": "Our story: crafting ",
+        "quality": "quality",
+        "middle": " with ",
+        "passion": "passion",
+        "emphasis": "with passion",
+        "suffix": ""
+      },
+      "description1": "We create burnt wood products using the traditional Japanese Shou Sugi Ban technique, combining craftsmanship with modern quality standards. Each board is carefully charred, brushed, and finished to reveal its natural character.",
+      "description2": "Our goal is to deliver beautiful, durable wood surfaces that perform in real-world conditions for years. We guide you from concept to installation so every solution is long-lasting and tailored to your project.",
+      "readAbout": "Read about us",
+      "partners": "Our partners",
+      "watch": "Watch",
+      "paragraphs": {
+        "p1": "We create burnt wood products using the traditional Japanese Shou Sugi Ban technique, combining craftsmanship with modern quality standards.",
+        "p2": "Our goal is to deliver beautiful, durable wood surfaces that perform in real-world conditions for years."
+      },
+      "actions": {
+        "readAbout": "Read about us",
+        "partners": "Our partners",
+        "watch": "Watch"
+      },
+      "aria": {
+        "watchVideo": "Watch video",
+        "dialog": "Video",
+        "dialogLabel": "Video",
+        "closeVideo": "Close video"
+      },
+      "close": "Close"
+    },
+    "cta": {
+      "headline": {
+        "prefix": "Ready to build ",
+        "emphasis": "with fire",
+        "suffix": "?"
+      },
+      "buttons": {
+        "offer": "Get an offer",
+        "getInTouch": "Get in touch",
+        "chooseWood": "Choose wood"
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "headline": {
+        "prefix": "Everything you wanted to ",
+        "emphasis": "ask",
+        "suffix": " & more"
+      },
+      "items": {
+        "01": {
+          "question": "What is Shou Sugi Ban?",
+          "answer": "Shou Sugi Ban is an ancient Japanese technique that involves charring wood to protect and enhance its natural beauty. This traditional method originated as a way to make wood more resistant to the elements, including insects, fire, and weathering. The process creates a striking aesthetic with deep tones, unique textures, and an elegant, rustic look."
+        },
+        "02": {
+          "question": "How do I maintain Shou Sugi Ban wood?",
+          "answer": "Shou Sugi Ban surfaces are typically low-maintenance. There’s no need for daily cleaning-an occasional gentle rinse to remove dust and dirt (as needed or seasonally) is usually enough. Avoid high-pressure washing and abrasive cleaners, as they can damage the surface texture. If the surface is oiled, refreshing the oil every ~2-5 years is typically sufficient (depending on sun exposure, rain, and facade orientation)."
+        },
+        "03": {
+          "question": "Where can charred wood products be used?",
+          "answer": "Charred wood (yakisugi) is well-suited for ventilated facades, wall and ceiling cladding, decorative partitions, fences, gates, and exterior accents. Indoors it’s often used for feature walls and furniture details-choose an appropriate finish (e.g., oil or lacquer) to reduce rub-off and make cleaning easier. For outdoor use, longevity depends heavily on correct detailing: ventilation, proper fasteners, and avoiding areas where water can sit on the surface."
+        },
+        "04": {
+          "question": "How is Shou Sugi Ban installed?",
+          "answer": "Shou Sugi Ban boards are most commonly installed as ventilated facade cladding on battens/framing, leaving an air gap to help moisture evaporate. Use stainless steel fasteners, follow the recommended expansion gaps, and install with correct water run-off detailing. It’s also a good idea to protect end-grain and cut edges (e.g., with oil/sealer, depending on the system). Before installation, store boards in a dry, ventilated area and pre-drill fastener points when needed to reduce the risk of splitting."
+        },
+        "05": {
+          "question": "Is Shou Sugi Ban suitable for interior use?",
+          "answer": "Yes-Shou Sugi Ban works well indoors for feature walls, ceilings, niches, and furniture details. For interior applications we recommend an oiled finish: when properly processed and oiled, the surface does not rub off and does not shed, and it’s easy to maintain."
+        },
+        "06": {
+          "question": "Is Yakisugi suitable for all climates?",
+          "answer": "Yakisugi performs well across many climates, but longevity depends on the wood species, charring/brushing intensity, chosen finish, and construction detailing. In humid/coastal conditions and on south-facing elevations (high UV exposure), finishes may need to be refreshed more often. The key is ventilated installation, good drainage/run-off detailing, and avoiding situations where water remains on the surface."
+        },
+        "07": {
+          "question": "What are the standard dimensions for Shou Sugi Ban planks?",
+          "answer": "Typical facade board widths are 95-145 mm, with common lengths of 3-6 m (depending on the selected profile and wood species). Exact dimensions depend on your profile choice and project requirements-custom options are also possible."
+        }
+      }
+    }
+  },
+  "languageSwitcher": {
+    "toggleAria": "Select language",
+    "optionsAria": "Available languages"
+  },
+  "product": {
+    "color": "Color",
+    "colors": "Colors",
+    "finish": "Finish",
+    "size": "Size",
+    "dimensions": "Dimensions",
+    "quantity": "Quantity",
+    "price": "Price",
+    "priceFrom": "From",
+    "basePrice": "Base price",
+    "totalPrice": "Total price",
+    "description": "Description",
+    "specifications": "Specifications",
+    "features": "Features",
+    "material": "Material",
+    "weight": "Weight",
+    "installation": "Installation",
+    "addToCart": "Add to cart",
+    "buyNow": "Buy now",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "available": "Available",
+    "preOrder": "Pre-order",
+    "comingSoon": "Coming soon",
+    "discontinued": "Discontinued",
+    "limitedStock": "Limited stock",
+    "lowStock": "Low stock",
+    "onlyLeft": "Only {count} left",
+    "viewProduct": "View product",
+    "relatedProducts": "Related products",
+    "recommendedProducts": "Recommended products",
+    "woodType": "Wood type",
+    "category": "Category",
+    "categories": "Categories",
+    "solutions": "Solutions",
+    "applications": "Applications"
+  },
+  "productPage": {
+    "fromPrice": "From {price} €/m²",
+    "back": "Back",
+    "photo": "Photo",
+    "view3d": "3D",
+    "relatedProducts": {
+      "title": "Related products",
+      "viewAll": "View all products"
+    },
+    "toggleShowPhotoAria": "Show photo",
+    "toggleShow3dAria": "Show 3D view",
+    "thicknessLabel": "Thickness",
+    "widthLabel": "Width",
+    "lengthLabel": "Length",
+    "solutionsLabel": "Solutions",
+    "profilesLabel": "Profiles",
+    "benefitsLabel": "Benefits",
+    "descriptionFallback": "Product description is coming soon.",
+    "itemAdded": "Product added to cart",
+    "colorLabelInline": "Color:",
+    "selectColorPlaceholder": "Select a color",
+    "ctaQuote": "Get a quote",
+    "ctaContact": "Contact",
+    "solutions": {
+      "facade": "Facades",
+      "cladding": "Cladding",
+      "fence": "Fence",
+      "terrace": "Terrace",
+      "decking": "Decking",
+      "interior": "Interior",
+      "tiles": "Tiles"
+    },
+    "woodTypes": {
+      "spruce": "Spruce",
+      "larch": "Larch",
+      "thermo": "Thermo"
+    },
+    "benefits": {
+      "aesthetics": {
+        "title": "BEAUTIFUL NATURAL AESTHETICS",
+        "content": "Bold grain patterns and warm tones give burnt wood a modern yet natural look."
+      },
+      "eco": {
+        "title": "SUSTAINABLE AND ECO-FRIENDLY",
+        "content": "Long-lasting wood and natural treatment reduce the need for maintenance and renewal."
+      },
+      "durability": {
+        "title": "EXCEPTIONAL DURABILITY",
+        "content": "Shou Sugi Ban treatment improves resistance to weathering and extends service life."
+      },
+      "maintenance": {
+        "title": "LOW MAINTENANCE, LONG SERVICE",
+        "content": "Minimal upkeep and long lifetime - ideal for both facades and terraces."
+      }
+    }
+  },
+  "cookieConsent": {
+    "title": "Cookies",
+    "description": "We use cookies to ensure the website works properly and (with your consent) to analyze usage.",
+    "policyLink": "Cookie Policy",
+    "reject": "Reject",
+    "accept": "Accept",
+    "customize": "Preferences",
+    "save": "Save",
+    "necessary": "Necessary",
+    "alwaysOn": "always on",
+    "analytics": "Analytics",
+    "analyticsHint": "helps us understand usage",
+    "marketing": "Marketing",
+    "marketingHint": "for personalized ads"
+  },
+  "products": {
+    "title": "Products",
+    "allProducts": "All products",
+    "noProducts": "No products found",
+    "noProductsDescription": "Try adjusting your filters or search terms",
+    "showingResults": "Showing {count} results",
+    "filterBy": "Filter by",
+    "sortBy": "Sort by",
+    "priceRange": "Price range",
+    "priceMin": "Min price",
+    "priceMax": "Max price",
+    "availability": "Availability",
+    "inStockOnly": "In stock only",
+    "clearFilters": "Clear all filters",
+    "activeFilters": "Active filters",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortPriceLowHigh": "Price: Low to high",
+    "sortPriceHighLow": "Price: High to low",
+    "sortNameAZ": "Name: A to Z",
+    "sortNameZA": "Name: Z to A",
+    "itemsPerPage": "Items per page",
+    "spruceWood": "Spruce wood",
+    "larchWood": "Larch wood",
+    "pineWood": "Pine wood",
+    "lightweightDescription": "Lightweight yet strong, spruce wood offers a smooth texture and a natural, clean finish. Its versatility and durability make it an excellent choice for both interior and exterior applications."
+  },
+  "solutions": {
+    "title": "Solutions",
+    "facades": "Facades",
+    "fence": "Fence",
+    "terrace": "Terrace",
+    "interior": "Interior",
+    "exterior": "Exterior",
+    "cladding": "Cladding",
+    "decking": "Decking",
+    "flooring": "Flooring"
+  },
+  "projects": {
+    "title": "Projects",
+    "allProjects": "All projects",
+    "viewProject": "View project",
+    "projectDetails": "Project details",
+    "location": "Location",
+    "year": "Year",
+    "client": "Client",
+    "architect": "Architect",
+    "productsUsed": "Products used",
+    "noProjects": "No projects found"
+  },
+  "about": {
+    "pavadinimas": "about us",
+    "title": "About us",
+    "aboutYakiwood": "About Yakiwood",
+    "ourStory": "Our story",
+    "ourMission": "Our mission",
+    "ourValues": "Our values",
+    "ourTeam": "Our team",
+    "whyChooseUs": "Why choose us",
+    "quality": "Quality",
+    "experience": "Experience",
+    "sustainability": "Sustainability",
+    "innovation": "Innovation",
+    "contactUs": "Contact us",
+    "page": {
+      "heroTitle": "About us",
+      "heroLead": "We are experts in the preparation of burnt wood, with many years of successful experience in preparing wood for facades, terraces, fences and interiors, and we guarantee a high quality and long-lasting result.",
+      "heroBody": "We produce wood prepared according to the unique, time-tested Japanese wood-burning technology \"Yakisugi\" (or \"Shou Sugi Ban\"). This is the most natural way of preparing wood, giving it both a protective and aesthetic function. The traditional Japanese woodworking technology, which has been around for centuries, was introduced to protect wood from the effects of the environment. Burning shrinks the pores in the surface of the wood, making it stronger and more resistant. At the same time, it retains its properties, naturalness, pattern and colour.",
+      "videoAlt": "Yakiwood process video",
+      "videoAria": "Watch video",
+      "videoWatch": "Watch",
+
+      "foundationsEyebrow": "Our foundations",
+      "foundationsTitlePrefix": "Guided by tradition, driven by",
+      "foundationsTitleItalic": "purpose",
+
+      "missionTitle": "Our mission",
+      "missionBody": "Our goal is to help you create a cosy and sustainable environment by using Yakisugi (Shou Sugi Ban)-a traditional Japanese wood-burning technique that enhances both the protection and aesthetics of wood.",
+
+      "visionTitle": "Our Vision",
+      "visionBody": "To become the leading provider of sustainable burnt wood solutions in Lithuania and beyond, inspiring people to embrace natural, durable, and eco-friendly materials in architecture and interior design. We strive to preserve tradition while innovating for a greener future.",
+      "visionBodyMobile": "To become the leading provider of sustainable burnt wood solutions in Lithuania and beyond, inspiring people to embrace natural, durable, and eco-friendly materials. We strive to preserve tradition while innovating for a greener future.",
+
+      "promiseTitle": "Our promise",
+      "promiseBody": "Whether for facades, terraces, fences, or interior designs, our burnt wood solutions add warmth, style, and lasting protection to your home and surroundings.",
+
+      "valuesTitle": "Our values",
+      "valueCraftsmanshipTitle": "Craftsmanship",
+      "valueCraftsmanshipBody": "We take pride in our work, paying close attention to every detail to ensure the highest quality.",
+      "valueSustainabilityTitle": "Sustainability",
+      "valueSustainabilityBody": "We believe in eco-friendly solutions that preserve nature while enhancing your living space.",
+      "valueAuthenticityTitle": "Authenticity",
+      "valueAuthenticityBody": "We honor the centuries-old Yakisugi tradition, delivering wood that retains its natural beauty and strength.",
+      "valueCraftsmanshipBodyMobile": "We take pride in our work, paying close attention to every detail.",
+      "valueSustainabilityBodyMobile": "We believe in eco-friendly solutions that preserve nature.",
+      "valueAuthenticityBodyMobile": "We honor the centuries-old Yakisugi tradition.",
+
+      "foundationsBlurbA": "We produce burnt wood products using the centuries-old Japanese method that naturally strengthens and preserves wood by shrinking its pores. This process enhances durability while maintaining the wood's natural texture, pattern, and color.",
+      "foundationsBlurbB": "Our skilled craftsmen are meticulous in their work, ensuring every detail meets the highest quality standards. We use the most durable woods-spruce and larch-treated with natural oils to achieve exceptional colours and protection.",
+
+      "processEyebrow": "Our process",
+      "processTitlePrefix": "The art of",
+      "processTitleItalic": "burnt wood:",
+      "processTitleSuffix": "our process",
+      "processBodyA": "Burnt wood is produced by burning wood at high temperatures in a special kiln, creating a natural and picturesque wood surface. This process gives the wood unique textures and colors, increases its resistance to moisture and fire",
+      "processBodyB": "So, if you want to give your home or business premises a special and eco-friendly finish, it is worth taking a look at burnt wood. It will give the interior a unique and stylish look, while at the same time helping to contribute to environmental protection.",
+      "processBodyMobile": "Burnt wood is produced by burning wood at high temperatures in a special kiln, creating a natural and picturesque wood surface. This process gives the wood unique textures and colors, increases its resistance to moisture and fire.",
+
+      "step1Title": "Wood preparation",
+      "step1Body": "First, the boards are prepared, dust and dirt are removed.",
+      "step2Title": "Burning and combing",
+      "step2Body": "The wood is heated to very high temperatures, which gives the board unique textures and colors.",
+      "step3Title": "Oil coating",
+      "step3Body": "When the board is completely cooled, it is processed and coated with a protective layer.",
+
+      "ctaTitlePrefix": "Ready to",
+      "ctaTitleItalic": "build",
+      "ctaTitleSuffix": "with fire?",
+      "ctaShopNow": "shop now",
+      "ctaGetInTouch": "get in touch",
+
+      "modalLabel": "Video",
+      "modalCloseOverlay": "Close video",
+      "modalCloseButton": "Close",
+      "modalIframeTitle": "YouTube video",
+
+      "teamEyebrow": "Our team",
+      "teamTitlePrefix": "Meet the",
+      "teamTitleItalic": "experts",
+      "teamTitleSuffix": "behind Yakiwood",
+      "teamMemberAlt": "Team member",
+      "teamMemberName": "Full name",
+      "teamMemberRole": "Director"
+    }
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Need assistance? Leave your contact details, and our manager will reach out for a consultation.",
+    "fullName": "Full name",
+    "email": "Email address",
+    "phone": "Phone number",
+    "message": "Message",
+    "subject": "Subject",
+    "company": "Company",
+    "sendMessage": "Send message",
+    "leaveRequest": "Leave a request",
+    "sending": "Sending...",
+    "thankYou": "Thank you!",
+    "thankYouMessage": "We'll get back to you shortly.",
+    "responseTime": "We typically respond within 24 hours",
+    "required": "Required field",
+    "requiredMark": "*",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "messageSent": "Message sent successfully",
+    "messageError": "Failed to send message. Please try again.",
+    "getInTouch": "Get in touch",
+    "contactInfo": "Contact information",
+    "companyNameLabel": "Company name",
+    "addressLabel": "Address",
+    "companyCodeLabel": "Company code",
+    "vatCodeLabel": "VAT code",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "officeAddress": "Office address",
+    "businessHours": "Business hours",
+    "privacyConsent": "I agree that my data will be processed directly by Yakiwood or shared with a sales agent located in my area in accordance with Yakiwood",
+    "privacyPolicy": "Privacy Policy",
+    "recaptchaRequired": "Please confirm you are not a robot."
+  },
+  "faq": {
+    "title": "FAQ",
+    "heading": "Everything you wanted",
+    "headingItalic": "to ask",
+    "headingEnd": "& more",
+    "question1": "What is Shou Sugi Ban?",
+    "answer1": "Shou Sugi Ban is an ancient Japanese technique that involves charring wood to protect and enhance its natural beauty. This traditional method originated as a way to make wood more resistant to the elements, including insects, fire, and weathering. The process creates a stunning aesthetic, offering a combination of deep black hues, unique textures, and an elegant, rustic appearance that appeals to architects and homeowners alike.",
+    "question2": "How Do I Maintain Shou Sugi Ban Wood?",
+    "answer2": "Maintenance details here...",
+    "question3": "Where can charred wood products be used?",
+    "answer3": "Usage details here...",
+    "question4": "How is Shou Sugi Ban installed?",
+    "answer4": "Installation details here...",
+    "question5": "Is Shou Sugi Ban suitable for interior use?",
+    "answer5": "Interior usage details here...",
+    "question6": "Is Yakisugi suitable for all climates?",
+    "answer6": "Climate details here...",
+    "question7": "What are the standard dimensions for Shou Sugi Ban planks?",
+    "answer7": "Dimensions details here...",
+    "noQuestions": "No frequently asked questions yet"
+  },
+  "cart": {
+    "title": "Shopping cart",
+    "yourCart": "Your cart",
+    "closeCart": "Close cart",
+    "emptyCart": "Your cart is empty",
+    "emptyCartDescription": "Add items to get started",
+    "continueShopping": "Continue shopping",
+    "viewCart": "View cart",
+    "updateCart": "Update cart",
+    "clearCart": "Clear cart",
+    "removeItem": "Remove item",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "subtotalExVat": "Subtotal excl. VAT",
+    "vatAmount": "VAT ({rate}%)",
+    "shipping": "Shipping",
+    "shippingCalculated": "Calculated at checkout",
+    "tax": "Tax",
+    "discount": "Discount",
+    "couponCode": "Coupon code",
+    "applyCoupon": "Apply coupon",
+    "removeCoupon": "Remove coupon",
+    "proceedToCheckout": "Proceed to checkout",
+    "checkout": "Checkout",
+    "itemAdded": "Item added to cart",
+    "itemRemoved": "Item removed from cart",
+    "itemUpdated": "Cart updated",
+    "cartError": "Cart error",
+    "invalidQuantity": "Invalid quantity",
+    "maxQuantity": "Maximum quantity reached",
+    "items": "items",
+    "item": "item",
+    "color": "Color:",
+    "finish": "Finish:",
+    "profile": "Profile:",
+    "free": "Free",
+    "includingVat": "Including VAT",
+    "dimensions": "Dimensions:",
+    "boardArea": "Single board area",
+    "dimensionsNotSet": "Not set",
+    "widthMm": "Width (mm)",
+    "lengthMm": "Length (mm)",
+    "dimensionsHint": "Enter dimensions if pricing is based on m²."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "contact": {
+      "title": "Contact information",
+      "haveAccountLogin": "Have an account? Log in",
+      "fullName": "Full name ",
+      "companyNameOptional": "Company name (optional)",
+      "email": "Email ",
+      "phone": "Phone number "
+    },
+    "delivery": {
+      "title": "Delivery information",
+      "alternateTitle": "Alternate delivery address",
+      "country": "Country ",
+      "city": "City ",
+      "address": "Address ",
+      "postalCode": "Postal code ",
+      "deliverDifferentAddress": "Deliver to a different address?",
+      "notesOptional": "Order notes (optional)"
+    },
+    "items": {
+      "title": "Items",
+      "hint": "If pricing depends on length / width (m²), enter dimensions in millimeters.",
+      "widthMm": "Width (mm)",
+      "lengthMm": "Length (mm)"
+    },
+    "payment": {
+      "title": "Payment method",
+      "stripeCard": "Card payment (Stripe)",
+      "paysera": "Paysera",
+      "cardNumber": "Card number ",
+      "expiryDate": "Expiry date ",
+      "cvc": "CVC ",
+      "paypalInfo": "You will be redirected to PayPal after placing the order.",
+      "paypalUnavailable": "At the moment, payment with PayPal is not available.",
+      "payseraInfo": "You will be redirected to Paysera after placing the order.",
+      "saveInfo": "Save this information for next time",
+      "creditDebitCard": "Credit / debit card"
+    },
+    "terms": {
+      "agreeTo": "I agree to the <terms>Terms and conditions</terms> and <privacy>Privacy policy</privacy>",
+      "terms": "Terms and conditions",
+      "privacy": "Privacy policy",
+      "customMadeAcknowledgement": "I understand that custom-made products cannot be cancelled once production begins."
+    },
+    "termsAccordion": {
+      "termsTitle": "Terms and conditions",
+      "privacyTitle": "Privacy policy",
+      "termsBody": "1. GENERAL\nBy placing an order you confirm that you have read and accept these terms.\n\n2. ORDERING\nAn order is submitted when you complete checkout and confirm payment.\n\n3. PRICES & PAYMENT\nAll prices are in EUR. Payments are processed via the selected provider.\n\n4. DELIVERY\nDelivery timelines and costs are shown at checkout.\n\n5. RETURNS\nReturns are handled according to applicable law and our return policy.\n\n6. LIABILITY\nWe are not liable for delays caused by third parties (couriers, payment providers).\n\n7. CONTACT\nFor questions, please contact us via the contact page.",
+      "privacyBody": "1. PURPOSE\nWe process your data to fulfill orders, deliver goods, and communicate with you.\n\n2. DATA COLLECTED\nContact details, delivery address, and order information.\n\n3. RETENTION\nWe keep data as long as necessary for fulfillment and legal obligations.\n\n4. SHARING\nData may be shared with payment processors and delivery partners.\n\n5. YOUR RIGHTS\nYou can request access, correction, or deletion of your data.\n\n6. CONTACT\nFor privacy questions, contact us via the contact page.",
+      "fullPolicyLink": "Read the full policy"
+    },
+    "actions": {
+      "backToCart": "Back to cart",
+      "submitOrder": "Place order",
+      "processing": "Processing..."
+    },
+    "summary": {
+      "title": "Your order ({count})",
+      "remove": "Remove",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "subtotalExVat": "Subtotal excl. VAT",
+      "vatAmount": "VAT ({rate}%)",
+      "total": "Total",
+      "includingTaxes": "Including taxes",
+      "colorLabel": "Color:",
+      "finishLabel": "Finish:",
+      "dimensions": "Dimensions: {widthMm}×{lengthMm} mm",
+      "quantity": "Qty: {count} pcs"
+    },
+    "coupon": {
+      "placeholder": "Enter discount code",
+      "apply": "Apply"
+    },
+    "success": {
+      "withNumber": "Order {orderNumber} created. We'll contact you about the next steps.",
+      "withoutNumber": "Order created. We'll contact you about the next steps.",
+      "passwordResetEmailSent": "We've sent you an email with a password reset link."
+    },
+    "errors": {
+      "orderCreateFailed": "Failed to create the order",
+      "orderIdMissing": "Failed to get the order ID",
+      "paymentSessionFailed": "Failed to create a payment session",
+      "paymentUrlMissing": "Payment URL missing",
+      "generic": "Something went wrong. Please try again."
+    },
+    "billingDetails": "Billing details",
+    "shippingDetails": "Shipping details",
+    "shippingAddress": "Shipping address",
+    "billingAddress": "Billing address",
+    "sameAsShipping": "Same as shipping address",
+    "differentBilling": "Use a different billing address",
+    "paymentMethod": "Payment method",
+    "orderSummary": "Order summary",
+    "orderTotal": "Order total",
+    "placeOrder": "Place order",
+    "processingOrder": "Processing your order...",
+    "orderConfirmation": "Order confirmation",
+    "orderNumber": "Order number",
+    "orderDate": "Order date",
+    "estimatedDelivery": "Estimated delivery",
+    "thankYouOrder": "Thank you for your order!",
+    "confirmationEmail": "A confirmation email has been sent to",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "address": "Address",
+    "addressLine1": "Address line 1",
+    "addressLine2": "Address line 2",
+    "city": "City",
+    "state": "State / Province",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "selectCountry": "Select a country",
+    "creditCard": "Credit card",
+    "debitCard": "Debit card",
+    "paypal": "PayPal",
+    "bankTransfer": "Bank transfer",
+    "cardNumber": "Card number",
+    "expiryDate": "Expiry date",
+    "cvv": "CVV",
+    "cardholderName": "Cardholder name",
+    "securePayment": "Secure payment",
+    "acceptedCards": "Accepted cards"
+  },
+  "account": {
+    "title": "Account",
+    "myAccount": "My account",
+    "orders": "Orders",
+    "myOrders": "My orders",
+    "invoices": "Invoices",
+    "orderHistory": "Order history",
+    "noOrders": "No orders yet",
+    "noOrdersDescription": "Start shopping to see your orders here",
+    "ordersEmpty": "No orders yet.",
+    "invoicesEmpty": "No invoices yet.",
+    "orderDetails": "Order details",
+    "trackOrder": "Track order",
+    "orderStatus": "Order status",
+    "reorder": "Reorder",
+    "cancelOrder": "Cancel order",
+    "returnOrder": "Return order",
+    "profile": "Profile",
+    "myProfile": "My profile",
+    "editProfile": "Edit profile",
+    "updateProfile": "Update profile",
+    "accountDetails": "Account details",
+    "personalInfo": "Personal information",
+    "addresses": "Addresses",
+    "addressBook": "Address book",
+    "addAddress": "Add address",
+    "editAddress": "Edit address",
+    "deleteAddress": "Delete address",
+    "defaultAddress": "Default address",
+    "setAsDefault": "Set as default",
+    "paymentMethods": "Payment methods",
+    "savedCards": "Saved cards",
+    "addCard": "Add card",
+    "settings": "Settings",
+    "accountSettings": "Account settings",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordChanged": "Password changed successfully",
+    "notifications": "Notifications",
+    "emailPreferences": "Email preferences",
+    "newsletter": "Newsletter",
+    "subscribeNewsletter": "Subscribe to newsletter",
+    "unsubscribe": "Unsubscribe",
+    "logout": "Log out",
+    "deleteAccount": "Delete account",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "register": "Register",
+    "login": "Log in",
+    "loggingIn": "Logging in...",
+    "continueWithGoogle": "Continue with Google",
+    "oauthErrorGeneric": "Could not sign in with Google",
+    "completeRegistrationDescription": "To continue, confirm that you agree to the Terms & Conditions and Privacy Policy.",
+    "completeRegistrationCta": "Complete registration",
+    "completeRegistrationSuccess": "Consent saved.",
+    "demoLogin": "Demo login",
+    "admin": "Administrator",
+    "user": "User",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "close": "Close",
+    "fullName": "Full name",
+    "agreeToTerms": "I agree to the Terms & Conditions and Privacy Policy",
+    "agreeToTermsError": "Please agree to the Terms & Conditions",
+    "creatingAccount": "Creating...",
+    "registerForm": {
+      "title": "Create Account",
+      "subtitle": "Join us to explore premium burnt wood products",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "emailPlaceholder": "your.email@example.com",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "confirmPasswordPlaceholder": "Re-enter password",
+      "termsPrefix": "I agree to the",
+      "termsMiddle": "and",
+      "termsLink": "Terms & Conditions",
+      "privacyLink": "Privacy Policy",
+      "newsletter": "I would like to receive news and special offers",
+      "passwordMismatch": "Passwords do not match",
+      "termsRequired": "Please agree to the Terms & Conditions"
+    },
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "forgotPasswordForm": {
+      "subtitle": "We will email you a link to reset your password",
+      "submit": "Submit",
+      "sending": "Sending...",
+      "cancel": "Cancel",
+      "success": "We sent you an email to reset your password.",
+      "successNote": "If you don't receive it, check spam or configure SMTP in Supabase.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "errorSupabase": "Supabase is not configured."
+    },
+    "rememberMe": "Remember me",
+    "createAccount": "Create account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "emailAddress": "Email address",
+    "password": "Password",
+    "confirmEmail": "Confirm email",
+    "verifyEmail": "Verify email",
+    "emailVerification": "Email verification",
+    "verificationSent": "Verification email sent",
+    "checkEmail": "Please check your email",
+    "table": {
+      "order": "ORDER",
+      "date": "DATE",
+      "status": "STATUS",
+      "totalCost": "TOTAL COST"
+    },
+    "invoicesTable": {
+      "invoice": "INVOICE",
+      "date": "DATE",
+      "status": "STATUS",
+      "totalCost": "TOTAL COST",
+      "actions": "ACTIONS"
+    },
+    "invoiceActions": {
+      "download": "Download",
+      "resend": "Send by email",
+      "languages": {
+        "lt": "LT",
+        "en": "EN"
+      }
+    },
+    "invoiceMessages": {
+      "resent": "Invoice sent by email.",
+      "resentLt": "Lithuanian invoice sent by email.",
+      "resentEn": "English invoice sent by email.",
+      "sending": "Sending...",
+      "resendError": "Failed to send invoice. Please try again later."
+    },
+    "details": {
+      "dateOfDelivery": "DATE OF DELIVERY",
+      "deliveryAddress": "DELIVERY ADDRESS",
+      "paymentMethod": "PAYMENT METHOD",
+      "paymentStatus": "PAYMENT STATUS",
+      "shipping": "SHIPPING",
+      "total": "TOTAL",
+      "dimensions": "Dimensions:",
+      "qty": "Qty:"
+    },
+    "status": {
+      "delivered": "Delivered",
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "paid": "Paid",
+      "failed": "Failed",
+      "draft": "Draft",
+      "issued": "Issued",
+      "overdue": "Overdue"
+    },
+    "form": {
+      "back": "Back",
+      "myInformation": "My information",
+      "deliveryInformation": "Delivery information",
+      "edit": "Edit",
+      "saveInline": "Save",
+      "fullName": "Full name",
+      "companyNameOptional": "Company name (optional)",
+      "email": "Email",
+      "phoneNumber": "Phone number",
+      "country": "Country",
+      "city": "City",
+      "streetAddress": "Street address",
+      "postcodeZip": "Postcode / ZIP",
+      "togglePasswordVisibility": "Toggle password visibility",
+      "save": "Save",
+      "passwordRequired": "Please fill in all password fields",
+      "passwordMismatch": "Passwords do not match"
+    }
+  },
+  "orderStatuses": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "confirmed": "Confirmed",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded",
+    "failed": "Failed",
+    "onHold": "On hold",
+    "awaitingPayment": "Awaiting payment",
+    "paymentReceived": "Payment received",
+    "inTransit": "In transit",
+    "outForDelivery": "Out for delivery",
+    "readyForPickup": "Ready for pickup"
+  },
+  "forms": {
+    "required": "This field is required",
+    "requiredField": "Required field",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhone": "Please enter a valid phone number",
+    "invalidPostal": "Please enter a valid postal code",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDontMatch": "Passwords don't match",
+    "invalidCreditCard": "Invalid credit card number",
+    "invalidCVV": "Invalid CVV",
+    "invalidExpiry": "Invalid expiry date",
+    "pleaseSelect": "Please select an option",
+    "minLength": "Minimum length: {min} characters",
+    "maxLength": "Maximum length: {max} characters",
+    "submit": "Submit",
+    "submitForm": "Submit form",
+    "reset": "Reset",
+    "resetForm": "Reset form",
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "saved": "Saved!",
+    "uploading": "Uploading...",
+    "uploaded": "Uploaded!",
+    "uploadFile": "Upload file",
+    "chooseFile": "Choose file",
+    "dragDrop": "Drag and drop file here",
+    "fileSize": "Maximum file size",
+    "allowedFormats": "Allowed formats"
+  },
+  "errors": {
+    "pageNotFound": "Page not found",
+    "notFound": "404 - Not Found",
+    "notFoundDescription": "The page you're looking for doesn't exist",
+    "somethingWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred",
+    "serverError": "Server error",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "tryAgain": "Please try again",
+    "tryAgainLater": "Please try again later",
+    "goHome": "Go to homepage",
+    "goBack": "Go back",
+    "refresh": "Refresh page",
+    "contactSupport": "Contact support",
+    "authRequired": "Authentication required",
+    "loginRequired": "Please log in to continue",
+    "insufficientPermissions": "You don't have permission to access this",
+    "sessionExpired": "Your session has expired",
+    "invalidRequest": "Invalid request",
+    "networkError": "Network error. Please check your connection",
+    "timeout": "Request timeout",
+    "loadingFailed": "Failed to load content",
+    "saveFailed": "Failed to save changes",
+    "deleteFailed": "Failed to delete",
+    "uploadFailed": "Failed to upload file"
+  },
+  "seo": {
+    "siteTitle": "Yakiwood - Burnt Wood Products | Shou Sugi Ban",
+    "siteDescription": "Discover the elegance and durability of burnt wood, crafted using the ancient Japanese Shou Sugi Ban technique. Premium wood products for facades, interiors, and more.",
+    "homeTitle": "Yakiwood - Timeless Beauty Enhanced by Fire",
+    "productsTitle": "Products - Premium Burnt Wood | Yakiwood",
+    "productsDescription": "Browse our selection of premium burnt wood products, including spruce, larch, and pine, treated with the Shou Sugi Ban technique.",
+    "solutionsTitle": "Solutions - Applications for Every Project | Yakiwood",
+    "solutionsDescription": "Discover how Yakiwood burnt wood can be used for facades, terraces, fences, and interior applications.",
+    "projectsTitle": "Projects - Inspiration Gallery | Yakiwood",
+    "projectsDescription": "Explore our portfolio of completed projects featuring Yakiwood burnt wood products.",
+    "aboutTitle": "About Us - Our Story | Yakiwood",
+    "aboutDescription": "Learn about Yakiwood's commitment to quality, sustainability, and the ancient art of Shou Sugi Ban.",
+    "contactTitle": "Contact Us - Get in Touch | Yakiwood",
+    "contactDescription": "Have questions? Contact Yakiwood for expert advice on burnt wood products and solutions.",
+    "faqTitle": "FAQ - Frequently Asked Questions | Yakiwood",
+    "faqDescription": "Find answers to common questions about Shou Sugi Ban, maintenance, installation, and more.",
+    "keywords": "burnt wood, shou sugi ban, yakisugi, charred wood, wood cladding, wood facade, sustainable wood, eco-friendly wood"
+  },
+  "testimonials": {
+    "eyebrow": "testimonials",
+    "title": "What our clients say",
+    "heading": "What our clients say",
+    "pavadinimas": "What our clients say",
+    "antraste": "What our clients say",
+    "testimonial1": {
+      "quote": "The burnt wood perfectly complemented our modern home design. It looks amazing!",
+      "author": "Jonas K.",
+      "role": "Homeowner"
+    },
+    "testimonial2": {
+      "quote": "Professional service and exceptional quality. Highly recommend!",
+      "author": "Mindaugas P.",
+      "role": "Architect"
+    },
+    "testimonial3": {
+      "quote": "Outstanding craftsmanship and attention to detail. Exceeded our expectations!",
+      "author": "Laura S.",
+      "role": "Interior Designer"
+    },
+    "atsiliepimas1": {
+      "citata": "The burnt wood perfectly complemented our modern home design. It looks amazing!",
+      "autorius": "Jonas K.",
+      "role": "Homeowner"
+    },
+    "atsiliepimas2": {
+      "citata": "Professional service and exceptional quality. Highly recommend!",
+      "autorius": "Mindaugas P.",
+      "role": "Architect"
+    },
+    "atsiliepimas3": {
+      "citata": "Outstanding craftsmanship and attention to detail. Exceeded our expectations!",
+      "autorius": "Laura S.",
+      "role": "Interior Designer"
+    },
+    "aria": {
+      "previous": "Previous testimonial",
+      "next": "Next testimonial"
+    }
+  },
+  "configurator": {
+    "pageTitle": "3D configurator",
+    "pageDescription": "Choose a color and profile to preview the product in 3D.",
+    "loadError": "Failed to load products.",
+    "fallbackNote": "Showing a demo configurator because product data was not found.",
+    "demoExampleLabel": "3D demo (example)",
+    "loadingModel": "Loading 3D model...",
+    "controlsHint": "Use your mouse to rotate, zoom, and pan",
+    "pauseRotation": "Pause rotation",
+    "resumeRotation": "Resume rotation",
+    "visualScaleNotice": "Note: In the 3D preview the length is shown shortened (visual scale). The real product length is according to the selected mm.",
+    "colorLabel": "Color",
+    "profileLabel": "Profile",
+    "selectColorAria": "Select color {name}",
+    "noteTitle": "Note:",
+    "noteBody": "Actual color and texture may vary slightly from what you see here. Each board is unique due to the natural properties of wood.",
+    "basePriceLabel": "Base price",
+
+    "pricingTitle": "Price",
+    "inputModeLabel": "Calculate by",
+    "inputModeBoards": "Boards",
+    "inputModeArea": "m²",
+    "quantityBoardsLabel": "Quantity (boards)",
+    "targetAreaLabel": "Area (m²)",
+    "roundingNotice": "Rounded up to {boards} boards ({actualArea} m²)",
+    "unitPricePerM2Label": "Price per m²",
+    "unitPricePerBoardLabel": "Price per board",
+    "totalAreaLabel": "Total area",
+    "lineTotalLabel": "Total",
+    "calculatingPrice": "Calculating price...",
+    "priceNotAvailable": "Price not available for this configuration",
+    "title": "3D Product Configurator",
+    "subtitle": "Customize your product",
+    "color": "Color",
+    "finish": "Finish",
+    "size": "Size",
+    "customization": "Customization",
+    "preview": "Preview",
+    "addToCart": "Add to Cart",
+    "saveConfiguration": "Save configuration",
+    "loadConfiguration": "Load configuration",
+    "resetConfiguration": "Reset configuration",
+    "rotateView": "Rotate view",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "viewMode": "View mode",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "downloadPdf": "Download PDF",
+    "downloadingPdf": "Generating PDF...",
+    "downloadingPdfShort": "PDF...",
+    "downloadPng": "Download PNG",
+    "downloadingPng": "Generating PNG...",
+    "downloadingPngShort": "PNG...",
+    "downloadJpg": "Download JPG",
+    "downloadingJpg": "Generating JPG...",
+    "downloadingJpgShort": "JPG...",
+    "print": "Print",
+    "printing": "Preparing print...",
+    "exportPdfSuccess": "PDF export is ready",
+    "exportPngSuccess": "PNG export is ready",
+    "exportJpgSuccess": "JPG export is ready",
+    "printOpened": "Print window opened",
+    "pdfError": "Failed to generate PDF",
+    "imageExportError": "Failed to generate image export"
+  },
+  "newsletter": {
+    "title": "Newsletter",
+    "heading": "Stay updated",
+    "description": "Subscribe to our newsletter for the latest products, projects, and news",
+    "placeholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "subscribed": "Subscribed!",
+    "thanksSubscribe": "Thanks for subscribing!",
+    "alreadySubscribed": "You're already subscribed",
+    "subscribeError": "Failed to subscribe. Please try again."
+  },
+  "search": {
+    "search": "Search",
+    "searchPlaceholder": "Search products...",
+    "searching": "Searching...",
+    "searchResults": "Search results",
+    "noResults": "No results found",
+    "noResultsFor": "No results found for \"{query}\"",
+    "showingResultsFor": "Showing results for \"{query}\"",
+    "popularSearches": "Popular searches",
+    "recentSearches": "Recent searches",
+    "clearSearch": "Clear search",
+    "clearHistory": "Clear history"
+  },
+  "units": {
+    "pieces": "pcs",
+    "piece": "piece",
+    "kilogram": "kg",
+    "gram": "g",
+    "meter": "m",
+    "squareMeter": "m²",
+    "cubicMeter": "m³",
+    "millimeter": "mm",
+    "centimeter": "cm",
+    "liter": "l",
+    "milliliter": "ml"
+  },
+  "time": {
+    "days": "days",
+    "day": "day",
+    "hours": "hours",
+    "hour": "hour",
+    "minutes": "minutes",
+    "minute": "minute",
+    "seconds": "seconds",
+    "second": "second",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "now": "Now",
+    "justNow": "Just now",
+    "ago": "ago",
+    "in": "in",
+    "businessDays": "business days",
+    "weekdays": "weekdays",
+    "workingDays": "working days"
+  },
+  "notifications": {
+    "success": "Success!",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "dismiss": "Dismiss",
+    "viewAll": "View all notifications",
+    "markAsRead": "Mark as read",
+    "markAllAsRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "newNotification": "New notification"
+  },
+  "metadata": {
+    "contact": {
+      "title": "Contact & consultation",
+      "description": "Need help? Leave your contact details and our manager will get in touch for consultation.",
+      "ogTitle": "Contact - Yakiwood"
+    },
+    "login": {
+      "title": "Login",
+      "description": "Sign in to your Yakiwood account to access orders, saved projects, and account settings.",
+      "ogTitle": "Login - Yakiwood"
+    },
+    "register": {
+      "title": "Register",
+      "description": "Create your Yakiwood account to speed up checkout, track orders, and save projects.",
+      "ogTitle": "Register - Yakiwood"
+    },
+    "account": {
+      "title": "My account",
+      "description": "Manage your Yakiwood account, review orders and invoices, and update your account details.",
+      "ogTitle": "My account - Yakiwood"
+    },
+    "about": {
+      "title": "About Yakiwood & Shou Sugi Ban",
+      "description": "Learn about Yakiwood - experts in Shou Sugi Ban burnt wood production (delivered across the UK).",
+      "ogTitle": "About Us - Yakiwood"
+    },
+    "products": {
+      "title": "Products - Shou Sugi Ban Burnt Wood",
+      "description": "Discover our range of Shou Sugi Ban burnt wood products - planks, tiles, and facade cladding.",
+      "ogTitle": "Products - Shou Sugi Ban - Yakiwood"
+    },
+    "solutions": {
+      "title": "Solutions - Shou Sugi Ban Applications",
+      "description": "Explore various Shou Sugi Ban wood applications - from facades to interior design.",
+      "ogTitle": "Solutions - Yakiwood"
+    },
+    "projects": {
+      "title": "Projects - Shou Sugi Ban Examples",
+      "description": "Browse our portfolio of completed Shou Sugi Ban projects and get inspired for your project.",
+      "ogTitle": "Projects - Yakiwood"
+    },
+    "news": {
+      "title": "News about Shou Sugi Ban",
+      "description": "Read the latest news about Shou Sugi Ban, our projects, and wood processing updates.",
+      "ogTitle": "News - Yakiwood"
+    },
+    "blog": {
+      "title": "Blog - Shou Sugi Ban insights",
+      "description": "Read articles about charred wood, design choices, maintenance, and project planning.",
+      "ogTitle": "Blog - Yakiwood"
+    },
+    "faq": {
+      "title": "FAQ about Shou Sugi Ban burnt wood",
+      "description": "Frequently asked questions about Shou Sugi Ban wood products, maintenance, and installation.",
+      "ogTitle": "FAQ - Yakiwood"
+    },
+    "configurator3d": {
+      "title": "3D configurator for Shou Sugi Ban",
+      "description": "Configure your product in 3D: choose a color and profile to preview the result.",
+      "ogTitle": "3D configurator - Yakiwood"
+    },
+    "checkout": {
+      "title": "Checkout",
+      "description": "Complete your Yakiwood order, review your cart, and enter shipping and payment details.",
+      "ogTitle": "Checkout - Yakiwood"
+    },
+    "orderConfirmation": {
+      "title": "Order confirmation",
+      "description": "Review your confirmed Yakiwood order details and the next delivery steps.",
+      "ogTitle": "Order confirmation - Yakiwood"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Recover your Yakiwood account password and request a secure reset link by email.",
+      "ogTitle": "Password recovery - Yakiwood"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "description": "Set a new password for your Yakiwood account and regain access to your orders and settings.",
+      "ogTitle": "Reset password - Yakiwood"
+    },
+    "euProjects": {
+      "title": "EU projects",
+      "description": "Learn more about Yakiwood projects supported or funded by the European Union.",
+      "ogTitle": "EU projects - Yakiwood"
+    },
+    "cookiePolicy": {
+      "title": "Cookie policy",
+      "description": "Learn how Yakiwood uses cookies, what data is collected, and how you can manage your preferences.",
+      "ogTitle": "Cookie policy - Yakiwood"
+    },
+    "policies": {
+      "title": "Policies",
+      "description": "Review Yakiwood policies for delivery, payment, refunds, and terms of use.",
+      "ogTitle": "Policies - Yakiwood"
+    },
+    "shippingPolicy": {
+      "title": "Shipping policy",
+      "description": "See Yakiwood delivery timelines, covered areas, kerbside freight conditions, and shipping details.",
+      "ogTitle": "Shipping policy - Yakiwood"
+    },
+    "refundPolicy": {
+      "title": "Refund policy",
+      "description": "Review Yakiwood return, cancellation, and defective goods terms under applicable consumer rules.",
+      "ogTitle": "Refund policy - Yakiwood"
+    },
+    "termsPolicy": {
+      "title": "Terms and conditions",
+      "description": "Read Yakiwood terms and conditions covering orders, bespoke production, delivery, and liability.",
+      "ogTitle": "Terms and conditions - Yakiwood"
+    },
+    "home": {
+      "title": "Yakiwood - Shou Sugi Ban Burnt Wood in the UK",
+      "description": "Highest quality Shou Sugi Ban burnt wood products delivered across the UK. Facades, interior, terrace - ecological and durable solutions.",
+      "ogTitle": "Yakiwood - Shou Sugi Ban burnt wood",
+      "ogAlt": "Yakiwood - Shou Sugi Ban burnt wood"
+    }
+  },
+  "admin": {
+    "breadcrumb": {
+      "home": "Homepage",
+      "admin": "Admin",
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "projects": "Projects",
+      "posts": "Posts",
+      "seo": "SEO",
+      "emailTemplates": "Email Templates",
+      "orders": "Orders",
+      "inventory": "Inventory",
+      "options": "Options",
+      "backups": "Backups",
+      "new": "New",
+      "edit": "Edit"
+    },
+    "main": {
+      "title": "Admin Panel",
+      "subtitle": "Manage products, projects, and blog posts",
+      "loadSampleProducts": "Load Sample Products",
+      "sampleProductsLoaded": "{count} products loaded!"
+    },
+    "tabs": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "projects": "Projects",
+      "posts": "Posts",
+      "orders": "Orders",
+      "inventory": "Inventory",
+      "options": "Options",
+      "backups": "Backups",
+      "users": "Users",
+      "chatbot": "Chatbot",
+      "seo": "SEO",
+      "emailTemplates": "Email Templates",
+      "badgeNew": "new"
+    },
+    "ui": {
+      "noFileSelected": "No file selected",
+      "add": "Add",
+      "close": "Close",
+      "cancel": "Cancel",
+      "addNewEllipsis": "Add new…"
+    },
+    "dashboard": {
+      "filters": {
+        "title": "Filters",
+        "timePeriod": "Time period",
+        "status": "Status",
+        "allTime": "All time",
+        "today": "Today",
+        "lastWeek": "Last week",
+        "lastMonth": "Last month",
+        "allOrders": "All orders"
+      },
+      "quickActions": {
+        "manageOrders": "Manage orders",
+        "manageOrdersSubtitle": "View and change order status",
+        "inventory": "Inventory",
+        "inventorySubtitle": "Manage stock levels",
+        "products": "Products",
+        "productsSubtitle": "Add and edit products",
+        "projects": "Projects",
+        "projectsSubtitle": "Show portfolio"
+      },
+      "stats": {
+        "todayOrders": "Today's orders",
+        "totalOrders": "Total orders",
+        "totalOrdersSubtitle": "{currency}{revenue} revenue",
+        "pending": "Pending",
+        "pendingSubtitle": "awaiting processing",
+        "completed": "Completed",
+        "completedSubtitle": "successful",
+        "products": "Products",
+        "productsSubtitle": "in catalog",
+        "lowStock": "Low stock",
+        "lowStockSubtitle": "< 10 pcs",
+        "avgOrder": "Avg. order",
+        "conversion": "Conversion",
+        "conversionSubtitle": "completed"
+      },
+      "topProducts": {
+        "title": "Top products",
+        "empty": "No sales data",
+        "table": {
+          "product": "Product",
+          "sold": "Sold",
+          "revenue": "Revenue"
+        }
+      },
+      "recentOrders": {
+        "title": "Recent orders",
+        "allOrders": "All orders",
+        "empty": "No orders",
+        "table": {
+          "order": "Order",
+          "customer": "Customer",
+          "date": "Date",
+          "total": "Total",
+          "status": "Status"
+        }
+      },
+      "orderStatus": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "units": "pcs"
+    },
+    "projects": {
+      "actions": {
+        "addProject": "Add project",
+        "import": "Import",
+        "export": "Export",
+        "regenerateSlugs": "Regenerate slugs",
+        "migrateLtTexts": "Restore LT texts",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save"
+      }
+    },
+    "productForm": {
+      "validation": {
+        "nameRequired": "Name is required",
+        "slugRequired": "Slug is required",
+        "slugFormat": "Slug may contain only lowercase letters, numbers, and hyphens",
+        "categoryRequired": "Category is required",
+        "usageRequired": "Usage is required",
+        "woodRequired": "Wood type is required",
+        "basePricePositive": "Base price must be positive"
+      }
+    },
+    "posts": {
+      "title": "Posts",
+      "subtitle": "Create and manage blog articles in LT/EN",
+      "new": "New post",
+      "save": "Save",
+      "delete": "Delete",
+      "noticeSaved": "Saved.",
+      "noticeDeleted": "Deleted.",
+      "listTitle": "Posts ({count})",
+      "empty": "No posts yet.",
+      "untitled": "Untitled",
+      "editorTitle": "Edit post",
+      "addSection": "Add section",
+      "removeSection": "Remove section",
+      "sectionsEmpty": "No sections yet.",
+      "status": {
+        "published": "Published",
+        "draft": "Draft"
+      },
+      "fields": {
+        "titleLt": "Title (LT)",
+        "titleEn": "Title (EN)",
+        "slugLt": "Slug (LT)",
+        "slugEn": "Slug (EN)",
+        "excerptLt": "Excerpt (LT)",
+        "excerptEn": "Excerpt (EN)",
+        "summaryLt": "Summary (LT)",
+        "summaryEn": "Summary (EN)",
+        "bodyLt": "Body (LT)",
+        "bodyEn": "Body (EN)",
+        "sections": "Sections",
+        "sectionHeadingLt": "Section heading (LT)",
+        "sectionHeadingEn": "Section heading (EN)",
+        "sectionBodyLt": "Section text (LT)",
+        "sectionBodyEn": "Section text (EN)",
+        "calloutLt": "Callout (LT)",
+        "calloutEn": "Callout (EN)",
+        "closingLt": "Closing (LT)",
+        "closingEn": "Closing (EN)",
+        "categoryLt": "Category (LT)",
+        "categoryEn": "Category (EN)",
+        "author": "Author",
+        "date": "Publish date",
+        "readTime": "Read time (min)",
+        "published": "Published"
+      },
+      "placeholders": {
+        "titleLt": "e.g., The art of burning",
+        "titleEn": "e.g., The art of burning",
+        "slugLt": "e.g., deginta-mediena-fasadui",
+        "slugEn": "e.g., charred-wood-facades",
+        "excerptLt": "Short summary in Lithuanian",
+        "excerptEn": "Short summary in English",
+        "summaryLt": "Intro paragraph in Lithuanian",
+        "summaryEn": "Intro paragraph in English",
+        "bodyLt": "Paragraphs separated by a blank line",
+        "bodyEn": "Paragraphs separated by a blank line",
+        "hero": "Image URL or upload",
+        "imageUrl": "Paste image URL"
+      },
+      "images": {
+        "hero": "Hero image",
+        "gallery": "Gallery images",
+        "feature": "Feature images",
+        "upload": "Upload",
+        "addUrl": "Add URL"
+      },
+      "errors": {
+        "loadFailed": "Failed to load posts.",
+        "saveFailed": "Failed to save post.",
+        "deleteFailed": "Failed to delete post.",
+        "titleLtRequired": "Lithuanian title is required.",
+        "titleEnRequired": "English title is required.",
+        "slugLtRequired": "Lithuanian slug is required.",
+        "slugEnRequired": "English slug is required."
+      },
+      "importSuccess": "Imported {count} posts successfully!",
+      "importError": "Error importing posts. Please check the JSON format."
+    },
+    "productsDemo": {
+      "noticeLine1": "Note: this /admin page is a demo and stores products only in this browser (localStorage).",
+      "noticeLine2": "Real products (Supabase) are created via /admin/products/new.",
+      "openProducts": "Open products",
+      "createRealProduct": "Create real product",
+      "addNewProduct": "Add New Product",
+      "fields": {
+        "name": "Product name *",
+        "slug": "Slug (URL) *",
+        "description": "Description",
+        "basePrice": "Base price (EUR) *",
+        "salePrice": "Sale price (EUR)",
+        "inStock": "In stock",
+        "usage": "Usage",
+        "wood": "Wood",
+        "profile": "Profile",
+        "color": "Color",
+        "thickness": "Thickness (mm)",
+        "width": "Width (mm)",
+        "length": "Length (mm)"
+      },
+      "placeholders": {
+        "name": "Black larch facade board",
+        "slug": "black-larch-facade-board",
+        "description": "Enter product description…",
+        "woodCustom": "Enter wood name",
+        "colorCustom": "Enter color name"
+      },
+      "usage": {
+        "facade": "Facade",
+        "terrace": "Terrace",
+        "interior": "Interior",
+        "fence": "Fence"
+      },
+      "wood": {
+        "spruce": "Spruce",
+        "larch": "Larch"
+      },
+      "colors": {
+        "natural": "Natural",
+        "carbonLight": "Carbon Light",
+        "carbonDark": "Carbon Dark",
+        "brown": "Brown",
+        "graphite": "Graphite",
+        "latte": "Latte",
+        "silver": "Silver",
+        "black": "Black"
+      }
+    },
+    "orderConfirmationPage": {
+      "loading": "Loading...",
+      "errorTitle": "Error",
+      "backHome": "Back to home",
+      "title": "Thank you for your order!",
+      "messagePaid": "Your payment was processed successfully. You'll receive a confirmation email and invoice shortly.",
+      "messagePaysera": "Your order has been created. We'll confirm the payment once we receive Paysera confirmation. You'll receive a confirmation email shortly.",
+      "paypalIdLabel": "PayPal ID",
+      "orderIdLabel": "Order ID",
+      "sessionIdLabel": "Session ID",
+      "summaryTitle": "Order summary",
+      "summaryTotal": "Total",
+      "summaryEmpty": "We couldn't find the order details. Please check your email for confirmation.",
+      "variantLabel": "Variant",
+      "qtyLabel": "Qty",
+      "priceLabel": "Price",
+      "nextStepsTitle": "What happens next?",
+      "nextStep1": "You'll receive an order confirmation email with the invoice",
+      "nextStep2": "Your order will be processed within 1-2 business days",
+      "nextStep3": "You'll get a notification when the order ships",
+      "nextStep4": "Delivery in 3-5 business days (free over €500)",
+      "viewOrders": "View orders",
+      "continueShopping": "Continue shopping",
+      "supportTitle": "Have questions about your order?",
+      "supportLink": "Contact us"
+    },
+    "seo": {
+      "title": "SEO Management",
+      "subtitle": "Monitor and optimize your website's search engine performance",
+      "scanning": "Scanning pages...",
+      "scanningProgress": "Scanning: {current} ({done}/{total})...",
+      "errors": {
+        "noSession": "You must be logged in to use admin tools",
+        "scanFailed": "SEO scan failed",
+        "noPaths": "No pages found to scan.",
+        "scanTimeout": "Scanning took too long. Please try again (or reduce the number of pages).",
+        "fixFailed": "Failed to generate fix suggestions",
+        "loadOverrideFailed": "Failed to load override",
+        "saveOverrideFailed": "Failed to save override",
+        "deleteOverrideFailed": "Failed to delete override"
+      },
+      "stats": {
+        "totalPages": "Total Pages",
+        "averageScore": "Average Score",
+        "goodSeo": "Good SEO",
+        "needsWork": "Needs Work"
+      },
+      "filters": {
+        "all": "All Pages",
+        "good": "Good",
+        "warning": "Warning",
+        "errors": "Errors"
+      },
+      "table": {
+        "page": "Page",
+        "title": "Title",
+        "score": "Score",
+        "issues": "Issues",
+        "actions": "Actions",
+        "noTitle": "No title"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "edit": "Edit",
+        "rescan": "Rescan",
+        "exportFixes": "Export Fixes",
+        "exportJson": "Export JSON"
+      },
+      "editor": {
+        "label": "Editor",
+        "on": "On",
+        "off": "Off",
+        "toggleTitle": "Toggle SEO editor",
+        "modalTitle": "Edit SEO",
+        "loadingOverride": "Loading override…",
+        "overrideTitle": "Override",
+        "overrideMeta": "canonical_path: {path} • locale: {locale}",
+        "updatedLabel": "Updated",
+        "enabled": "Enabled",
+        "basic": "Basic",
+        "title": "Title",
+        "description": "Description",
+        "canonicalUrl": "Canonical URL (optional)",
+        "robotsIndex": "Robots index",
+        "robotsFollow": "Robots follow",
+        "robots": {
+          "inherit": "Inherit",
+          "index": "index",
+          "noindex": "noindex",
+          "follow": "follow",
+          "nofollow": "nofollow"
+        },
+        "openGraph": "Open Graph",
+        "ogTitle": "OG Title",
+        "ogDescription": "OG Description",
+        "ogImage": "OG Image URL",
+        "twitter": "Twitter",
+        "twitterTitle": "Twitter Title",
+        "twitterDescription": "Twitter Description",
+        "twitterImage": "Twitter Image URL",
+        "save": "Save",
+        "saving": "Saving…",
+        "deleteOverride": "Delete override",
+        "close": "Close",
+        "preview": "Preview",
+        "noticeSaved": "Saved. Re-scan to see updated score.",
+        "noticeDeleted": "Override deleted.",
+        "confirmDelete": "Delete this override?"
+      },
+      "notScannedYet": "SEO scan has not been run yet. Click \"Rescan\" to start.",
+      "noPages": "No pages match the selected filter",
+      "seoScore": "SEO Score",
+      "preview": {
+        "googleTitle": "Google Search Preview",
+        "facebookTitle": "Facebook / Open Graph Preview",
+        "twitterTitle": "Twitter Card Preview",
+        "searchSocialTitle": "Search & Social Previews",
+        "seoScoreLabel": "SEO Score",
+        "issuesFoundLabel": "Issues Found",
+        "seoIssuesTitle": "SEO Issues",
+        "noIssues": "No SEO issues found - excellent!",
+        "titleLabel": "Title",
+        "descriptionLabel": "Description",
+        "ogTitleLabel": "OG Title",
+        "ogDescriptionLabel": "OG Description",
+        "twitterTitleLabel": "Twitter Title",
+        "twitterDescriptionLabel": "Twitter Description",
+        "imageLabel": "Image",
+        "imageMissing": "Image missing",
+        "descriptionMissing": "Description missing",
+        "untitledPage": "Untitled Page",
+        "untitled": "Untitled",
+        "fields": {
+          "title": "Title",
+          "description": "Description",
+          "openGraph": "Open Graph",
+          "openGraphTitle": "Open Graph Title",
+          "openGraphDescription": "Open Graph Description",
+          "openGraphImages": "Open Graph Image",
+          "openGraphType": "Open Graph Type",
+          "twitter": "Twitter",
+          "twitterCard": "Twitter Card",
+          "twitterTitle": "Twitter Title",
+          "twitterDescription": "Twitter Description",
+          "canonical": "Canonical URL",
+          "robots": "Robots"
+        }
+      }
+    },
+    "emailTemplates": {
+      "title": "Email Templates",
+      "subtitle": "E-commerce email template management and preview",
+      "availableTemplates": "Available Templates",
+      "categories": {
+        "transactional": "Transactional",
+        "marketing": "Marketing",
+        "customerService": "Customer Service"
+      },
+      "subjectLine": "Subject Line:",
+      "htmlPreview": "HTML Preview",
+      "actions": {
+        "sendTest": "Send Test Email",
+        "copyHtml": "Copy HTML"
+      },
+      "sampleData": "Sample Data",
+      "selectTemplate": "Select a Template",
+      "selectTemplateDescription": "Choose an email template from the list to preview"
+    },
+    "products": {
+      "title": "Products Management",
+      "subtitle": "Manage products, variants and inventory",
+      "newProduct": "New Product",
+      "newProductDesc": "Create a new product with variants",
+      "editProduct": "Edit Product",
+      "editProductDesc": "Update product information and variants",
+      "list": {
+        "searchPlaceholder": "Search products…",
+        "newProductButton": "+ New product",
+        "filters": {
+          "allCategories": "All categories",
+          "allUsage": "All usage",
+          "allStatuses": "All statuses",
+          "statusActivePlural": "Active",
+          "statusInactivePlural": "Inactive"
+        },
+        "bulk": {
+          "selected": "Selected: {count}",
+          "publish": "Publish",
+          "unpublish": "Unpublish",
+          "delete": "Delete",
+          "deleteConfirm": "Are you sure you want to delete {count} products?"
+        },
+        "table": {
+          "product": "Product",
+          "category": "Category",
+          "usage": "Usage",
+          "price": "Price",
+          "stock": "Stock",
+          "status": "Status",
+          "actions": "Actions",
+          "noImage": "No img"
+        },
+        "rowActions": {
+          "edit": "Edit",
+          "preview": "Preview",
+          "duplicate": "Duplicate",
+          "delete": "Delete"
+        },
+        "statusBadge": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "empty": {
+          "noneFound": "No products found",
+          "noneYet": "No products yet"
+        },
+        "deleteModal": {
+          "title": "Confirm deletion",
+          "body": "Are you sure you want to delete this product? It will be marked as inactive.",
+          "cancel": "Cancel",
+          "confirm": "Delete",
+          "confirming": "Deleting…"
+        },
+        "errors": {
+          "deleteFailed": "Error deleting product",
+          "bulkDeleteFailed": "Error deleting products",
+          "statusFailed": "Error updating status",
+          "duplicateFailed": "Error duplicating product"
+        }
+      },
+      "form": {
+        "sections": {
+          "photo": "Photo",
+          "photoLibrary": "Photo library",
+          "basicInfo": "Basic information",
+          "pricingInventory": "Pricing & inventory",
+          "dimensions": "Dimensions",
+          "variants": "Variants",
+          "publishing": "Publishing",
+          "urlPreview": "URL preview",
+          "quickStats": {
+            "variants": "Variants:",
+            "status": "Status:"
+          }
+        },
+        "fields": {
+          "nameLt": "Name (LT) *",
+          "nameEn": "Name (EN)",
+          "slug": "Slug *",
+          "slugLt": "Slug (LT) *",
+          "slugEn": "Slug (EN) *",
+          "descriptionLt": "Description (LT)",
+          "descriptionEn": "Description (EN)",
+          "usage": "Usage *",
+          "category": "Category *",
+          "woodType": "Wood type *",
+          "basePrice": "Base price (EUR) *",
+          "stockQuantity": "Stock (pcs.)",
+          "sku": "SKU",
+          "width": "Width (mm)",
+          "height": "Height (mm)",
+          "depth": "Depth (mm)",
+          "thickness": "Thickness (mm)",
+          "length": "Length (mm)",
+          "weight": "Weight (kg)",
+          "status": "Status"
+        },
+        "placeholders": {
+          "nameLt": "e.g., Burnt spruce cladding",
+          "nameEn": "e.g., Burnt Spruce Cladding",
+          "slug": "e.g., burnt-spruce-cladding",
+          "slugLt": "e.g., degintos-medienos-dailylente-fasadui-maumedis-natural",
+          "slugEn": "e.g., shou-sugi-ban-for-facade-larch-natural",
+          "descriptionLt": "Product description in Lithuanian…",
+          "descriptionEn": "Product description in English…",
+          "selectUsage": "Select usage",
+          "selectCategory": "Select category",
+          "selectWoodType": "Select wood type",
+          "selectUsageFirst": "Select usage first",
+          "basePrice": "0.00",
+          "stockQuantity": "0",
+          "sku": "SKU-001",
+          "number": "0"
+        },
+        "validation": {
+          "nameRequired": "Name is required",
+          "slugRequired": "Slug is required",
+          "slugFormat": "Slug must contain only lowercase letters, numbers, and hyphens",
+          "colorRequired": "Select at least one color",
+          "categoryRequired": "Category is required",
+          "usageRequired": "Usage is required",
+          "usageInvalid": "Only Facade or Terrace is allowed",
+          "woodRequired": "Wood type is required",
+          "woodInvalid": "Only Spruce, Larch, or Thermo is allowed",
+          "basePriceRequired": "Base price is required",
+          "basePriceNumber": "Enter the price as a number",
+          "basePricePositive": "Price must be a positive number",
+          "widthRequired": "Width is required",
+          "heightRequired": "Thickness is required",
+          "depthRequired": "Length is required",
+          "numberExpected": "Enter a number",
+          "integerExpected": "Enter an integer",
+          "numberMinZero": "Value cannot be negative"
+        },
+        "errors": {
+          "saveFailed": "Error saving product",
+          "deleteFailed": "Error deleting product",
+          "slugEnMissing": "Your database is missing `products.slug_en`. Apply migration: {path}",
+          "dimensionsMissing": "Your database is missing product dimension fields (`products.width/height/depth`). Apply migration: {path}",
+          "inventoryFieldsMissing": "Your database is missing inventory fields (`products.sku`, `products.stock_quantity`, `products.usage_type`). Apply migration: {path}",
+          "notAuthorized": "You don't have permission to create/update products. Sign in with an admin account.",
+          "slugTaken": "This LT slug already exists. Choose another slug.",
+          "slugEnTaken": "This EN slug already exists. Choose another slug.",
+          "skuTaken": "This SKU is already used. Change it or leave it empty."
+        },
+        "options": {
+          "categories": {
+            "cladding": "Cladding",
+            "decking": "Decking",
+            "interior": "Interior",
+            "tiles": "Tiles"
+          },
+          "woodTypes": {
+            "pine": "Pine",
+            "spruce": "Spruce",
+            "oak": "Oak",
+            "larch": "Larch",
+            "thermo": "Thermo"
+          },
+          "usageTypes": {
+            "facade": "Facade",
+            "terrace": "Terrace",
+            "interior": "Interior",
+            "fence": "Fence"
+          },
+          "status": {
+            "draft": "Draft",
+            "published": "Published"
+          },
+          "statusHelp": {
+            "draft": "Visible to admins only",
+            "published": "Visible to all visitors"
+          }
+        },
+        "image": {
+          "previewAlt": "Preview",
+          "noPhoto": "No photo",
+          "chooseFromLibrary": "Choose from library",
+          "hideLibrary": "Hide library",
+          "remove": "Remove"
+        },
+        "photoLibrary": {
+          "help": "Pick a previously uploaded global photo (e.g., spruce + black) from /admin/options.",
+          "wood": "Wood",
+          "color": "Color",
+          "noColors": "No colors (catalog_options)",
+          "missingSchemaTitle": "Database tables are missing",
+          "missingSchemaBody": "Supabase can't find `catalog_options` / `product_assets`. Run this migration: {path} (Supabase Dashboard → SQL Editor), then reload the page.",
+          "missingSchemaEnvHint": "If you already ran the migration, make sure `.env.local` `NEXT_PUBLIC_SUPABASE_URL` points to the same Supabase project.",
+          "refresh": "Refresh",
+          "refreshing": "Loading…",
+          "noneFound": "No photos found for this combination.",
+          "any": "any"
+        },
+        "variants": {
+          "add": "+ Add variant",
+          "empty": "No variants yet. Add colors or finish variants.",
+          "typeLabelColor": "Color",
+          "typeLabelFinish": "Finish",
+          "typeLabelProfile": "Profile",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "variantModal": {
+          "titleNew": "New variant",
+          "titleEdit": "Edit variant",
+          "fields": {
+            "name": "Name *",
+            "type": "Type *",
+            "hex": "Color code (HEX)",
+            "priceAdjustment": "Price adjustment (EUR)",
+            "description": "Description",
+            "available": "Variant available for ordering"
+          },
+          "placeholders": {
+            "name": "e.g., Natural burnt",
+            "hex": "#161616",
+            "priceAdjustment": "0.00",
+            "description": "Additional description…"
+          },
+          "typeOptions": {
+            "color": "Color",
+            "finish": "Finish",
+            "profile": "Profile"
+          },
+          "priceHelp": "Positive adds, negative subtracts from the base price",
+          "buttons": {
+            "cancel": "Cancel",
+            "save": "Save"
+          }
+        },
+        "buttons": {
+          "saving": "Saving…",
+          "create": "Create product",
+          "save": "Save changes",
+          "cancel": "Cancel",
+          "deleteProduct": "Delete product"
+        },
+        "deleteModal": {
+          "title": "Confirm deletion",
+          "body": "Are you sure you want to permanently delete this product? This action cannot be undone.",
+          "cancel": "Cancel",
+          "confirm": "Delete",
+          "confirming": "Deleting…"
+        }
+      },
+      "profile": {
+        "selectPlaceholder": "Select profile",
+        "addNewOption": "+ Add new profile",
+        "enterNamePlaceholder": "Enter profile name",
+        "addButton": "Add",
+        "cancelButton": "Cancel",
+        "existsMessage": "Profile already exists",
+        "addedMessage": "Profile added!"
+      },
+      "profileOptions": {
+        "half_taper_45": "Half taper 45",
+        "half_taper_45_deg": "Half taper 45°",
+        "rectangle": "Rectangle",
+        "rhombus": "Rhombus"
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "products": "Products",
+    "projects": "Projects"
+  },
+  "productsPage": {
+    "title": "Products",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search for a product",
+    "filtersUsage": "Usage",
+    "filtersWood": "Wood",
+    "filtersColor": "Color",
+    "filtersProfile": "Profile",
+    "filtersPrice": "Price",
+    "filtersSize": "Size",
+    "filtersWidth": "Width",
+    "filtersLength": "Length",
+    "filtersToggle": "Filters",
+    "filtersAny": "All",
+    "filtersAll": "All products",
+    "filtersEmpty": "No options",
+    "colorFilterLabel": "Color",
+    "colorFilterAll": "All colors",
+    "profileFilterLabel": "Profile",
+    "profileFilterAll": "All profiles",
+    "priceFilterAll": "All prices",
+    "priceFilters": {
+      "under100": "Under 100 €/m²",
+      "between100And150": "100–150 €/m²",
+      "between150And200": "150–200 €/m²",
+      "above200": "200+ €/m²"
+    },
+    "usageFilters": {
+      "all": "All solutions",
+      "facade": "Facade systems",
+      "terrace": "Terrace systems",
+      "interior": "Interior solutions",
+      "fence": "Fence solutions"
+    },
+    "woodFilters": {
+      "all": "All wood",
+      "spruce": "Burnt spruce",
+      "larch": "Burnt larch",
+      "thermo": "Thermo"
+    },
+    "errorTitle": "Error loading products",
+    "errorHelp": "Check console for details.",
+    "errorContactLink": "Contact us",
+    "errorContactSuffix": "if the problem persists.",
+    "retry": "Retry",
+    "emptyTitle": "No products yet",
+    "emptyDescriptionPrefix": "Products will be added soon. If you have any questions,",
+    "emptyContactLink": "contact us",
+    "emptyDescriptionSuffix": ".",
+    "fromPrice": "From {price} €/m²",
+    "loadMore": "Show more"
+  },
+  "productDetail": {
+    "validationSelectColor": "Please select a color",
+    "validationSelectProfile": "Please select a profile",
+    "addToCartError": "Error adding to cart. Please try again.",
+    "addedToCart": "Added to cart",
+    "descriptionFallback": "Product description is being prepared.",
+    "colorLabel": "Color:",
+    "colorPlaceholder": "Select color",
+    "profileLabel": "Profile",
+    "quantityLabel": "Quantity m²",
+    "helpPrefix": "Can't find what you're looking for?",
+    "helpLink": "Contact us",
+    "adding": "Adding...",
+    "addToCart": "Add to cart",
+    "mobilePcs": "pcs",
+    "mobileTotal": "Total:"
+  },
+  "productGallery": {
+    "imageUnavailable": "Image unavailable",
+    "zoomHint": "Click to zoom",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "close": "Close"
+  },
+  "productTabs": {
+    "description": "Description",
+    "specifications": "Specifications",
+    "installation": "Installation",
+    "reviews": "Reviews",
+    "infoPreparing": "Information is being prepared.",
+    "technicalNotesTitle": "Technical notes:",
+    "technicalNote1": "Material naturalness: each board is unique",
+    "technicalNote2": "Color shade may vary from photos",
+    "technicalNote3": "Recommended to store in a dry, ventilated area",
+    "installationSoon": "Installation instructions will be added soon.",
+    "noReviews": "No reviews yet",
+    "beFirst": "Be the first to share your opinion about this product",
+    "writeReviewSoon": "Write a review (soon)"
+  },
+  "relatedProducts": {
+    "title": "Related products",
+    "view": "View",
+    "from": "From",
+    "viewAll": "View all products"
+  },
+  "adminUsers": {
+    "title": "Users",
+    "subtitle": "Manage users, roles, managers, and discounts",
+    "loading": "Loading...",
+    "refresh": "Refresh",
+    "roles": {
+      "user": "User",
+      "manager": "Manager",
+      "admin": "Administrator",
+      "partner": "Partner"
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "admin": "Admin",
+      "users": "Users"
+    },
+    "notConfigured": {
+      "title": "Supabase not configured",
+      "body": "To use admin features, configure Supabase environment variables."
+    },
+    "users": {
+      "title": "Users",
+      "email": "Email",
+      "role": "Role",
+      "permissions": "Visible areas",
+      "actions": "Actions",
+      "empty": "No users found",
+      "emptyFiltered": "No users match the current filter",
+      "autoSave": "Auto-saves",
+      "groups": {
+        "partnersAndStaff": "Partners and staff",
+        "partnersAndStaffHelp": "This section shows partners, managers, and administrators.",
+        "buyers": "Buyers",
+        "buyersHelp": "This section shows buyers and regular account users without admin access."
+      }
+    },
+    "filters": {
+      "searchLabel": "Search",
+      "searchPlaceholder": "Search by email, name, or role",
+      "roleLabel": "Show",
+      "options": {
+        "all": "All users",
+        "partnersAndStaff": "Partners and staff",
+        "buyers": "Buyers only"
+      }
+    },
+    "help": {
+      "rolesTitle": "What each role can do",
+      "permissionsTitle": "What the permission levels mean",
+      "roles": {
+        "user": "cannot access admin sections.",
+        "manager": "only sees assigned areas and can only perform allowed actions.",
+        "admin": "has full access to all admin areas and actions."
+      },
+      "permissions": {
+        "none": "the area is hidden and cannot be opened.",
+        "view": "the user can open the page and view data, but cannot change it.",
+        "manage": "the user can view and make changes through the admin UI and APIs."
+      },
+      "enforcementNote": "Permissions are enforced not only in the menu, but also in admin pages and API requests."
+    },
+    "create": {
+      "title": "Create user",
+      "email": "Email",
+      "password": "Password",
+      "fullName": "Full name",
+      "permissionsLabel": "Managed admin areas",
+      "visibilityHelp": "Choose which admin areas the manager will actually see in the menu and be able to open.",
+      "actionsLabel": "Allowed actions",
+      "actionsHelp": "For each visible area, choose whether the user can only view it or also make changes.",
+      "permissionsHelp": "Choose whether the user should not see, only view, or fully manage each area. The dashboard stays visible automatically.",
+      "submit": "Create"
+    },
+    "permissions": {
+      "fullAccess": "Full administrator access",
+      "managerSelected": "The manager will only see assigned areas, and available actions depend on the selected permission level.",
+      "managerEmpty": "The manager will only see the admin dashboard for now.",
+      "noAdminAccess": "No admin area assigned",
+      "visibilityHelp": "This controls which areas are visible and accessible at all for the selected manager.",
+      "actionsHelp": "This controls whether a visible area is read-only or can also be changed.",
+      "levels": {
+        "none": "Hide",
+        "view": "View only",
+        "manage": "Manage"
+      }
+    },
+    "discounts": {
+      "title": "Role discounts",
+      "help": "Set a discount per role (percent or fixed amount).",
+      "role": "Role",
+      "type": "Type",
+      "types": {
+        "percent": "Percent",
+        "fixed": "Fixed amount"
+      },
+      "valuePercent": "Value (%)",
+      "valueFixed": "Value (€)",
+      "active": "Active",
+      "save": "Save discount",
+      "createRole": {
+        "title": "Create role",
+        "label": "New role name",
+        "placeholder": "e.g. partner",
+        "button": "Create role",
+        "errors": {
+          "invalidRole": "Invalid role name. Use letters, numbers, _ or -, up to 64 characters.",
+          "roleExists": "Role already exists - selected the existing role."
+        }
+      }
+    },
+    "errors": {
+      "noSession": "No active session",
+      "loadUsers": "Failed to load users",
+      "loadDiscounts": "Failed to load discounts",
+      "generic": "Something went wrong. Please try again.",
+      "updateRole": "Failed to update role",
+      "createUser": "Failed to create user",
+      "invalidDiscount": "Invalid discount value",
+      "invalidPercent": "Percent must be between 0 and 100",
+      "saveDiscount": "Failed to save discount"
+    }
+  },
+  "adminChatbot": {
+    "title": "Chatbot",
+    "subtitle": "Manage conversations, knowledge base, and GPT training",
+    "tabs": {
+      "sessions": "Sessions",
+      "faq": "Knowledge base",
+      "ai": "AI",
+      "training": "Training"
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "admin": "Admin",
+      "chatbot": "Chatbot"
+    },
+    "common": {
+      "refresh": "Refresh",
+      "loading": "Loading...",
+      "new": "New",
+      "save": "Save",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "roles": {
+      "user": "Customer",
+      "assistant": "Assistant",
+      "system": "System"
+    },
+    "sessions": {
+      "title": "Chatbot sessions",
+      "empty": "No sessions yet.",
+      "conversationTitle": "Conversation",
+      "pickSession": "Pick a session on the left.",
+      "eventsCount": "{count} events"
+    },
+    "faq": {
+      "title": "Knowledge base (Q&A)",
+      "empty": "No entries yet.",
+      "importDefaults": "Import default questions",
+      "importing": "Importing...",
+      "statusEnabled": "Enabled",
+      "statusDisabled": "Disabled",
+      "editTitle": "Edit entry",
+      "noticeSaved": "Saved.",
+      "noticeCreated": "Created.",
+      "noticeDeleted": "Deleted.",
+      "noticeImported": "Imported: {count} entries."
+    },
+    "ai": {
+      "title": "GPT / OpenAI settings",
+      "subtitle": "Status and managed settings",
+      "empty": "Could not load configuration.",
+      "statusTitle": "Status",
+      "configured": "OPENAI_API_KEY",
+      "useOpenAI": "CHATBOT_USE_OPENAI",
+      "openAiMode": "CHATBOT_OPENAI_MODE",
+      "model": "OPENAI_CHAT_MODEL",
+      "minConfidence": "Min confidence (fallback)",
+      "temperature": "Temperature",
+      "source": "Source",
+      "yes": "Yes",
+      "no": "No",
+      "note": "The API key is never shown in UI. OPENAI_API_KEY is managed via .env.local; other settings can be managed in Admin (if Supabase is configured).",
+      "settingsTitle": "Settings",
+      "noticeSaved": "Saved.",
+      "promptTitle": "Training prompt",
+      "promptLt": "LT prompt",
+      "promptEn": "EN prompt",
+      "set": "Set",
+      "notSet": "Not set",
+      "defaultPrompt": "Using the default prompt (no env override).",
+      "envTitle": "Env example (.env.local)"
+    },
+
+    "training": {
+      "title": "GPT training",
+      "subtitle": "Export knowledge base to fine-tune format and (optionally) start a fine-tune",
+      "exportTitle": "Export data",
+      "exportNote": "Generates a JSONL file from knowledge base entries (question → answer).",
+      "exportJsonl": "Export JSONL",
+      "locale": "Language",
+      "fineTuneTitle": "Fine-tune (optional)",
+      "fineTuneNote": "Fine-tune from admin UI is disabled by default (cost control). Enable CHATBOT_ENABLE_FINE_TUNE_ADMIN=true.",
+      "baseModel": "Base model",
+      "startFineTune": "Start fine-tune",
+      "starting": "Starting...",
+      "refreshStatus": "Refresh status",
+      "jobId": "Job ID",
+      "status": "Status",
+      "statusValue": "Status",
+      "fineTunedModel": "Fine-tuned model"
+    },
+
+    "dbSetup": {
+      "title": "Database setup",
+      "subtitle": "If tables are missing, paste the SQL into Supabase SQL Editor, then reload the schema.",
+      "copySessions": "Copy sessions tables SQL",
+      "copyFaq": "Copy FAQ table SQL",
+      "copySettings": "Copy settings SQL",
+      "copyReload": "Copy reload schema",
+      "copied": "SQL copied.",
+      "copyFailed": "Failed to copy SQL."
+    },
+    "form": {
+      "enabled": "Enabled",
+      "order": "Order",
+      "locale": "Language",
+      "question": "Question",
+      "answer": "Answer",
+      "keywords": "Keywords (comma-separated)",
+      "suggestions": "Suggestions (comma-separated)",
+      "id": "ID: {id}",
+      "newEntry": "New entry",
+      "placeholders": {
+        "question": "Enter a question",
+        "answer": "Enter an answer",
+        "keywords": "e.g.: delivery, pricing, warranty",
+        "suggestions": "e.g.: Show products, Contact us, Pricing calculator"
+      }
+    },
+    "errors": {
+      "noAdminSession": "No active admin session.",
+      "parseResponse": "Failed to parse server response (HTTP {status}).",
+      "requestFailed": "Request failed (HTTP {status}).",
+      "supabaseNotConfigured": "Supabase is not configured (.env.local is missing NEXT_PUBLIC_SUPABASE_URL and/or SUPABASE_SERVICE_ROLE_KEY).",
+      "supabaseMissingTable": "Missing Supabase DB table: public.{table}. Apply SQL migrations from supabase/migrations and run in Supabase SQL Editor: select pg_notify('pgrst','reload schema');",
+      "loadEventsFailed": "Failed to load events.",
+      "loadFaqFailed": "Failed to load knowledge base entries.",
+      "importFailed": "Failed to import default knowledge base.",
+      "saveFailed": "Failed to save.",
+      "deleteFailed": "Failed to delete.",
+      "questionRequired": "Question is required.",
+      "answerRequired": "Answer is required."
+    }
+  },
+  "solutionsPage": {
+    "title": "Solutions",
+    "faqLabel": "Frequently asked questions",
+    "productsTitle": "Products",
+    "nav": {
+      "facades": "Facades",
+      "terraces": "Terraces",
+      "interior": "Interior",
+      "fences": "Fences"
+    },
+    "cta": {
+      "getOffer": "Shop now",
+      "seeProjects": "See projects",
+      "viewProducts": "View products",
+      "seeInteriors": "See interiors",
+      "seeFences": "See fences"
+    },
+    "products": {
+      "graphiteSpruce": {
+        "name": "Graphite Spruce",
+        "profile": "RHOMBUS PROFILE · 95×3000 mm",
+        "usage": "Facade systems · Charred spruce"
+      },
+      "graphiteLarch": {
+        "name": "Graphite Larch",
+        "profile": "RHOMBUS PROFILE · 145×3600 mm",
+        "usage": "Facade systems · Charred larch"
+      },
+      "latteSpruce": {
+        "name": "Latte Spruce",
+        "profile": "HALF TAPER 45° PROFILE · 95×3000 mm",
+        "usage": "Facade systems · Charred spruce"
+      },
+      "latteLarch": {
+        "name": "Latte Larch",
+        "profile": "RHOMBUS PROFILE · 145×3600 mm",
+        "usage": "Facade systems · Charred larch"
+      }
+    },
+    "facades": {
+      "eyebrow": "Facades / Quick spec",
+      "title": {
+        "prefix": "Designed to",
+        "italic": "last",
+        "suffix": "outside"
+      },
+      "description": "A modern, ventilated facade system with charred wood cladding - built for the Baltic climate, minimal maintenance, and a clean architectural finish.",
+      "intro": "Burning wood is an ancient and unique technique that is becoming increasingly popular in modern architecture. The result is wooden facade cladding that provides a modern and robust appearance.",
+      "detail": "Charred wood cladding not only provides a unique appearance but is also durable and resistant to weather conditions. By properly charring the wood, a modern, nature-inspired aesthetic can be created, suitable for all architectural styles. Furthermore, charred wood serves as a natural defence against external influences, such as pests or harmful ultraviolet rays from the sun.",
+      "faqSubtitle": "Do you want to give your building a distinctive and appealing look? Encourage diverse design solutions with charred wood.",
+      "specs": {
+        "thickness": { "label": "Thickness", "value": "18/20 mm" },
+        "wood": { "label": "Wood", "value": "Larch / Spruce" },
+        "finish": { "label": "Finish", "value": "Matte, UV stable" }
+      },
+      "images": {
+        "topLeft": "Facade project detail",
+        "topRight": "Charred wood facade",
+        "wide": "Facade board texture"
+      },
+      "badges": {
+        "epd": "Environmental Product Declaration",
+        "fsc": "Responsible forestry",
+        "uv": "Fade resistance"
+      },
+      "badgesLabels": {
+        "epd": "Sustainability",
+        "fsc": "Sourcing",
+        "uv": "UV"
+      },
+      "faq": {
+        "1": {
+          "title": "Introduction to burnt wood facade cladding",
+          "content": "Burnt wood is an ancient and unique technique becoming increasingly popular in modern architecture. The result is wooden facade cladding that provides a modern and robust appearance. Burnt wood not only provides a unique look but is also durable and resistant, naturally protecting against pests and UV rays."
+        },
+        "2": {
+          "title": "Advantages of burnt wood facade cladding",
+          "content": "Burnt wood facade cladding offers numerous benefits: enhanced durability, natural weather resistance, and distinctive aesthetic appeal. Without chemical preservatives, the wood becomes resistant to mold, fungi, and pests."
+        },
+        "3": {
+          "title": "Most popular wood types for facade cladding",
+          "content": "Common wood types used for charred facade cladding include larch, pine, spruce, and oak. Each species has unique characteristics and visual appeal. Larch is particularly noted for its excellent moisture resistance."
+        },
+        "4": {
+          "title": "Burnt wood facade installation process",
+          "content": "The installation process involves proper surface preparation, selecting the right mounting system, and ensuring adequate ventilation behind the cladding. A ventilated facade is essential for ensuring longevity."
+        },
+        "5": {
+          "title": "Cost aspects of burnt wood facade cladding",
+          "content": "While initial costs may be higher than traditional options, the long-term durability and low maintenance requirements make burnt wood an economical choice over the entire lifespan."
+        }
+      }
+    },
+    "terraces": {
+      "eyebrow": "Terraces / Quick spec",
+      "title": {
+        "prefix": "Made for",
+        "italic": "comfort",
+        "suffix": "outdoors"
+      },
+      "description": "Fire-treated decking with natural grip and a refined texture. Built to handle seasonal changes while staying beautiful underfoot.",
+      "intro": "Charred wood terraces are a unique solution for outdoor spaces. Modern Shou Sugi Ban technique gives terraces not only a distinctive appearance but also increased resistance to moisture and UV rays.",
+      "detail": "A charred terrace features a natural non-slip surface that remains safe even when wet. This finish is barefoot-friendly and perfect for poolside, sauna, or outdoor relaxation areas. The wood becomes more stable and less prone to deformation due to moisture changes.",
+      "faqSubtitle": "Looking for a durable and beautiful solution for your outdoor terrace? Charred wood is an excellent choice for a modern space.",
+      "specs": {
+        "use": { "label": "Use", "value": "Decking / terraces" },
+        "feel": { "label": "Feel", "value": "Natural texture, stable" },
+        "care": { "label": "Care", "value": "Low maintenance" }
+      },
+      "images": {
+        "topLeft": "Terrace decking",
+        "topRight": "Terrace project",
+        "wide": "Decking detail"
+      },
+      "badges": {
+        "grip": "Confident footing",
+        "drain": "Ventilated system",
+        "season": "Weather-ready"
+      },
+      "badgesLabels": {
+        "grip": "Grip",
+        "drain": "Drainage",
+        "season": "Weather"
+      },
+      "faq": {
+        "1": {
+          "title": "Why choose charred wood for a terrace?",
+          "content": "Charred wood offers a unique combination for terraces - natural beauty and increased durability. The charring process creates a protective layer that shields the wood from moisture, UV rays, and biological pests, while providing an unparalleled aesthetic."
+        },
+        "2": {
+          "title": "Is charred wood suitable for pool areas?",
+          "content": "Yes, charred wood is excellent for pool zones. Its natural surface remains non-slip even when wet, and the increased moisture resistance ensures longevity even under constant water exposure."
+        },
+        "3": {
+          "title": "How to maintain a charred terrace?",
+          "content": "A charred terrace requires minimal maintenance. Regular dust and debris removal is recommended, and protective oil can be renewed once a year. Avoid high-pressure washing as it may damage the surface."
+        },
+        "4": {
+          "title": "What is the lifespan of a charred terrace?",
+          "content": "A properly maintained charred terrace can last 25-30 years and longer. The charring process significantly increases wood resistance to rot and pests, resulting in a longer lifespan than standard wood."
+        },
+        "5": {
+          "title": "Can different colors be combined on a terrace?",
+          "content": "Yes, we offer various charred wood colors and tones. You can choose from deep black to lighter shades, depending on the charring intensity and finish. This allows for creating an individual design."
+        }
+      }
+    },
+    "interior": {
+      "eyebrow": "Interior / Quick spec",
+      "title": {
+        "prefix": "Bring",
+        "italic": "depth",
+        "suffix": "inside"
+      },
+      "description": "Charred wood panels for modern interiors - warmth, contrast, and texture for feature walls, ceilings, and details.",
+      "intro": "Charred wood in interiors opens unlimited design possibilities. From accent walls to ceiling finishes - Shou Sugi Ban technique gives spaces a unique character and depth.",
+      "detail": "Charred wood used for interior finishing is specially prepared for indoor spaces - softer texture, fewer carbon residues, and perfectly treated surfaces. It creates a cozy atmosphere and pairs beautifully with modern and minimalist interiors.",
+      "faqSubtitle": "Looking for a way to add warmth and uniqueness to your interior? Charred wood is the perfect choice for accent walls and ceilings.",
+      "specs": {
+        "applications": { "label": "Applications", "value": "Walls / ceilings" },
+        "look": { "label": "Look", "value": "Rich texture, matte" },
+        "design": { "label": "Design", "value": "Custom patterns" }
+      },
+      "images": {
+        "topLeft": "Interior wall panels",
+        "topRight": "Interior project detail",
+        "wide": "Panel texture detail"
+      },
+      "badges": {
+        "text": "Tactile surface",
+        "warm": "Natural ambience",
+        "detail": "Architectural finish"
+      },
+      "badgesLabels": {
+        "text": "Texture",
+        "warm": "Warmth",
+        "detail": "Finish"
+      },
+      "faq": {
+        "1": {
+          "title": "Is charred wood suitable for indoor spaces?",
+          "content": "Yes, charred wood is excellent for indoor spaces. Wood used for interior finishing is specially prepared with lighter charring, fewer carbon particles, and meticulously treated surfaces. It meets all indoor finishing safety requirements."
+        },
+        "2": {
+          "title": "What rooms are suitable for charred wood?",
+          "content": "Charred wood suits most rooms: living rooms, bedrooms, offices, restaurants, hotels. It looks particularly effective as an accent wall, ceiling finish, or furniture element. For wet rooms (bathrooms), additional protection is recommended."
+        },
+        "3": {
+          "title": "Does charred wood emit odor?",
+          "content": "Newly installed charred wood may have a slight smoky scent that dissipates within a few weeks. Fully finished products with a protective layer have virtually no odor and are suitable even for sensitive individuals."
+        },
+        "4": {
+          "title": "How to maintain charred wood indoors?",
+          "content": "Interior charred wood requires minimal maintenance. Regularly remove dust with a dry or slightly damp cloth. Avoid aggressive cleaning agents. It's recommended to renew the protective layer every few years."
+        },
+        "5": {
+          "title": "Can charred wood be combined with other materials?",
+          "content": "Charred wood pairs beautifully with various materials: concrete, metal, glass, stone, and natural fabrics. The contrast between dark charred wood and light elements creates a stunning visual effect."
+        }
+      }
+    },
+    "fences": {
+      "eyebrow": "Fences / Quick spec",
+      "title": {
+        "prefix": "Privacy with",
+        "italic": "style",
+        "suffix": "built in"
+      },
+      "description": "Charred wood fencing that stays stable, looks premium, and withstands the elements - for clean lines and long-term durability.",
+      "intro": "A charred wood fence is more than just a barrier. It's an architectural element that gives your property character and protection while emphasizing contemporary design.",
+      "detail": "Our charred wood fences feature exceptional longevity and minimal maintenance. The charring process creates natural protection against rot, pests, and UV rays, so the fence maintains its appearance for decades.",
+      "faqSubtitle": "Looking for a fence that's both functional and aesthetic? Charred wood is the solution that will make your property unique.",
+      "specs": {
+        "purpose": { "label": "Purpose", "value": "Privacy / boundaries" },
+        "build": { "label": "Build", "value": "Strong & stable" },
+        "finish": { "label": "Finish", "value": "Distinct charred look" }
+      },
+      "images": {
+        "topLeft": "Charred wood fence",
+        "topRight": "Fence project",
+        "wide": "Fence detail"
+      },
+      "badges": {
+        "long": "Built to endure",
+        "clean": "Minimal silhouette",
+        "care": "Low upkeep"
+      },
+      "badgesLabels": {
+        "long": "Longevity",
+        "clean": "Silhouette",
+        "care": "Care"
+      },
+      "faq": {
+        "1": {
+          "title": "Why is a charred wood fence better than standard?",
+          "content": "Charred wood offers several key advantages: increased resistance to rot and pests, longer service life, less maintenance, and a unique aesthetic appearance that becomes even more impressive with each passing year."
+        },
+        "2": {
+          "title": "What is the lifespan of a charred fence?",
+          "content": "A properly installed and minimally maintained charred fence can serve 30-40 years and longer. This is significantly longer than a standard wooden fence, which typically lasts 10-15 years."
+        },
+        "3": {
+          "title": "Does the charred fence need painting?",
+          "content": "No, a charred fence does not require painting. The natural charred surface is the protection itself. Protective oil can be periodically renewed, but it's not necessary. The fence naturally ages to a silver tone or remains deep black with oil."
+        },
+        "4": {
+          "title": "What fence style options are available?",
+          "content": "We offer various fence styles: horizontal and vertical planks, framed construction, combined options with metal. We can also create custom designs according to your preferences and property architecture."
+        },
+        "5": {
+          "title": "Can a charred fence withstand Baltic climate?",
+          "content": "Yes, charred wood is particularly well suited for Baltic climate conditions. The charring process creates a hydrophobic layer that repels moisture. The fence will withstand rain, snow, cold, and heat without any problems."
+        }
+      }
+    }
+  }
+}
+

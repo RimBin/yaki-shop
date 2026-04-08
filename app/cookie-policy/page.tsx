@@ -1,0 +1,127 @@
+import type { Metadata } from 'next';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { PageCover } from '@/components/shared/PageLayout';
+import InView from '@/components/InView';
+import { canonicalUrl } from '@/lib/seo/canonical';
+import { applySeoOverride } from '@/lib/seo/overrides';
+import { getOgImage } from '@/lib/og-image';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('metadata.cookiePolicy');
+  const locale = await getLocale();
+  const currentLocale = locale === 'lt' ? 'lt' : 'en';
+  const canonical = canonicalUrl('/cookie-policy', currentLocale);
+  const ogImage = getOgImage('faq');
+
+  const metadata: Metadata = {
+    title: t('title'),
+    description: t('description'),
+    alternates: {
+      canonical,
+    },
+    openGraph: {
+      title: t('ogTitle'),
+      description: t('description'),
+      url: canonical,
+      type: 'article',
+      siteName: 'Yakiwood',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: t('ogTitle') }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('ogTitle'),
+      description: t('description'),
+      images: [ogImage],
+    },
+  };
+
+  return applySeoOverride(metadata, new URL(canonical).pathname, currentLocale);
+}
+
+export default function CookiePolicyPage() {
+  return (
+    <main className="min-h-screen bg-[#E1E1E1]">
+      {/* Cover Section */}
+      <InView className="hero-animate-root">
+        <PageCover>
+          <h1
+            className="font-['DM_Sans'] font-light text-[56px] md:text-[128px] leading-[0.95] tracking-[-2.8px] md:tracking-[-6.4px] text-[#161616] hero-seq-item hero-seq-right"
+            style={{ fontVariationSettings: "'opsz' 14", animationDelay: '0ms' }}
+          >
+            Cookie Policy
+          </h1>
+        </PageCover>
+      </InView>
+
+      {/* Content */}
+      <InView className="hero-animate-root">
+      <div className="max-w-[1440px] mx-auto px-[16px] sm:px-[40px] pt-[20px] sm:pt-[24px] pb-[80px] sm:pb-[120px]">
+        <div className="grid grid-cols-1 sm:grid-cols-[344px_1fr] gap-[24px] sm:gap-[40px]">
+          {/* What are cookies */}
+          <div className="sm:col-start-1 hero-seq-item hero-seq-right" style={{ animationDelay: '0ms' }}>
+            <h2 className="font-['Outfit'] font-normal text-[14px] sm:text-[16px] leading-[1.3] tracking-[0.14px] sm:tracking-[0.16px] uppercase text-[#161616]">
+              What are cookies
+            </h2>
+          </div>
+          <div className="sm:col-start-2 hero-seq-item hero-seq-right" style={{ animationDelay: '160ms' }}>
+            <p className="font-['Outfit'] font-light text-[14px] leading-[1.5] text-[#161616]">
+              Cookies are small text files that are stored on your device when you visit our website. They help us remember your preferences and provide you with a better browsing experience. We use both session cookies (which expire when you close your browser) and persistent cookies (which remain on your device until deleted or expired).
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="sm:col-span-2 h-px bg-[#BBBBBB] my-[16px]" />
+
+          {/* How we use cookies */}
+          <div className="sm:col-start-1 hero-seq-item hero-seq-right" style={{ animationDelay: '320ms' }}>
+            <h2 className="font-['Outfit'] font-normal text-[14px] sm:text-[16px] leading-[1.3] tracking-[0.14px] sm:tracking-[0.16px] uppercase text-[#161616]">
+              How we use cookies
+            </h2>
+          </div>
+          <div className="sm:col-start-2 space-y-[16px] hero-seq-item hero-seq-right" style={{ animationDelay: '480ms' }}>
+            <div>
+              <h3 className="font-['Outfit'] font-normal text-[14px] sm:text-[16px] leading-[1.5] text-[#161616] mb-[8px]">
+                Essential Cookies
+              </h3>
+              <p className="font-['Outfit'] font-light text-[14px] leading-[1.5] text-[#161616]">
+                These cookies are necessary for the website to function properly. They enable basic features like page navigation and access to secure areas.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-['Outfit'] font-normal text-[14px] sm:text-[16px] leading-[1.5] text-[#161616] mb-[8px]">
+                Analytics Cookies
+              </h3>
+              <p className="font-['Outfit'] font-light text-[14px] leading-[1.5] text-[#161616]">
+                We use analytics cookies to understand how visitors interact with our website. This helps us improve our services and user experience.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-['Outfit'] font-normal text-[14px] sm:text-[16px] leading-[1.5] text-[#161616] mb-[8px]">
+                Marketing Cookies
+              </h3>
+              <p className="font-['Outfit'] font-light text-[14px] leading-[1.5] text-[#161616]">
+                These cookies track your online activity to help us deliver more relevant advertising. They may be set by us or third-party providers.
+              </p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="sm:col-span-2 h-px bg-[#BBBBBB] my-[16px]" />
+
+          {/* Managing cookies */}
+          <div className="sm:col-start-1 hero-seq-item hero-seq-right" style={{ animationDelay: '640ms' }}>
+            <h2 className="font-['Outfit'] font-normal text-[14px] sm:text-[16px] leading-[1.3] tracking-[0.14px] sm:tracking-[0.16px] uppercase text-[#161616]">
+              Managing cookies
+            </h2>
+          </div>
+          <div className="sm:col-start-2 hero-seq-item hero-seq-right" style={{ animationDelay: '800ms' }}>
+            <p className="font-['Outfit'] font-light text-[14px] leading-[1.5] text-[#161616]">
+              You can control and manage cookies in your browser settings. Please note that removing or blocking cookies may impact your user experience and some features of the website may not function properly. Most browsers allow you to refuse or accept cookies, delete existing cookies, and set preferences for certain websites.
+            </p>
+          </div>
+        </div>
+      </div>
+      </InView>
+    </main>
+  );
+}

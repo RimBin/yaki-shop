@@ -1,0 +1,616 @@
+import { createClient } from '@supabase/supabase-js';
+import type { Invoice, InvoiceGenerateRequest, InvoiceItem } from '@/types/invoice';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+function looksLikeJwt(value: string): boolean {
+  return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value.trim());
+}
+
+export const supabaseAdmin = supabaseUrl && supabaseServiceKey && looksLikeJwt(supabaseServiceKey)
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : null;
+
+type StoredItems = unknown[];
+
+type OrderStripePaymentUpdates = {
+  stripe_session_id?: string;
+  stripe_payment_intent?: string;
+};
+
+type OrderStatusUpdates = {
+  status: Order['status'];
+  payment_status?: Order['payment_status'];
+  completed_at?: string;
+  paid_at?: string;
+};
+
+type InvoiceStatusUpdates = {
+  status: DBInvoice['status'];
+  paid_at?: string;
+};
+
+export interface Order {
+  id: string;
+  order_number: string;
+  stripe_session_id?: string;
+  stripe_payment_intent?: string;
+  quote_id?: string;
+  customer_email: string;
+  customer_name: string;
+  customer_phone?: string;
+  customer_address?: string;
+  items: StoredItems;
+  subtotal: number;
+  vat_amount: number;
+  total: number;
+  currency: string;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  created_at: string;
+  updated_at: string;
+  paid_at?: string;
+  completed_at?: string;
+  notes?: string;
+}
+
+export interface DBInvoice {
+  id: string;
+  invoice_number: string;
+  order_id?: string;
+  seller_name: string;
+  seller_company_code?: string;
+  seller_vat_code?: string;
+  seller_address: string;
+  seller_city: string;
+  seller_postal_code?: string;
+  seller_country: string;
+  seller_phone?: string;
+  seller_email?: string;
+  seller_bank_name?: string;
+  seller_bank_account?: string;
+  buyer_name: string;
+  buyer_company_name?: string;
+  buyer_company_code?: string;
+  buyer_vat_code?: string;
+  buyer_address: string;
+  buyer_city: string;
+  buyer_postal_code?: string;
+  buyer_country: string;
+  buyer_phone?: string;
+  buyer_email?: string;
+  items: StoredItems;
+  subtotal: number;
+  vat_amount: number;
+  total: number;
+  currency: string;
+  status: 'draft' | 'issued' | 'paid' | 'overdue' | 'cancelled';
+  issued_at: string;
+  due_date: string;
+  paid_at?: string;
+  payment_method: 'bank_transfer' | 'cash' | 'card' | 'stripe' | 'paypal' | 'manual';
+  notes?: string;
+  pdf_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function createOrder(data: {
+  orderNumber: string;
+  stripeSessionId?: string;
+  customerEmail: string;
+  customerName: string;
+  customerPhone?: string;
+  customerAddress?: string;
+  items: StoredItems;
+  subtotal: number;
+  vatAmount: number;
+  total: number;
+  currency?: string;
+  notes?: string;
+  quoteId?: string;
+}): Promise<Order | null> {
+  if (!supabaseAdmin) {
+    console.warn('Supabase not configured, skipping order creation');
+    return null;
+  }
+  const baseInsert = {
+    order_number: data.orderNumber,
+    stripe_session_id: data.stripeSessionId,
+    quote_id: data.quoteId,
+    customer_email: data.customerEmail,
+    customer_name: data.customerName,
+    customer_phone: data.customerPhone,
+    customer_address: data.customerAddress,
+    items: data.items,
+    subtotal: data.subtotal,
+    vat_amount: data.vatAmount,
+    total: data.total,
+    currency: data.currency || 'EUR',
+    status: 'pending',
+    payment_status: 'pending',
+    notes: data.notes,
+  };
+
+  const firstAttempt = await supabaseAdmin.from('orders').insert(baseInsert).select().single();
+  if (!firstAttempt.error) {
+    return firstAttempt.data;
+  }
+
+  const firstMessage = String(firstAttempt.error?.message || '').toLowerCase();
+  const shouldTryLegacyFallback =
+    firstMessage.includes('column "email"') ||
+    firstMessage.includes('column "total_amount"') ||
+    firstMessage.includes('column "shipping_name"');
+
+  if (!shouldTryLegacyFallback) {
+    console.error('Error creating order:', firstAttempt.error);
+    return null;
+  }
+
+  const legacyInsert = {
+    ...baseInsert,
+    email: data.customerEmail,
+    total_amount: data.total,
+    shipping_name: data.customerName || 'Klientas',
+    shipping_address: data.customerAddress || '',
+    shipping_city: '',
+    shipping_postal_code: '',
+    shipping_country: 'LT',
+    shipping_phone: data.customerPhone || '',
+  };
+
+  const secondAttempt = await supabaseAdmin.from('orders').insert(legacyInsert).select().single();
+  if (secondAttempt.error) {
+    console.error('Error creating order:', secondAttempt.error);
+    return null;
+  }
+
+  return secondAttempt.data;
+}
+
+export async function getOrderByStripeSession(sessionId: string): Promise<Order | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('orders')
+    .select('*')
+    .eq('stripe_session_id', sessionId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching order:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getOrderById(orderId: string): Promise<Order | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching order by id:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function updateOrderStripePayment(
+  orderId: string,
+  data: {
+    stripeSessionId?: string;
+    stripePaymentIntent?: string;
+  }
+): Promise<boolean> {
+  if (!supabaseAdmin) return false;
+  const updates: OrderStripePaymentUpdates = {};
+  if (data.stripeSessionId) updates.stripe_session_id = data.stripeSessionId;
+  if (data.stripePaymentIntent) updates.stripe_payment_intent = data.stripePaymentIntent;
+
+  if (Object.keys(updates).length === 0) return true;
+
+  const { error } = await supabaseAdmin
+    .from('orders')
+    .update(updates)
+    .eq('id', orderId);
+
+  if (error) {
+    console.error('Error updating order stripe fields:', error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function updateOrderStatus(
+  orderId: string,
+  status: Order['status'],
+  paymentStatus?: Order['payment_status']
+): Promise<boolean> {
+  if (!supabaseAdmin) return false;
+  
+  const updates: OrderStatusUpdates = { status };
+  
+  if (paymentStatus) {
+    updates.payment_status = paymentStatus;
+  }
+
+  if (status === 'completed') {
+    updates.completed_at = new Date().toISOString();
+  }
+
+  if (paymentStatus === 'paid') {
+    updates.paid_at = new Date().toISOString();
+  }
+
+  const { error } = await supabaseAdmin
+    .from('orders')
+    .update(updates)
+    .eq('id', orderId);
+
+  if (error) {
+    console.error('Error updating order:', error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function getAllOrders(limit = 100): Promise<Order[]> {
+  if (!supabaseAdmin) return [];
+  const { data, error } = await supabaseAdmin
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching orders:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export interface PricingQuote {
+  id: string;
+  token_hash: string;
+  status: 'active' | 'consumed' | 'expired';
+  currency: string;
+  vat_rate: number;
+  subtotal_gross_cents: number;
+  shipping_gross_cents: number;
+  total_gross_cents: number;
+  subtotal_net_cents: number;
+  vat_cents: number;
+  items_snapshot: StoredItems;
+  consumed_order_id?: string | null;
+  created_at: string;
+  expires_at: string;
+  consumed_at?: string | null;
+}
+
+export async function createPricingQuote(data: {
+  tokenHash: string;
+  status: PricingQuote['status'];
+  currency: string;
+  vatRate: number;
+  subtotalGrossCents: number;
+  shippingGrossCents: number;
+  totalGrossCents: number;
+  subtotalNetCents: number;
+  vatCents: number;
+  itemsSnapshot: StoredItems;
+  expiresAt: string;
+}): Promise<PricingQuote | null> {
+  if (!supabaseAdmin) return null;
+  const { data: quote, error } = await supabaseAdmin
+    .from('pricing_quotes')
+    .insert({
+      token_hash: data.tokenHash,
+      status: data.status,
+      currency: data.currency,
+      vat_rate: data.vatRate,
+      subtotal_gross_cents: data.subtotalGrossCents,
+      shipping_gross_cents: data.shippingGrossCents,
+      total_gross_cents: data.totalGrossCents,
+      subtotal_net_cents: data.subtotalNetCents,
+      vat_cents: data.vatCents,
+      items_snapshot: data.itemsSnapshot,
+      expires_at: data.expiresAt,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating pricing quote:', error);
+    return null;
+  }
+
+  return quote as PricingQuote;
+}
+
+export async function getPricingQuoteByTokenHash(tokenHash: string): Promise<PricingQuote | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('pricing_quotes')
+    .select('*')
+    .eq('token_hash', tokenHash)
+    .single();
+
+  if (error) {
+    console.error('Error fetching pricing quote:', error);
+    return null;
+  }
+
+  return (data as PricingQuote) ?? null;
+}
+
+export async function consumePricingQuote(quoteId: string, orderId: string): Promise<boolean> {
+  if (!supabaseAdmin) return false;
+
+  const { error } = await supabaseAdmin
+    .from('pricing_quotes')
+    .update({
+      status: 'consumed',
+      consumed_at: new Date().toISOString(),
+      consumed_order_id: orderId,
+    })
+    .eq('id', quoteId)
+    .eq('status', 'active');
+
+  if (error) {
+    console.error('Error consuming pricing quote:', error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function getOrderByQuoteId(quoteId: string): Promise<Order | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('orders')
+    .select('*')
+    .eq('quote_id', quoteId)
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return (data as Order) ?? null;
+}
+
+export async function saveInvoiceToDatabase(invoice: Invoice, orderId?: string): Promise<DBInvoice | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('invoices')
+    .insert({
+      invoice_number: invoice.invoiceNumber,
+      order_id: orderId,
+      seller_name: invoice.seller.name,
+      seller_company_code: invoice.seller.companyCode,
+      seller_vat_code: invoice.seller.vatCode,
+      seller_address: invoice.seller.address,
+      seller_city: invoice.seller.city,
+      seller_postal_code: invoice.seller.postalCode,
+      seller_country: invoice.seller.country,
+      seller_phone: invoice.seller.phone,
+      seller_email: invoice.seller.email,
+      buyer_name: invoice.buyer.name,
+      buyer_company_name: invoice.buyer.companyName,
+      buyer_company_code: invoice.buyer.companyCode,
+      buyer_vat_code: invoice.buyer.vatCode,
+      buyer_address: invoice.buyer.address,
+      buyer_city: invoice.buyer.city,
+      buyer_postal_code: invoice.buyer.postalCode,
+      buyer_country: invoice.buyer.country,
+      buyer_phone: invoice.buyer.phone,
+      buyer_email: invoice.buyer.email,
+      items: invoice.items,
+      subtotal: invoice.subtotal,
+      vat_amount: invoice.totalVat,
+      total: invoice.total,
+      currency: 'EUR',
+      status: invoice.status,
+      issued_at: invoice.issueDate,
+      due_date: invoice.dueDate,
+      paid_at: invoice.paymentDate,
+      payment_method: invoice.paymentMethod,
+      notes: invoice.notes
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving invoice:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getInvoiceById(id: string): Promise<DBInvoice | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('invoices')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching invoice:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getInvoiceByNumber(invoiceNumber: string): Promise<DBInvoice | null> {
+  if (!supabaseAdmin) return null;
+  const { data, error } = await supabaseAdmin
+    .from('invoices')
+    .select('*')
+    .eq('invoice_number', invoiceNumber)
+    .single();
+
+  if (error) {
+    console.error('Error fetching invoice:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getAllInvoices(limit = 100): Promise<DBInvoice[]> {
+  if (!supabaseAdmin) return [];
+  const { data, error } = await supabaseAdmin
+    .from('invoices')
+    .select('*')
+    .order('issued_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching invoices:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function updateInvoiceStatus(
+  id: string,
+  status: DBInvoice['status']
+): Promise<boolean> {
+  if (!supabaseAdmin) return false;
+  const updates: InvoiceStatusUpdates = { status };
+  
+  if (status === 'paid') {
+    updates.paid_at = new Date().toISOString();
+  }
+
+  const { error } = await supabaseAdmin
+    .from('invoices')
+    .update(updates)
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating invoice:', error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function deleteInvoice(id: string): Promise<boolean> {
+  if (!supabaseAdmin) return false;
+  const { error } = await supabaseAdmin
+    .from('invoices')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting invoice:', error);
+    return false;
+  }
+
+  return true;
+}
+
+export function generateOrderNumber(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `YW-${year}${month}${day}-${random}`;
+}
+
+function toInvoiceItems(items: StoredItems): InvoiceItem[] {
+  return items.map((item, index) => {
+    const source = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const quantity = Number(source.quantity ?? 1);
+    const unitPrice = Number(source.unitPrice ?? 0);
+    const vatRate = Number(source.vatRate ?? 0.21);
+    const total = Number(
+      source.total
+      ?? source.totalInclVat
+      ?? source.totalExclVat
+      ?? quantity * unitPrice
+    );
+
+    return {
+      id: typeof source.id === 'string' && source.id.trim() ? source.id : `item-${index + 1}`,
+      name: typeof source.name === 'string' && source.name.trim() ? source.name : 'Prekė',
+      description: typeof source.description === 'string' ? source.description : undefined,
+      quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+      unit: typeof source.unit === 'string' ? source.unit : undefined,
+      unitPrice: Number.isFinite(unitPrice) ? unitPrice : 0,
+      unitPriceInclVat: Number.isFinite(Number(source.unitPriceInclVat)) ? Number(source.unitPriceInclVat) : undefined,
+      vatRate: Number.isFinite(vatRate) ? vatRate : 0.21,
+      totalExclVat: Number.isFinite(Number(source.totalExclVat)) ? Number(source.totalExclVat) : undefined,
+      vatAmount: Number.isFinite(Number(source.vatAmount)) ? Number(source.vatAmount) : undefined,
+      totalInclVat: Number.isFinite(Number(source.totalInclVat)) ? Number(source.totalInclVat) : undefined,
+      total: Number.isFinite(total) ? total : 0
+    };
+  });
+}
+
+export function convertDBInvoiceToInvoice(dbInvoice: DBInvoice): Invoice {
+  return {
+    id: dbInvoice.id,
+    invoiceNumber: dbInvoice.invoice_number,
+    series: dbInvoice.invoice_number.split('-')[0] || 'YW',
+    sequenceNumber: parseInt(dbInvoice.invoice_number.split('-').pop() || '0'),
+    seller: {
+      name: dbInvoice.seller_name,
+      companyCode: dbInvoice.seller_company_code,
+      vatCode: dbInvoice.seller_vat_code,
+      address: dbInvoice.seller_address,
+      city: dbInvoice.seller_city,
+      postalCode: dbInvoice.seller_postal_code || '',
+      country: dbInvoice.seller_country,
+      phone: dbInvoice.seller_phone,
+      email: dbInvoice.seller_email
+    },
+    buyer: {
+      name: dbInvoice.buyer_name,
+      companyName: dbInvoice.buyer_company_name,
+      companyCode: dbInvoice.buyer_company_code,
+      vatCode: dbInvoice.buyer_vat_code,
+      address: dbInvoice.buyer_address,
+      city: dbInvoice.buyer_city,
+      postalCode: dbInvoice.buyer_postal_code || '',
+      country: dbInvoice.buyer_country,
+      phone: dbInvoice.buyer_phone,
+      email: dbInvoice.buyer_email
+    },
+    items: toInvoiceItems(dbInvoice.items),
+    subtotal: Number(dbInvoice.subtotal),
+    totalVat: Number(dbInvoice.vat_amount),
+    total: Number(dbInvoice.total),
+    status: dbInvoice.status,
+    issueDate: dbInvoice.issued_at,
+    dueDate: dbInvoice.due_date,
+    paymentDate: dbInvoice.paid_at,
+    paymentMethod: dbInvoice.payment_method,
+    notes: dbInvoice.notes,
+    bankName: dbInvoice.seller_bank_name,
+    bankAccount: dbInvoice.seller_bank_account,
+    createdAt: dbInvoice.created_at,
+    updatedAt: dbInvoice.updated_at
+  };
+}

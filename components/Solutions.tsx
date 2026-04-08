@@ -1,0 +1,213 @@
+'use client';
+
+import React, { useState } from 'react';
+import ArrowRight from '@/components/icons/ArrowRight';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
+import { toLocalePath } from '@/i18n/paths';
+import { assets } from '@/lib/assets';
+import InView from '@/components/InView';
+import SeoImage from '@/components/ui/SeoImage';
+import { buildUiImageSeo } from '@/lib/seo/images';
+const { fence: imgFence, facades: imgFacades, terrace: imgTerrace, interior: imgInterior } = assets.categories;
+
+type SolutionId = 'terrace' | 'facade' | 'fence' | 'interior';
+
+type SolutionItem = {
+  id: SolutionId;
+  image: string;
+};
+
+const solutions: SolutionItem[] = [
+  { id: 'terrace', image: imgTerrace },
+  { id: 'facade', image: imgFacades },
+  { id: 'fence', image: imgFence },
+  { id: 'interior', image: imgInterior },
+];
+
+export default function Solutions() {
+  const [openIndex, setOpenIndex] = useState<number>(0); // Terrace open by default
+  const locale = useLocale();
+  const currentLocale = locale === 'lt' ? 'lt' : 'en';
+  const t = useTranslations('home.solutions');
+
+  const anchorMap: Record<'lt' | 'en', Record<SolutionId, string>> = {
+    lt: {
+      terrace: 'terasos',
+      facade: 'fasadai',
+      fence: 'tvoros',
+      interior: 'interjeras',
+    },
+    en: {
+      terrace: 'terraces',
+      facade: 'facades',
+      fence: 'fences',
+      interior: 'interior',
+    },
+  };
+
+  return (
+    <section className="w-full bg-[#E1E1E1]">
+      {/* Page Header */}
+      {/* Removed duplicated header blocks as requested */}
+      
+      {/* ===== MOBILE LAYOUT (< 1280px) - Figma 759:7698 ===== */}
+        <InView className="xl:hidden hero-animate-root">
+        {/* Title Section - Mobile/Tablet */}
+        <div className="px-[16px] md:px-[32px] pt-[64px] pb-[24px] hero-seq-item hero-seq-right" style={{ animationDelay: '0ms' }}>
+          <p className="font-['Outfit'] font-normal text-[12px] leading-[1.3] tracking-[0.6px] uppercase text-[#161616] mb-[8px]">
+            {t('eyebrow')}
+          </p>
+          <p
+            className="font-['DM_Sans'] font-light leading-none text-[#161616] max-w-[760px]"
+            style={{ fontSize: 'clamp(40px, 6vw, 80px)', letterSpacing: 'clamp(-1.6px, -0.04em, -4.4px)' }}
+          >
+            <span>{t('headline.prefix')}</span>
+            <span className="font-['Tiro_Tamil'] italic tracking-[-2.4px]"> {t('headline.emphasis')}</span>
+            <span> {t('headline.suffix')}</span>
+          </p>
+        </div>
+        {/* Cards - Mobile: Full width accordion style like Figma 759:7702 */}
+        <div className="w-full flex flex-col">
+          {/* Top border */}
+          <div className="h-[1px] bg-[#BBBBBB] w-full" />
+          
+          {solutions.map((solution, idx) => (
+            <div key={idx}>
+              {/* Card */}
+              <div 
+                className={`w-full p-[16px] md:p-[24px] flex flex-col gap-[16px] cursor-pointer transition-colors hero-seq-item hero-seq-right ${openIndex === idx ? 'bg-[#161616]' : 'bg-[#e1e1e1]'}`}
+                style={{ animationDelay: `${idx * 180}ms` }}
+                onClick={() => setOpenIndex(openIndex === idx ? -1 : idx)}
+              >
+                {/* Title */}
+                <p className={`font-['DM_Sans'] font-normal text-[20px] md:text-[24px] leading-[1.1] tracking-[-0.96px] max-w-[600px] ${openIndex === idx ? 'text-white' : 'text-[#161616]'}`}>
+                  {t(`items.${solution.id}.title`)}
+                </p>
+                
+                {/* Image - responsive height */}
+                <div className={`w-full rounded-[8px] relative overflow-hidden transition-all ${openIndex === idx ? 'h-[160px] md:h-[220px]' : 'h-[56px] md:h-[80px]'}`}>
+                  <SeoImage src={solution.image} alt={buildUiImageSeo(currentLocale, { name: t(`items.${solution.id}.title`), context: currentLocale === 'lt' ? 'Sprendimo nuotrauka' : 'Solution image' }).alt} title={buildUiImageSeo(currentLocale, { name: t(`items.${solution.id}.title`), context: currentLocale === 'lt' ? 'Sprendimo nuotrauka' : 'Solution image' }).title} description={buildUiImageSeo(currentLocale, { name: t(`items.${solution.id}.title`), context: t(`items.${solution.id}.description`) }).description} fill sizes="100vw" className="object-cover" />
+                </div>
+                
+                {/* Description + Learn More - only when open */}
+                {openIndex === idx && (
+                  <div className="flex flex-col gap-[24px] w-full">
+                    <p className="font-['Outfit'] font-light text-[14px] leading-[1.2] tracking-[0.14px] text-white">
+                      {t(`items.${solution.id}.description`)}
+                    </p>
+                    <div className="flex gap-[8px] items-center h-[24px]">
+                      <Link
+                        href={toLocalePath(`/solutions#${anchorMap[currentLocale][solution.id]}`, currentLocale)}
+                        className="flex items-center gap-[8px]"
+                      >
+                        <p className="font-['Outfit'] font-normal text-[12px] leading-[1.2] tracking-[0.6px] uppercase text-white">
+                          {t('cta.learnMore')}
+                        </p>
+                        <ArrowRight color="#FFFFFF" />
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Divider between cards */}
+              {idx < solutions.length - 1 && openIndex !== idx && openIndex !== idx + 1 && (
+                <div className="h-[1px] bg-[#BBBBBB] mx-[16px]" />
+              )}
+            </div>
+          ))}
+          
+          {/* Bottom border */}
+          <div className="h-[1px] bg-[#BBBBBB] w-full" />
+        </div>
+
+      </InView>
+
+      {/* ===== DESKTOP LAYOUT (>= 1280px) ===== */}
+        <InView className="hidden xl:block hero-animate-root">
+        {/* Title Section - Figma pattern: eyebrow at left-[0], heading at left-[calc(25%+24px)] */}
+        <div className="max-w-[1440px] mx-auto px-[40px] pt-[120px] pb-[40px] hero-seq-item hero-seq-right" style={{ animationDelay: '0ms' }}>
+          <div className="relative h-[160px] text-[#161616]">
+            <p className="absolute left-0 top-[25px] font-['Outfit'] font-normal text-[12px] leading-[1.3] tracking-[0.6px] uppercase">
+              {t('eyebrow')}
+            </p>
+            <p className="absolute left-[calc(25%+24px)] top-0 font-['DM_Sans'] font-light text-[80px] leading-none tracking-[-4.4px] w-[713px]">
+              <span className="inline-flex whitespace-nowrap">
+                <span>{t('headline.prefix')}</span>
+                <span className="font-['Tiro_Tamil'] italic tracking-[-2.4px]">&nbsp;{t('headline.emphasis')}</span>
+              </span>
+              <span className="block">{t('headline.suffix')}</span>
+            </p>
+          </div>
+        </div>
+        
+        {/* Desktop Cards (Accordion) */}
+        <div className="w-full flex flex-col items-center">
+          {/* Top divider line */}
+          <div className="w-full flex justify-center">
+            <div className="w-[1360px] h-px bg-[#BBBBBB]" />
+          </div>
+
+          {solutions.map((solution, idx) => {
+            const isOpen = openIndex === idx;
+
+            return (
+              <React.Fragment key={solution.id}>
+                <button
+                  type="button"
+                  className={`${isOpen ? 'bg-[#161616]' : 'bg-[#e1e1e1]'} w-full text-left hero-seq-item hero-seq-right`}
+                  style={{ animationDelay: `${220 + idx * 160}ms` }}
+                  aria-expanded={isOpen}
+                  aria-controls={`solutions-accordion-panel-${idx}`}
+                  onClick={() => setOpenIndex(isOpen ? -1 : idx)}
+                >
+                  <div
+                    id={`solutions-accordion-panel-${idx}`}
+                    className="max-w-[1440px] mx-auto px-[40px] py-[24px] flex gap-[16px] items-start"
+                  >
+                    <div className="w-[328px] shrink-0">
+                      <p
+                        className={`font-['DM_Sans'] font-normal text-[32px] leading-[1.1] tracking-[-1.28px] whitespace-pre-wrap ${isOpen ? 'text-white' : 'text-[#161616]'}`}
+                      >
+                        {t(`items.${solution.id}.title`)}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`w-[672px] relative overflow-hidden ${isOpen ? 'h-[300px] rounded-[8px]' : 'h-[100px] rounded-tl-[8px] rounded-tr-[8px]'}`}
+                    >
+                      <SeoImage src={solution.image} alt={buildUiImageSeo(currentLocale, { name: t(`items.${solution.id}.title`), context: currentLocale === 'lt' ? 'Sprendimo nuotrauka' : 'Solution image' }).alt} title={buildUiImageSeo(currentLocale, { name: t(`items.${solution.id}.title`), context: currentLocale === 'lt' ? 'Sprendimo nuotrauka' : 'Solution image' }).title} description={buildUiImageSeo(currentLocale, { name: t(`items.${solution.id}.title`), context: t(`items.${solution.id}.description`) }).description} fill sizes="(min-width: 1280px) 672px, 100vw" className="object-cover" />
+                    </div>
+
+                    {isOpen && (
+                      <div className="w-[288px] h-[300px] flex flex-col items-start justify-between shrink-0">
+                        <p className="font-['Outfit'] font-light text-[14px] leading-[1.2] tracking-[0.14px] text-white whitespace-pre-wrap">
+                          {t(`items.${solution.id}.description`)}
+                        </p>
+                        <div className="flex gap-[16px] items-center">
+                          <Link
+                            href={toLocalePath(`/solutions#${anchorMap[currentLocale][solution.id]}`, currentLocale)}
+                            className="flex items-center gap-[8px]"
+                          >
+                            <p className="font-['Outfit'] font-normal text-[12px] leading-[1.2] tracking-[0.6px] uppercase text-white">{t('cta.learnMore')}</p>
+                            <ArrowRight color="#FFFFFF" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {/* Divider line between cards */}
+                <div className="w-full flex justify-center">
+                  <div className="w-[1360px] h-px bg-[#BBBBBB]" />
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </InView>
+    </section>
+  );
+}

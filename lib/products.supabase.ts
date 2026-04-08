@@ -1,0 +1,606 @@
+import { seedProducts } from '@/data/seed-products'
+import { getDefaultFinishPreviewImage, getFinishPreviewImage, getFinishTextureImage } from '@/lib/assets'
+import { createPublicClient } from '@/lib/supabase/public'
+import type { TypedObject } from '@portabletext/types'
+
+export interface ProductColorVariant {
+  id: string
+  name: string
+  nameLt?: string
+  nameEn?: string
+  hex?: string
+  image?: string
+  productImage?: string
+  description?: string
+  priceModifier?: number
+}
+
+export interface ProductProfileVariant {
+  id: string
+  name: string
+  nameLt?: string
+  nameEn?: string
+  code?: string
+  description?: string
+  priceModifier?: number
+  dimensions?: {
+    width?: number
+    thickness?: number
+    length?: number
+  }
+  image?: string
+}
+
+export interface Product {
+  id: string
+  slug: string
+  slugEn?: string
+  name: string
+  nameEn?: string
+  price: number
+  salePrice?: number
+  image: string
+  category: string
+  woodType?: string
+  description?: string
+  descriptionEn?: string
+  descriptionPortable?: TypedObject | TypedObject[]
+  images?: string[]
+  colors?: ProductColorVariant[]
+  profiles?: ProductProfileVariant[]
+  specifications?: Array<{ label: string; value: string }>
+  inStock?: boolean
+}
+
+const USAGE_LABELS = {
+  facade: { lt: 'Fasadinė dailylentė', en: 'Facade cladding' },
+  terrace: { lt: 'Terasinė lenta', en: 'Terrace board' },
+} as const
+
+const WOOD_LABELS = {
+  spruce: { lt: 'Eglė', en: 'Spruce' },
+  larch: { lt: 'Maumedis', en: 'Larch' },
+  thermo: { lt: 'Termo', en: 'Thermo' },
+} as const
+
+function normalizeUsageType(value?: string | null): keyof typeof USAGE_LABELS | null {
+  const raw = (value ?? '').trim().toLowerCase()
+  if (!raw) return null
+
+  // Already canonical
+  if (raw === 'facade' || raw === 'terrace') return raw
+
+  // Common DB/category labels
+  if (raw.includes('facade') || raw.includes('fasad')) return 'facade'
+  if (raw.includes('terrace') || raw.includes('teras') || raw.includes('deck')) return 'terrace'
+
+  return null
+}
+
+function buildBaseProductName(
+  usageType?: string | null,
+  woodType?: string | null,
+  locale: 'lt' | 'en' = 'lt'
+): string | null {
+  const usageKey = (usageType || '').trim().toLowerCase() as keyof typeof USAGE_LABELS
+  const woodKey = (woodType || '').trim().toLowerCase() as keyof typeof WOOD_LABELS
+  const usage = USAGE_LABELS[usageKey]?.[locale]
+  const wood = WOOD_LABELS[woodKey]?.[locale]
+  if (!usage || !wood) return null
+  return `${usage} / ${wood}`
+}
+
+type FetchProductsOptions = {
+  mode?: 'active' | 'stock-items' | 'all'
+}
+
+type DbProduct = {
+  id: string
+  name: string
+  name_en?: string | null
+  slug: string
+  slug_en?: string | null
+  description: string | null
+  description_en?: string | null
+  base_price: string | number
+  sale_price?: string | number | null
+  wood_type: string | null
+  category: string | null
+  usage_type?: string | null
+  image_url: string | null
+  is_active: boolean | null
+  product_variants?: DbVariant[]
+}
+
+type DbVariant = {
+  id: string
+  name: string
+  label_lt?: string | null
+  label_en?: string | null
+  value_mm?: number | null
+  variant_type: string
+  hex_color: string | null
+  price_adjustment: string | number | null
+  texture_url: string | null
+  image_url?: string | null
+  stock_quantity: number | null
+  is_available: boolean | null
+}
+
+function toNumber(value: unknown): number {
+  if (typeof value === 'number') return value
+  if (typeof value === 'string' && value.trim() !== '') {
+    const n = Number(value)
+    return Number.isFinite(n) ? n : 0
+  }
+  return 0
+}
+
+function transformSeedProduct(seed: (typeof seedProducts)[number]): Product {
+  const previewImage = getDefaultFinishPreviewImage(seed.woodType) ?? seed.images?.[0] ?? '/images/ui/wood/imgSpruce.png'
+  return {
+    id: seed.id,
+    slug: seed.slug,
+    slugEn: (seed as any).slugEn ?? undefined,
+    name: seed.name,
+    price: seed.basePrice,
+    image: previewImage,
+    images: previewImage ? [previewImage] : seed.images ?? [],
+    category: seed.category,
+    woodType: seed.woodType,
+    description: seed.description,
+    inStock: seed.inStock,
+  }
+}
+
+export function transformDbProduct(db: DbProduct): Product {
+  const variants = Array.isArray(db.product_variants) ? db.product_variants : []
+
+  const slug = db.slug
+  const isStockItem = !!slug && slug.includes('--') && (db.is_active === false || db.is_active === null)
+
+  const colors: ProductColorVariant[] = variants
+    .filter((v) => v.variant_type === 'color')
+    .map((v) => ({
+      id: v.id,
+      // Keep `name` as a stable fallback, but also preserve per-locale labels.
+      name: v.label_en ?? v.name,
+      nameEn: v.label_en ?? v.name,
+      nameLt: v.label_lt ?? v.name,
+      hex: v.hex_color ?? undefined,
+      image: v.image_url ?? v.texture_url ?? undefined,
+      productImage:
+        getFinishPreviewImage(db.wood_type, v.label_en ?? v.label_lt ?? v.name) ??
+        v.image_url ??
+        v.texture_url ??
+        undefined,
+      priceModifier: v.price_adjustment === null ? undefined : toNumber(v.price_adjustment),
+    }))
+
+  const hasExplicitProfiles = variants.some((v) => v.variant_type === 'profile')
+  const profileSource = hasExplicitProfiles
+    ? variants.filter((v) => v.variant_type === 'profile')
+    : variants.filter((v) => v.variant_type === 'finish' || v.variant_type === 'profile')
+
+  const profiles: ProductProfileVariant[] = profileSource
+    .map((v) => ({
+      id: v.id,
+      name: v.label_en ?? v.name,
+      nameEn: v.label_en ?? v.name,
+      nameLt: v.label_lt ?? undefined,
+      code: v.name,
+      priceModifier: v.price_adjustment === null ? undefined : toNumber(v.price_adjustment),
+      image: v.image_url ?? v.texture_url ?? undefined,
+    }))
+
+  const parsedStock = isStockItem ? parseStockItemSlug(slug) : null
+  const stockColors: ProductColorVariant[] = parsedStock
+    ? [
+        {
+          id: `stock-color:${parsedStock.color}`,
+          name: humanizeSlugToken(parsedStock.color),
+          nameEn: humanizeSlugToken(parsedStock.color),
+          nameLt: humanizeSlugToken(parsedStock.color),
+          image: getFinishTextureImage(db.wood_type, parsedStock.color) ?? undefined,
+          productImage:
+            getFinishPreviewImage(db.wood_type, parsedStock.color) ??
+            getFinishTextureImage(db.wood_type, parsedStock.color) ??
+            undefined,
+        },
+      ]
+    : []
+
+  const stockProfiles: ProductProfileVariant[] = parsedStock
+    ? [
+        {
+          id: `stock-profile:${parsedStock.profile}`,
+          name: humanizeSlugToken(parsedStock.profile),
+          nameEn: humanizeSlugToken(parsedStock.profile),
+          code: parsedStock.profile,
+        },
+      ]
+    : []
+
+  const image =
+    getFinishPreviewImage(db.wood_type, parsedStock?.color) ??
+    getDefaultFinishPreviewImage(db.wood_type) ??
+    db.image_url ??
+    '/images/ui/wood/imgSpruce.png'
+  const usage =
+    normalizeUsageType(db.usage_type) ??
+    normalizeUsageType(db.category) ??
+    // Keep a safe default so filters/UI don't break.
+    'facade'
+  const baseNameLt = buildBaseProductName(usage, db.wood_type, 'lt')
+  const baseNameEn = buildBaseProductName(usage, db.wood_type, 'en')
+
+  const inStock =
+    variants.length === 0
+      ? true
+      : variants.some((v) => (v.is_available ?? true) && (v.stock_quantity ?? 0) > 0)
+
+  return {
+    id: db.id,
+    slug: db.slug,
+    slugEn: db.slug_en ?? undefined,
+    name: baseNameLt ?? db.name,
+    nameEn: baseNameEn ?? db.name_en ?? db.name,
+    price: toNumber(db.base_price),
+    salePrice: db.sale_price === null ? undefined : toNumber(db.sale_price),
+    image,
+    images: image ? [image] : [],
+    category: usage,
+    woodType: db.wood_type ?? undefined,
+    description: db.description ?? undefined,
+    descriptionEn: db.description_en ?? undefined,
+    colors: colors.length ? colors : stockColors.length ? stockColors : undefined,
+    profiles: profiles.length ? profiles : stockProfiles.length ? stockProfiles : undefined,
+    inStock,
+  }
+}
+
+function humanizeSlugToken(token: string): string {
+  const safe = token.trim().replace(/[_\s]+/g, '-')
+  return safe
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
+const COLOR_LABELS: Record<string, { lt: string; en: string }> = {
+  black: { lt: 'Juoda', en: 'Black' },
+  silver: { lt: 'Sidabrinė', en: 'Silver' },
+  graphite: { lt: 'Grafitas', en: 'Graphite' },
+  latte: { lt: 'Latte', en: 'Latte' },
+  carbon: { lt: 'Anglis', en: 'Carbon' },
+  'carbon-light': { lt: 'Šviesi anglis', en: 'Carbon Light' },
+  'carbon-dark': { lt: 'Tamsi anglis', en: 'Carbon Dark' },
+  brown: { lt: 'Ruda', en: 'Brown' },
+  'dark-brown': { lt: 'Tamsiai ruda', en: 'Dark Brown' },
+}
+
+const COLOR_SYNONYMS: Record<string, keyof typeof COLOR_LABELS> = {
+  juoda: 'black',
+  sidabrine: 'silver',
+  grafitas: 'graphite',
+  anglis: 'carbon',
+  'sviesi-anglis': 'carbon-light',
+  'tamsi-anglis': 'carbon-dark',
+  ruda: 'brown',
+  'tamsi-ruda': 'dark-brown',
+}
+
+function normalizeColorKey(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[_\s]+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+export function localizeColorLabel(input: string, locale: 'lt' | 'en'): string {
+  const normalizedRaw = normalizeColorKey(input)
+  const normalized = COLOR_SYNONYMS[normalizedRaw] ?? normalizedRaw
+  if (!normalized) return input
+
+  const direct = COLOR_LABELS[normalized]
+  if (direct) return locale === 'lt' ? direct.lt : direct.en
+
+  const parts = normalized.split('-').filter(Boolean)
+  if (parts.length > 1) {
+    const mapped = parts.map((part) =>
+      COLOR_LABELS[part] ? (locale === 'lt' ? COLOR_LABELS[part].lt : COLOR_LABELS[part].en) : humanizeSlugToken(part)
+    )
+    return mapped.join(' ')
+  }
+
+  return humanizeSlugToken(normalized)
+}
+
+const PROFILE_LABELS: Record<string, { lt: string; en: string }> = {
+  'half-taper': { lt: 'Pusė špunto', en: 'Half Taper' },
+  'half-taper-45': { lt: 'Pusė špunto 45°', en: 'Half Taper 45°' },
+  rectangle: { lt: 'Stačiakampis', en: 'Rectangle' },
+  rhombus: { lt: 'Rombas', en: 'Rhombus' },
+}
+
+function normalizeProfileKey(input: string): string {
+  return normalizeColorKey(input)
+}
+
+function normalizeProfileToken(input: string): string {
+  const token = normalizeProfileKey(input)
+  if (!token) return ''
+
+  const isHalf = token.includes('half') || token.includes('taper') || token.includes('pus') || token.includes('spunto')
+  if (isHalf && token.includes('45')) return 'half-taper-45'
+  if (isHalf) return 'half-taper'
+  if (token.includes('rhomb') || token.includes('romb')) return 'rhombus'
+  if (token.includes('rectangle') || token.includes('staciakamp')) return 'rectangle'
+  return token
+}
+
+export function localizeProfileLabel(input: string, locale: 'lt' | 'en'): string {
+  const normalized = normalizeProfileToken(input)
+  if (!normalized) return input
+  const mapped = PROFILE_LABELS[normalized]
+  if (mapped) return locale === 'lt' ? mapped.lt : mapped.en
+  return input
+}
+
+export function getLocalizedColorName(
+  color: Pick<ProductColorVariant, 'name' | 'nameLt' | 'nameEn'>,
+  locale: 'lt' | 'en'
+): string {
+  if (locale === 'lt') return color.nameLt ?? localizeColorLabel(color.name ?? '', 'lt')
+  return color.nameEn ?? localizeColorLabel(color.name ?? '', 'en')
+}
+
+export function getLocalizedProfileName(
+  profile: Pick<ProductProfileVariant, 'name' | 'nameLt' | 'nameEn' | 'code'>,
+  locale: 'lt' | 'en'
+): string {
+  const raw = [profile.name, profile.code].filter(Boolean).join(' ')
+  if (locale === 'lt') return profile.nameLt ?? localizeProfileLabel(raw, 'lt')
+  return profile.nameEn ?? localizeProfileLabel(raw, 'en')
+}
+
+function parseStockItemSlug(
+  slug: string
+):
+  | {
+      baseSlug: string
+      profile: string
+      color: string
+      size: string
+    }
+  | null {
+  // Stock-item slugs are generated like:
+  //   <baseSlug>--<profile>--<color>--<width>x<length>
+  const parts = slug.split('--')
+  if (parts.length < 4) return null
+  const [baseSlug, profile, color, size] = parts
+  if (!baseSlug || !profile || !color || !size) return null
+  return { baseSlug, profile, color, size }
+}
+
+function formatSupabaseError(error: unknown): string {
+  if (!error) return '<no error details>'
+
+  if (error instanceof Error) {
+    return error.message || error.name
+  }
+
+  if (typeof error === 'string') return error
+
+  if (typeof error === 'object') {
+    const record = error as Record<string, unknown>
+
+    // Supabase/PostgREST errors frequently have non-enumerable properties.
+    const message = typeof record.message === 'string' ? record.message : null
+    const code = typeof record.code === 'string' ? record.code : null
+    const details = typeof record.details === 'string' ? record.details : null
+    const hint = typeof record.hint === 'string' ? record.hint : null
+    const status =
+      typeof record.status === 'number'
+        ? String(record.status)
+        : typeof record.status === 'string'
+          ? record.status
+          : null
+
+    const parts = [
+      message,
+      code ? `code=${code}` : null,
+      status ? `status=${status}` : null,
+      details ? `details=${details}` : null,
+      hint ? `hint=${hint}` : null,
+    ].filter(Boolean)
+
+    if (parts.length > 0) return parts.join(' | ')
+
+    try {
+      const keys = Object.getOwnPropertyNames(error)
+      const picked: Record<string, unknown> = {}
+      for (const key of keys) {
+        picked[key] = (error as Record<string, unknown>)[key]
+      }
+      const json = JSON.stringify(picked)
+      return json === '{}' ? '[object]' : json
+    } catch {
+      return '[object]'
+    }
+  }
+
+  return String(error)
+}
+
+export async function fetchProducts(options?: FetchProductsOptions): Promise<Product[]> {
+  const supabase = createPublicClient()
+  const mode = options?.mode ?? 'active'
+
+  // In the browser, always prefer the server API so client-side rendering does
+  // not depend on direct Supabase network availability or RLS behavior.
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch(`/api/products?mode=${encodeURIComponent(mode)}`, {
+        headers: {
+          accept: 'application/json',
+        },
+      })
+
+      if (res.ok) {
+        const json = (await res.json()) as unknown
+        if (Array.isArray(json)) {
+          return (json as unknown as DbProduct[]).map(transformDbProduct)
+        }
+      }
+    } catch {
+      // Fall back to local seed data below.
+    }
+
+    return seedProducts.map(transformSeedProduct)
+  }
+
+  if (!supabase) {
+    return seedProducts.map(transformSeedProduct)
+  }
+
+  let query = supabase
+    .from('products')
+    .select('*, product_variants(*)')
+    .order('created_at', { ascending: false })
+
+  if (mode === 'active') {
+    query = query.eq('is_active', true)
+  } else if (mode === 'stock-items') {
+    query = query.eq('is_active', false).ilike('slug', '%--%')
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    // Expected in local/demo environments when DB/RLS/schema isn't ready.
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Supabase products fetch failed:', formatSupabaseError(error))
+    }
+    return seedProducts.map(transformSeedProduct)
+  }
+
+  if (!data || data.length === 0) {
+    return []
+  }
+
+  return (data as unknown as DbProduct[]).map(transformDbProduct)
+}
+
+export function mergeProductLists(...lists: Product[][]): Product[] {
+  const merged = new Map<string, Product>()
+
+  for (const list of lists) {
+    for (const product of list) {
+      const key = product.slug || product.id
+      if (!key) continue
+      if (!merged.has(key)) {
+        merged.set(key, product)
+      }
+    }
+  }
+
+  return Array.from(merged.values())
+}
+
+export async function fetchProductBySlug(
+  slug: string,
+  options?: {
+    locale?: 'en' | 'lt'
+  }
+): Promise<Product | null> {
+  const supabase = createPublicClient()
+
+  if (!supabase) {
+    const seed = seedProducts.find((p) => p.slug === slug || (p as any).slugEn === slug)
+    return seed ? transformSeedProduct(seed) : null
+  }
+
+  const locale = options?.locale
+  const columnsToTry = locale === 'en' ? (['slug_en', 'slug'] as const) : (['slug', 'slug_en'] as const)
+
+  const allowInactive = slug.includes('--')
+
+  const enrichWithBaseProduct = async (stockProduct: Product): Promise<Product> => {
+    if (!allowInactive) return stockProduct
+
+    const parsed = parseStockItemSlug(stockProduct.slug)
+    if (!parsed?.baseSlug || parsed.baseSlug.includes('--')) return stockProduct
+
+    const base = await fetchProductBySlug(parsed.baseSlug, options)
+    if (!base) return stockProduct
+
+    return {
+      ...stockProduct,
+      // Keep stock item identity (slug/name/price), but expose full choice sets.
+      colors: base.colors ?? stockProduct.colors,
+      profiles: base.profiles ?? stockProduct.profiles,
+      images: base.images?.length ? base.images : stockProduct.images,
+      image: stockProduct.image || base.image,
+      description: stockProduct.description ?? base.description,
+      descriptionEn: stockProduct.descriptionEn ?? base.descriptionEn,
+      woodType: stockProduct.woodType ?? base.woodType,
+      category: stockProduct.category || base.category,
+    }
+  }
+
+  for (const column of columnsToTry) {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .eq(column, slug)
+        .eq('is_active', true)
+        .maybeSingle()
+
+      if (allowInactive && !error && !data) {
+        // For stock-item pages, we need to be able to resolve inactive rows.
+        // NOTE: This still depends on RLS policies permitting select.
+        const fallback = await supabase
+          .from('products')
+          .select('*, product_variants(*)')
+          .eq(column, slug)
+          .maybeSingle()
+
+        if (!fallback.error && fallback.data) {
+          const stockProduct = transformDbProduct(fallback.data as unknown as DbProduct)
+          return enrichWithBaseProduct(stockProduct)
+        }
+      }
+
+      if (error) {
+        // Older schemas may not have slug_en yet.
+        const message = formatSupabaseError(error)
+        if (/slug_en/i.test(message) && /does not exist|schema cache|could not find/i.test(message)) {
+          continue
+        }
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('Supabase product-by-slug fetch failed:', message)
+        }
+        break
+      }
+
+      if (data) {
+        const product = transformDbProduct(data as unknown as DbProduct)
+        return enrichWithBaseProduct(product)
+      }
+    } catch {
+      // ignore and try next column
+    }
+  }
+
+  const seed = seedProducts.find((p) => p.slug === slug || (p as any).slugEn === slug)
+  return seed ? transformSeedProduct(seed) : null
+}

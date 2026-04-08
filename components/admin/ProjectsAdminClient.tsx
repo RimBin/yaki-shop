@@ -1,0 +1,1766 @@
+'use client'
+
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { createClient } from '@/lib/supabase/client'
+
+import { projects as defaultProjects } from '@/data/projects'
+import type { Project } from '@/types/project'
+import { getProjectDescription, getProjectLocation, getProjectSubtitle, getProjectTitle, normalizeProjectLocale } from '@/lib/projects/i18n'
+import {
+  AdminBadge,
+  AdminButton,
+  AdminCard,
+  AdminInput,
+  AdminSelect,
+  AdminSectionTitle,
+  AdminStack,
+  AdminTextarea,
+} from '@/components/admin/ui/AdminUI'
+import { useToast } from '@/components/ui/Toast'
+
+const PROJECT_IMAGES_BUCKET = 'project-images'
+
+async function getAdminToken(): Promise<string | null> {
+  const supabase = createClient()
+  if (!supabase) return null
+  const { data } = await supabase.auth.getSession()
+  return data.session?.access_token ?? null
+}
+
+async function adminRequest<T>(input: RequestInfo | URL, init: RequestInit = {}): Promise<T> {
+  const token = await getAdminToken()
+  if (!token) {
+    throw new Error('No admin session. Please login again.')
+  }
+
+  const headers = new Headers(init.headers)
+  headers.set('Authorization', `Bearer ${token}`)
+  if (!headers.has('Content-Type') && init.body) headers.set('Content-Type', 'application/json')
+
+  const res = await fetch(input, { ...init, headers })
+  const json = (await res.json().catch(() => null)) as any
+  if (!res.ok) {
+    const msg = json?.error || `Request failed (${res.status})`
+    throw new Error(msg)
+  }
+  return json as T
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message
+  if (typeof error === 'string' && error) return error
+  return fallback
+}
+
+async function uploadImageToSupabase(file: File, bucket = PROJECT_IMAGES_BUCKET): Promise<string> {
+  const supabase = createClient()
+  if (!supabase) {
+    throw new Error('Supabase is not configured (missing env vars)')
+  }
+
+  const token = await getAdminToken()
+  if (!token) {
+    throw new Error('No admin session. Please login again.')
+  }
+
+  const res = await fetch('/api/admin/uploads', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      fileName: file.name,
+      contentType: file.type || 'application/octet-stream',
+      bucket,
+    }),
+  })
+
+  const json = (await res.json().catch(() => null)) as any
+  if (!res.ok) {
+    const msg = json?.error || `Upload URL request failed (${res.status})`
+    throw new Error(msg)
+  }
+
+  const path = String(json?.path || '')
+  const signedToken = String(json?.token || '')
+  const outBucket = String(json?.bucket || bucket)
+  const publicUrl = String(json?.publicUrl || '')
+
+  if (!path || !signedToken || !publicUrl) {
+    throw new Error('Upload URL response missing required fields')
+  }
+
+  const { error } = await supabase.storage.from(outBucket).uploadToSignedUrl(path, signedToken, file, {
+    contentType: file.type || undefined,
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return publicUrl
+}
+
+function slugify(value: string) {
+  return value
+    .normalize('NFKD')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function trimString(value: unknown) {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+const defaultProjectsById = new Map(defaultProjects.map((project) => [project.id, project]))
+const defaultProjectsByLtSlug = new Map(
+  defaultProjects
+    .map((project) => {
+      const ltSlug = trimString(project.i18n?.lt?.slug) || trimString(project.slug)
+      return ltSlug ? ([ltSlug, project] as const) : null
+    })
+    .filter(Boolean) as Array<readonly [string, Project]>
+)
+const defaultProjectsByEnSlug = new Map(
+  defaultProjects
+    .map((project) => {
+      const enSlug = trimString(project.i18n?.en?.slug)
+      return enSlug ? ([enSlug, project] as const) : null
+    })
+    .filter(Boolean) as Array<readonly [string, Project]>
+)
+
+function shouldReplaceWithDefaultLt(options: {
+  current: string
+  base: string
+  currentEn: string
+  defaultEn: string
+}) {
+  const { current, base, currentEn, defaultEn } = options
+  if (!current) return true
+  if (defaultEn && current === defaultEn) return true
+  if (currentEn && current === currentEn) return true
+  if (base && current === base && ((defaultEn && base === defaultEn) || (currentEn && base === currentEn))) return true
+  return false
+}
+
+function shouldReplaceBaseWithDefaultLt(options: { base: string; currentEn: string; defaultEn: string }) {
+  const { base, currentEn, defaultEn } = options
+  if (!base) return true
+  if (currentEn && base === currentEn) return true
+  if (defaultEn && base === defaultEn) return true
+  return false
+}
+
+function findDefaultProjectForMigration(project: Project): Project | null {
+  const byId = defaultProjectsById.get(project.id)
+  if (byId) return byId
+
+  const baseSlug = trimString(project.slug)
+  const enSlug = trimString(project.i18n?.en?.slug)
+  const ltSlug = trimString(project.i18n?.lt?.slug)
+
+  return (
+    (enSlug ? defaultProjectsByEnSlug.get(enSlug) : null) ||
+    (ltSlug ? defaultProjectsByLtSlug.get(ltSlug) : null) ||
+    (baseSlug ? defaultProjectsByEnSlug.get(baseSlug) || defaultProjectsByLtSlug.get(baseSlug) : null) ||
+    null
+  )
+}
+
+function migrateProjectLtFromDefaults(project: Project): { project: Project; changed: boolean } {
+  const defaults = findDefaultProjectForMigration(project)
+  if (!defaults) return { project, changed: false }
+
+  const nextLt = { ...(project.i18n?.lt ?? {}) }
+  const nextI18n = { ...(project.i18n ?? {}), lt: nextLt }
+  let nextProject: Project = project
+  let changed = false
+
+  const fields: Array<{
+    key: 'title' | 'subtitle' | 'slug' | 'location' | 'description' | 'fullDescription'
+    baseValue: () => string
+    setBase: (value: string) => void
+    ltValue: () => string
+    setLt: (value: string) => void
+    enValue: () => string
+    defaultLt: () => string
+    defaultEn: () => string
+  }> = [
+    {
+      key: 'title',
+      baseValue: () => trimString(nextProject.title),
+      setBase: (value) => {
+        nextProject = { ...nextProject, title: value }
+      },
+      ltValue: () => trimString(nextLt.title),
+      setLt: (value) => {
+        nextLt.title = value
+      },
+      enValue: () => trimString(nextProject.i18n?.en?.title),
+      defaultLt: () => trimString(defaults.i18n?.lt?.title) || trimString(defaults.title),
+      defaultEn: () => trimString(defaults.i18n?.en?.title),
+    },
+    {
+      key: 'subtitle',
+      baseValue: () => trimString(nextProject.subtitle),
+      setBase: (value) => {
+        nextProject = { ...nextProject, subtitle: value }
+      },
+      ltValue: () => trimString(nextLt.subtitle),
+      setLt: (value) => {
+        nextLt.subtitle = value
+      },
+      enValue: () => trimString(nextProject.i18n?.en?.subtitle),
+      defaultLt: () => trimString(defaults.i18n?.lt?.subtitle) || trimString(defaults.subtitle),
+      defaultEn: () => trimString(defaults.i18n?.en?.subtitle),
+    },
+    {
+      key: 'slug',
+      baseValue: () => trimString(nextProject.slug),
+      setBase: (value) => {
+        nextProject = { ...nextProject, slug: value }
+      },
+      ltValue: () => trimString(nextLt.slug),
+      setLt: (value) => {
+        nextLt.slug = value
+      },
+      enValue: () => trimString(nextProject.i18n?.en?.slug),
+      defaultLt: () => trimString(defaults.i18n?.lt?.slug) || trimString(defaults.slug),
+      defaultEn: () => trimString(defaults.i18n?.en?.slug),
+    },
+    {
+      key: 'location',
+      baseValue: () => trimString(nextProject.location),
+      setBase: (value) => {
+        nextProject = { ...nextProject, location: value }
+      },
+      ltValue: () => trimString(nextLt.location),
+      setLt: (value) => {
+        nextLt.location = value
+      },
+      enValue: () => trimString(nextProject.i18n?.en?.location),
+      defaultLt: () => trimString(defaults.i18n?.lt?.location) || trimString(defaults.location),
+      defaultEn: () => trimString(defaults.i18n?.en?.location),
+    },
+    {
+      key: 'description',
+      baseValue: () => trimString(nextProject.description),
+      setBase: (value) => {
+        nextProject = { ...nextProject, description: value }
+      },
+      ltValue: () => trimString(nextLt.description),
+      setLt: (value) => {
+        nextLt.description = value
+      },
+      enValue: () => trimString(nextProject.i18n?.en?.description),
+      defaultLt: () => trimString(defaults.i18n?.lt?.description) || trimString(defaults.description),
+      defaultEn: () => trimString(defaults.i18n?.en?.description),
+    },
+    {
+      key: 'fullDescription',
+      baseValue: () => trimString(nextProject.fullDescription),
+      setBase: (value) => {
+        nextProject = { ...nextProject, fullDescription: value }
+      },
+      ltValue: () => trimString(nextLt.fullDescription),
+      setLt: (value) => {
+        nextLt.fullDescription = value
+      },
+      enValue: () => trimString(nextProject.i18n?.en?.fullDescription),
+      defaultLt: () => trimString(defaults.i18n?.lt?.fullDescription) || trimString(defaults.fullDescription),
+      defaultEn: () => trimString(defaults.i18n?.en?.fullDescription),
+    },
+  ]
+
+  for (const field of fields) {
+    const defaultLtValue = field.defaultLt()
+    if (!defaultLtValue) continue
+
+    const base = field.baseValue()
+    const current = field.ltValue()
+    const currentEn = field.enValue()
+    const defaultEn = field.defaultEn()
+
+    if (shouldReplaceWithDefaultLt({ current, base, currentEn, defaultEn })) {
+      field.setLt(defaultLtValue)
+      changed = true
+    }
+
+    if (shouldReplaceBaseWithDefaultLt({ base, currentEn, defaultEn })) {
+      field.setBase(defaultLtValue)
+      changed = true
+    }
+  }
+
+  if (!changed) return { project, changed: false }
+
+  return {
+    project: {
+      ...nextProject,
+      i18n: nextI18n,
+    },
+    changed: true,
+  }
+}
+
+function migrateProjectSlugs(project: Project): { project: Project; changed: boolean } {
+  const ltTitle = trimString(project.i18n?.lt?.title) || trimString(project.title)
+  const enTitle = trimString(project.i18n?.en?.title) || trimString(project.title)
+
+  const desiredLtSlug = ltTitle ? slugify(ltTitle) : ''
+  const desiredEnSlug = enTitle ? slugify(enTitle) : ''
+
+  const existingBaseSlug = trimString(project.slug)
+  const existingLtSlug = trimString(project.i18n?.lt?.slug)
+  const existingEnSlug = trimString(project.i18n?.en?.slug)
+
+  let nextBaseSlug = existingBaseSlug
+  const nextLt = { ...(project.i18n?.lt ?? {}) }
+  const nextEn = { ...(project.i18n?.en ?? {}) }
+  let changed = false
+
+  if (desiredLtSlug && !existingLtSlug) {
+    nextLt.slug = desiredLtSlug
+    changed = true
+  }
+
+  if (desiredEnSlug && !existingEnSlug) {
+    nextEn.slug = desiredEnSlug
+    changed = true
+  }
+
+  const targetLtSlug = trimString(nextLt.slug) || desiredLtSlug
+
+  if (!nextBaseSlug && targetLtSlug) {
+    nextBaseSlug = targetLtSlug
+    changed = true
+  }
+
+  const baseMatchesEnglishAuto =
+    Boolean(targetLtSlug) &&
+    Boolean(nextBaseSlug) &&
+    nextBaseSlug !== targetLtSlug &&
+    ((desiredEnSlug && nextBaseSlug === desiredEnSlug) || (existingEnSlug && nextBaseSlug === existingEnSlug))
+
+  if (baseMatchesEnglishAuto && targetLtSlug) {
+    nextBaseSlug = targetLtSlug
+    changed = true
+  }
+
+  if (!changed) return { project, changed: false }
+
+  return {
+    project: {
+      ...project,
+      slug: nextBaseSlug || project.slug,
+      i18n: {
+        ...(project.i18n ?? {}),
+        lt: nextLt,
+        en: nextEn,
+      },
+    },
+    changed: true,
+  }
+}
+
+type ProjectFormState = {
+  title: string
+  subtitle: string
+  slug: string
+  location: string
+  titleEn: string
+  subtitleEn: string
+  slugEn: string
+  locationEn: string
+  images: string
+  featuredImage: string
+  productsUsed: string
+  description: string
+  fullDescription: string
+  descriptionEn: string
+  fullDescriptionEn: string
+  category: string
+  featured: boolean
+}
+
+const EMPTY_FORM: ProjectFormState = {
+  title: '',
+  subtitle: '',
+  slug: '',
+  location: '',
+  titleEn: '',
+  subtitleEn: '',
+  slugEn: '',
+  locationEn: '',
+  images: '',
+  featuredImage: '',
+  productsUsed: '',
+  description: '',
+  fullDescription: '',
+  descriptionEn: '',
+  fullDescriptionEn: '',
+  category: 'residential',
+  featured: false,
+}
+
+export default function ProjectsAdminClient() {
+  const t = useTranslations('admin')
+  const locale = useLocale()
+  const currentLocale = normalizeProjectLocale(locale)
+  const toast = useToast()
+
+  const [projects, setProjects] = useState<Project[]>([])
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
+  const [projectForm, setProjectForm] = useState<ProjectFormState>(EMPTY_FORM)
+
+  const [projectImageFiles, setProjectImageFiles] = useState<string[]>([])
+  const [featuredImageFile, setFeaturedImageFile] = useState('')
+  const [isUploadingImages, setIsUploadingImages] = useState(false)
+  const [uploadingTarget, setUploadingTarget] = useState<'gallery' | 'featured' | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [isRegeneratingSlugs, setIsRegeneratingSlugs] = useState(false)
+  const [isMigratingLtTexts, setIsMigratingLtTexts] = useState(false)
+
+  const projectFileInputRef = useRef<HTMLInputElement | null>(null)
+  const featuredImageInputRef = useRef<HTMLInputElement | null>(null)
+  const projectCardRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const [projectSelectedFileNames, setProjectSelectedFileNames] = useState<string[]>([])
+
+  const scrollProjectCardIntoView = (projectId?: string | null) => {
+    if (!projectId || typeof window === 'undefined') return
+
+    window.requestAnimationFrame(() => {
+      const card = projectCardRefs.current[projectId]
+      if (!card) return
+
+      const top = card.getBoundingClientRect().top + window.scrollY - 120
+      window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' })
+    })
+  }
+
+  const projectSelectedFilesLabel =
+    projectSelectedFileNames.length > 0
+      ? currentLocale === 'lt'
+        ? `Pasirinkta: ${projectSelectedFileNames.length}`
+        : `Selected: ${projectSelectedFileNames.length}`
+      : t('ui.noFileSelected')
+
+  const featuredUploadLabel =
+    uploadingTarget === 'featured' && isUploadingImages
+      ? currentLocale === 'lt'
+        ? 'Įkeliama nuotrauka...'
+        : 'Uploading image...'
+      : featuredImageFile
+        ? currentLocale === 'lt'
+          ? 'Pakeisti nuotrauką'
+          : 'Replace image'
+        : currentLocale === 'lt'
+          ? 'Įkelti nuotrauką'
+          : 'Upload image'
+
+  const galleryUploadLabel =
+    uploadingTarget === 'gallery' && isUploadingImages
+      ? currentLocale === 'lt'
+        ? `Įkeliamos nuotraukos... ${uploadProgress}%`
+        : `Uploading images... ${uploadProgress}%`
+      : projectSelectedFilesLabel
+
+  const uploadProgressHint =
+    uploadingTarget === 'featured'
+      ? currentLocale === 'lt'
+        ? `Nuotrauka įkeliama: ${uploadProgress}%`
+        : `Uploading image: ${uploadProgress}%`
+      : currentLocale === 'lt'
+        ? `Nuotraukos įkeliamos: ${uploadProgress}%`
+        : `Uploading images: ${uploadProgress}%`
+
+  const persistProjects = async (next: Project[]) => {
+    const previous = projects
+    setProjects(next)
+    try {
+      await adminRequest('/api/admin/projects', {
+        method: 'PUT',
+        body: JSON.stringify({ projects: next }),
+      })
+    } catch (error) {
+      setProjects(previous)
+      throw error
+    }
+  }
+
+  useEffect(() => {
+    let cancelled = false
+
+    const run = async () => {
+      try {
+        const json = await adminRequest<{ projects: Project[] }>('/api/admin/projects')
+        if (cancelled) return
+
+        const loaded = Array.isArray(json.projects) ? json.projects : []
+        if (loaded.length > 0) {
+          setProjects(loaded)
+          return
+        }
+
+        if (typeof window !== 'undefined') {
+          const seededKey = 'yakiwood_cms_seeded_projects_v1'
+          const alreadySeeded = window.localStorage.getItem(seededKey) === '1'
+          if (!alreadySeeded && defaultProjects.length > 0) {
+            try {
+              await adminRequest('/api/admin/projects', {
+                method: 'PUT',
+                body: JSON.stringify({ projects: defaultProjects }),
+              })
+              window.localStorage.setItem(seededKey, '1')
+              if (cancelled) return
+              setProjects(defaultProjects)
+              return
+            } catch {
+
+            }
+          }
+        }
+
+        setProjects(defaultProjects)
+      } catch (e) {
+        if (cancelled) return
+        setProjects(defaultProjects)
+        showToast(getErrorMessage(e, 'Nepavyko užkrauti projektų.'))
+      }
+    }
+
+    void run()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  function showToast(msg: string) {
+    toast.success(msg)
+  }
+
+  function showErrorToast(msg: string) {
+    toast.error(msg)
+  }
+
+  const handleProjectImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files
+    if (!fileList || fileList.length === 0) return
+
+    const files = Array.from(fileList)
+    setProjectSelectedFileNames(files.map((file) => file.name))
+
+    setUploadingTarget('gallery')
+    setUploadProgress(0)
+    setIsUploadingImages(true)
+
+    try {
+      const urls: string[] = []
+      for (const [index, file] of files.entries()) {
+        urls.push(await uploadImageToSupabase(file))
+        setUploadProgress(Math.round(((index + 1) / files.length) * 100))
+      }
+
+      setProjectImageFiles((prev) => [...prev, ...urls])
+      showToast(`Įkelta ${urls.length} nuotr. į Supabase.`)
+    } catch (error) {
+
+      try {
+        const base64Images = await Promise.all(
+          files.map(
+            (file) =>
+              new Promise<string>((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onload = () => resolve(String(reader.result || ''))
+                reader.onerror = () => reject(reader.error ?? new Error('File read failed'))
+                reader.readAsDataURL(file)
+              })
+          )
+        )
+
+        const cleaned = base64Images.filter(Boolean)
+        if (cleaned.length > 0) {
+          setProjectImageFiles((prev) => [...prev, ...cleaned])
+        }
+        setUploadProgress(100)
+
+        showToast(
+          `Įkėlimas nepavyko; nuotraukos išsaugotos lokaliai: ${getErrorMessage(error, 'Įkėlimas nepavyko')}`
+        )
+      } catch {
+        showToast(getErrorMessage(error, 'Įkėlimas nepavyko'))
+      }
+    } finally {
+      setIsUploadingImages(false)
+      setUploadingTarget(null)
+      setUploadProgress(0)
+      e.target.value = ''
+      if (projectFileInputRef.current) projectFileInputRef.current.value = ''
+    }
+  }
+
+  const handleProjectFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) {
+      setProjectSelectedFileNames([])
+      return
+    }
+    setProjectSelectedFileNames(Array.from(files).map((file) => file.name))
+  }
+
+  const handleFeaturedImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingTarget('featured')
+    setUploadProgress(15)
+    setIsUploadingImages(true)
+    try {
+      const url = await uploadImageToSupabase(file)
+      setFeaturedImageFile(url)
+      setUploadProgress(100)
+      showToast('Pagrindinė nuotrauka įkelta į Supabase.')
+    } catch (error) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setFeaturedImageFile(String(reader.result || ''))
+        setUploadProgress(100)
+        showToast(`Įkėlimas nepavyko; nuotrauka išsaugota lokaliai: ${getErrorMessage(error, 'Įkėlimas nepavyko')}`)
+      }
+      reader.readAsDataURL(file)
+    } finally {
+      setIsUploadingImages(false)
+      setUploadingTarget(null)
+      setUploadProgress(0)
+      e.target.value = ''
+      if (featuredImageInputRef.current) featuredImageInputRef.current.value = ''
+    }
+  }
+
+  const handleProjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const urlImages = projectForm.images
+      .split(',')
+      .map((url) => url.trim())
+      .filter(Boolean)
+
+    const allImages = [...projectImageFiles, ...urlImages]
+
+    const productsArray = projectForm.productsUsed
+      .split(',')
+      .map((p) => ({ name: p.trim(), slug: slugify(p.trim()) }))
+      .filter((p) => p.name)
+
+    const safeSlug = projectForm.slug?.trim() ? projectForm.slug : slugify(projectForm.title)
+    const safeSlugEn = projectForm.slugEn?.trim()
+      ? projectForm.slugEn
+      : slugify(projectForm.titleEn?.trim() ? projectForm.titleEn : projectForm.title)
+
+    const featuredImg =
+      featuredImageFile || projectForm.featuredImage || (allImages.length > 0 ? allImages[0] : undefined)
+
+    const ltTitle = projectForm.title
+    const ltSubtitle = projectForm.subtitle || undefined
+    const ltLocation = projectForm.location
+    const ltDescription = projectForm.description
+    const ltFullDescription = projectForm.fullDescription || undefined
+
+    const enTitle = projectForm.titleEn?.trim() ? projectForm.titleEn : ltTitle
+    const enSubtitle = projectForm.subtitleEn?.trim() ? projectForm.subtitleEn : ltSubtitle
+    const enLocation = projectForm.locationEn?.trim() ? projectForm.locationEn : ltLocation
+    const enDescription = projectForm.descriptionEn?.trim() ? projectForm.descriptionEn : ltDescription
+    const enFullDescription = projectForm.fullDescriptionEn?.trim() ? projectForm.fullDescriptionEn : ltFullDescription
+
+    if (editingProjectId) {
+      const updated = projects.map((project) => {
+        if (project.id === editingProjectId) {
+          return {
+            ...project,
+            title: ltTitle,
+            subtitle: ltSubtitle,
+            slug: safeSlug,
+            location: ltLocation,
+            images: allImages.length > 0 ? allImages : project.images,
+            featuredImage: featuredImg,
+            productsUsed: productsArray,
+            description: ltDescription,
+            fullDescription: ltFullDescription,
+            i18n: {
+              ...(project.i18n ?? {}),
+              lt: {
+                ...(project.i18n?.lt ?? {}),
+                title: ltTitle,
+                subtitle: ltSubtitle,
+                slug: safeSlug,
+                location: ltLocation,
+                description: ltDescription,
+                fullDescription: ltFullDescription,
+              },
+              en: {
+                ...(project.i18n?.en ?? {}),
+                title: enTitle,
+                subtitle: enSubtitle,
+                slug: safeSlugEn,
+                location: enLocation,
+                description: enDescription,
+                fullDescription: enFullDescription,
+              },
+            },
+            category: projectForm.category as 'residential' | 'commercial',
+            featured: projectForm.featured,
+          }
+        }
+        return project
+      })
+
+      try {
+        await persistProjects(updated)
+        showToast('Projektas atnaujintas!')
+      } catch (e) {
+        showErrorToast(`Projekto išsaugoti nepavyko: ${getErrorMessage(e, 'Saugoti nepavyko')}`)
+      }
+      setProjectSelectedFileNames([])
+    } else {
+      const newProject: Project = {
+        id: Date.now().toString(),
+        ...projectForm,
+        slug: safeSlug,
+        images:
+          allImages.length > 0
+            ? allImages
+            : projectForm.images
+                .split(',')
+                .map((url) => url.trim())
+                .filter(Boolean),
+        featuredImage: featuredImg,
+        productsUsed: productsArray,
+        i18n: {
+          lt: {
+            title: ltTitle,
+            subtitle: ltSubtitle,
+            slug: safeSlug,
+            location: ltLocation,
+            description: ltDescription,
+            fullDescription: ltFullDescription,
+          },
+          en: {
+            title: enTitle,
+            subtitle: enSubtitle,
+            slug: safeSlugEn,
+            location: enLocation,
+            description: enDescription,
+            fullDescription: enFullDescription,
+          },
+        },
+      }
+
+      try {
+        const updated = [...projects, newProject]
+        await persistProjects(updated)
+        showToast('Projektas pridėtas!')
+      } catch (e) {
+        showErrorToast(`Projekto pridėti nepavyko: ${getErrorMessage(e, 'Saugoti nepavyko')}`)
+      }
+    }
+
+    if (!editingProjectId) {
+      setProjectForm(EMPTY_FORM)
+      setProjectImageFiles([])
+      setFeaturedImageFile('')
+      setProjectSelectedFileNames([])
+    }
+
+    if (projectFileInputRef.current) {
+      projectFileInputRef.current.value = ''
+    }
+    if (featuredImageInputRef.current) {
+      featuredImageInputRef.current.value = ''
+    }
+  }
+
+  const handleProjectDelete = async (id: string) => {
+    const updated = projects.filter((p) => p.id !== id)
+    try {
+      await persistProjects(updated)
+      showToast('Projektas ištrintas')
+    } catch (e) {
+      showErrorToast(`Projekto ištrinti nepavyko: ${getErrorMessage(e, 'Saugoti nepavyko')}`)
+    }
+  }
+
+  const handleProjectCancelEdit = (projectId?: string | null) => {
+    setEditingProjectId(null)
+    setShowAddForm(false)
+    setProjectForm(EMPTY_FORM)
+    setProjectImageFiles([])
+    setFeaturedImageFile('')
+    setProjectSelectedFileNames([])
+    scrollProjectCardIntoView(projectId)
+  }
+
+  const handleProjectEdit = (project: Project) => {
+    if (editingProjectId === project.id) {
+      handleProjectCancelEdit(project.id)
+      return
+    }
+
+    setShowAddForm(false)
+    setEditingProjectId(project.id)
+
+    const lt = project.i18n?.lt ?? {}
+    const en = project.i18n?.en ?? {}
+
+    const baseTitle = project.title
+    const baseSubtitle = project.subtitle || ''
+    const baseSlug = project.slug
+    const baseLocation = project.location
+    const baseDescription = project.description
+    const baseFullDescription = project.fullDescription || ''
+
+    setProjectForm({
+      title: typeof lt.title === 'string' && lt.title.trim() ? lt.title : baseTitle,
+      subtitle: typeof lt.subtitle === 'string' && lt.subtitle.trim() ? lt.subtitle : baseSubtitle,
+      slug: typeof lt.slug === 'string' && lt.slug.trim() ? lt.slug : baseSlug,
+      location: typeof lt.location === 'string' && lt.location.trim() ? lt.location : baseLocation,
+      titleEn: typeof en.title === 'string' && en.title.trim() ? en.title : baseTitle,
+      subtitleEn: typeof en.subtitle === 'string' && en.subtitle.trim() ? en.subtitle : baseSubtitle,
+      slugEn: typeof en.slug === 'string' && en.slug.trim() ? en.slug : baseSlug,
+      locationEn: typeof en.location === 'string' && en.location.trim() ? en.location : baseLocation,
+      images: '',
+      featuredImage: project.featuredImage || '',
+      productsUsed: Array.isArray(project.productsUsed)
+        ? project.productsUsed.map((p) => (typeof p === 'string' ? p : p.name)).join(', ')
+        : (project.productsUsed as any) || '',
+      description: typeof lt.description === 'string' && lt.description.trim() ? lt.description : baseDescription,
+      fullDescription:
+        typeof lt.fullDescription === 'string' && lt.fullDescription.trim() ? lt.fullDescription : baseFullDescription,
+      descriptionEn:
+        typeof en.description === 'string' && en.description.trim() ? en.description : baseDescription,
+      fullDescriptionEn:
+        typeof en.fullDescription === 'string' && en.fullDescription.trim()
+          ? en.fullDescription
+          : baseFullDescription,
+      category: project.category || 'residential',
+      featured: project.featured || false,
+    })
+
+    if (project.images && project.images.length > 0) {
+      setProjectImageFiles(project.images.map((img) => (typeof img === 'string' ? img : (img as any).url || '')))
+    }
+    if (project.featuredImage) {
+      setFeaturedImageFile(project.featuredImage)
+    }
+  }
+
+  const handleProjectImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const importedProjects = JSON.parse(event.target?.result as string) as unknown
+        if (!Array.isArray(importedProjects)) {
+          showToast('Nepavyko importuoti projektų. Patikrinkite JSON formatą.')
+          return
+        }
+        const updated = [...projects, ...(importedProjects as Project[])]
+        void persistProjects(updated)
+          .then(() => showToast(`Importuota: ${importedProjects.length} projektai.`))
+          .catch((e) => {
+            showErrorToast(`Projektų importuoti nepavyko: ${getErrorMessage(e, 'Saugoti nepavyko')}`)
+          })
+      } catch {
+        showErrorToast('Nepavyko importuoti projektų. Patikrinkite JSON formatą.')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const handleProjectExport = () => {
+    const dataStr = JSON.stringify(projects, null, 2)
+    const blob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'yakiwood-projects.json'
+    link.click()
+  }
+
+  const handleRegenerateProjectSlugs = async () => {
+    if (projects.length === 0) {
+      showToast('Nėra projektų, kuriems reikėtų atnaujinti slug’us.')
+      return
+    }
+
+    const confirmed = window.confirm(
+      "Atnaujinti slug’us iš pavadinimų (LT ir EN)?\n\n• Trūkstami slug’ai bus sugeneruoti automatiškai.\n• Jei pagrindinis slug’as akivaizdžiai angliškas, jis bus pakeistas į lietuvišką.\n• Rankiniu būdu pakeisti slug’ai nebus perrašyti."
+    )
+    if (!confirmed) return
+
+    setIsRegeneratingSlugs(true)
+    try {
+      let changedCount = 0
+      const updated = projects.map((project) => {
+        const result = migrateProjectSlugs(project)
+        if (result.changed) changedCount += 1
+        return result.project
+      })
+
+      if (changedCount === 0) {
+        showToast('Slug’ai jau atnaujinti.')
+        return
+      }
+
+      setProjects(updated)
+
+      try {
+        await persistProjects(updated)
+        showToast(`Atnaujinti slug’ai: ${changedCount} projektų.`)
+      } catch (e) {
+        showErrorToast(`Slug’ų išsaugoti nepavyko: ${getErrorMessage(e, 'Saugoti nepavyko')}`)
+      }
+    } finally {
+      setIsRegeneratingSlugs(false)
+    }
+  }
+
+  const handleMigrateLtTextsFromDefaults = async () => {
+    if (projects.length === 0) {
+      showToast('Nėra projektų, kuriems reikėtų atnaujinti LT tekstus.')
+      return
+    }
+
+    const confirmed = window.confirm(
+      'Atnaujinti lietuviškus (pagrindinius) projekto tekstus iš pradinio šablono?\n\n• Pritaikoma tik pradiniams demo projektams (pagal ID/slug).\n• LT laukai bus pataisyti, jei jie tušti arba akivaizdžiai angliški.\n• EN turinys nebus keičiamas.'
+    )
+    if (!confirmed) return
+
+    setIsMigratingLtTexts(true)
+    try {
+      let changedCount = 0
+      const updated = projects.map((project) => {
+        const result = migrateProjectLtFromDefaults(project)
+        if (result.changed) changedCount += 1
+        return result.project
+      })
+
+      if (changedCount === 0) {
+        showToast('LT tekstai jau atnaujinti (arba nėra atpažintų demo projektų).')
+        return
+      }
+
+      setProjects(updated)
+
+      try {
+        await persistProjects(updated)
+        showToast(`Atnaujinti LT tekstai: ${changedCount} projektų.`)
+      } catch (e) {
+        showErrorToast(`LT tekstų išsaugoti nepavyko: ${getErrorMessage(e, 'Saugoti nepavyko')}`)
+      }
+    } finally {
+      setIsMigratingLtTexts(false)
+    }
+  }
+
+  return (
+    <AdminStack>
+      <AdminCard>
+        <div className="flex flex-col items-start gap-[16px] sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <AdminSectionTitle>{t('breadcrumb.projects')}</AdminSectionTitle>
+            <p className="mt-[8px] font-['Outfit'] text-[14px] text-[#535353]">{t('main.subtitle')}</p>
+          </div>
+
+          <AdminButton
+            size="sm"
+            className="w-full sm:w-auto"
+            onClick={() => {
+              setShowAddForm((prev) => !prev)
+              setEditingProjectId(null)
+              if (!showAddForm) {
+                setProjectForm(EMPTY_FORM)
+                setProjectImageFiles([])
+                setFeaturedImageFile('')
+              }
+            }}
+          >
+            {showAddForm ? t('ui.cancel') : t('projects.actions.addProject')}
+          </AdminButton>
+        </div>
+
+        {showAddForm && (
+          <form onSubmit={handleProjectSubmit} className="mt-[24px] space-y-[20px]">
+            <div className="rounded-[16px] border border-[#BBBBBB] bg-[#EAEAEA] p-[16px]">
+              <p className="font-['Outfit'] text-[12px] tracking-[0.6px] uppercase text-[#535353]">Lietuvių (pagrindinė)</p>
+
+              <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                <div>
+                  <AdminInput
+                    type="text"
+                    required
+                    value={projectForm.title}
+                    onChange={(e) => {
+                      const nextTitle = e.target.value
+                      setProjectForm((prev) => {
+                        const prevAutoSlug = slugify(prev.title)
+                        const shouldAuto = !prev.slug || prev.slug === prevAutoSlug
+                        return {
+                          ...prev,
+                          title: nextTitle,
+                          slug: shouldAuto ? slugify(nextTitle) : prev.slug,
+                        }
+                      })
+                    }}
+                    placeholder="Projekto pavadinimas"
+                  />
+                  <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Rodomas sąrašuose ir projekto puslapyje.</p>
+                </div>
+
+                <div>
+                  <AdminInput
+                    type="text"
+                    value={projectForm.subtitle}
+                    onChange={(e) => setProjectForm({ ...projectForm, subtitle: e.target.value })}
+                    placeholder="Paantraštė (nebūtina)"
+                  />
+                  <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Trumpa paantraštė šalia pavadinimo.</p>
+                </div>
+              </div>
+
+              <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                <div>
+                  <AdminInput
+                    type="text"
+                    required
+                    value={projectForm.slug}
+                    onChange={(e) => setProjectForm({ ...projectForm, slug: slugify(e.target.value) })}
+                    placeholder="projekto-slug"
+                  />
+                  <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                    URL identifikatorius (mažosios raidės, brūkšneliai). Sugeneruojamas automatiškai, bet galima keisti.
+                  </p>
+                </div>
+
+                <div>
+                  <AdminInput
+                    type="text"
+                    required
+                    value={projectForm.location}
+                    onChange={(e) => setProjectForm({ ...projectForm, location: e.target.value })}
+                    placeholder="Vieta (pvz., Vilnius, Lietuva)"
+                  />
+                  <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Miestas, šalis (pvz., Vilnius, Lietuva).</p>
+                </div>
+              </div>
+
+              <div className="mt-[12px]">
+                <AdminTextarea
+                  required
+                  value={projectForm.description}
+                  onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                  rows={3}
+                  placeholder="Trumpas aprašymas (kortelėms)"
+                />
+                <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Trumpas tekstas, rodomas projekto kortelėje.</p>
+              </div>
+
+              <div className="mt-[12px]">
+                <AdminTextarea
+                  value={projectForm.fullDescription}
+                  onChange={(e) => setProjectForm({ ...projectForm, fullDescription: e.target.value })}
+                  rows={5}
+                  placeholder="Pilnas aprašymas (nebūtina, projekto puslapiui)"
+                />
+                <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Išsamesnis tekstas projekto puslapiui.</p>
+              </div>
+            </div>
+
+            <div className="rounded-[16px] border border-[#BBBBBB] bg-[#EAEAEA] p-[16px]">
+              <p className="font-['Outfit'] text-[12px] tracking-[0.6px] uppercase text-[#535353]">English (optional)</p>
+              <p className="mt-[4px] font-['Outfit'] text-[12px] text-[#535353]">Palikite tuščia - bus naudojamas LT tekstas.</p>
+
+              <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                <div>
+                  <AdminInput
+                    type="text"
+                    value={projectForm.titleEn}
+                    onChange={(e) => {
+                      const nextTitle = e.target.value
+                      setProjectForm((prev) => {
+                        const prevAutoSlug = slugify(prev.titleEn)
+                        const shouldAuto = !prev.slugEn || prev.slugEn === prevAutoSlug
+                        return {
+                          ...prev,
+                          titleEn: nextTitle,
+                          slugEn: shouldAuto ? slugify(nextTitle) : prev.slugEn,
+                        }
+                      })
+                    }}
+                    placeholder="Project title (EN)"
+                  />
+                </div>
+                <div>
+                  <AdminInput
+                    type="text"
+                    value={projectForm.subtitleEn}
+                    onChange={(e) => setProjectForm({ ...projectForm, subtitleEn: e.target.value })}
+                    placeholder="Subtitle (EN)"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                <div>
+                  <AdminInput
+                    type="text"
+                    value={projectForm.slugEn}
+                    onChange={(e) => setProjectForm({ ...projectForm, slugEn: slugify(e.target.value) })}
+                    placeholder="project-slug (EN)"
+                  />
+                </div>
+                <div>
+                  <AdminInput
+                    type="text"
+                    value={projectForm.locationEn}
+                    onChange={(e) => setProjectForm({ ...projectForm, locationEn: e.target.value })}
+                    placeholder="Location (EN)"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-[12px]">
+                <AdminTextarea
+                  value={projectForm.descriptionEn}
+                  onChange={(e) => setProjectForm({ ...projectForm, descriptionEn: e.target.value })}
+                  rows={3}
+                  placeholder="Short Description (EN)"
+                />
+              </div>
+
+              <div className="mt-[12px]">
+                <AdminTextarea
+                  value={projectForm.fullDescriptionEn}
+                  onChange={(e) => setProjectForm({ ...projectForm, fullDescriptionEn: e.target.value })}
+                  rows={5}
+                  placeholder="Full Description (EN)"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+              <div>
+                <AdminSelect
+                  value={projectForm.category}
+                  onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                >
+                  <option value="residential">Gyvenamieji</option>
+                  <option value="commercial">Komerciniai</option>
+                  <option value="public">Viešieji</option>
+                </AdminSelect>
+                <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Projekto kategorija.</p>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-[12px] px-[16px] py-[12px] border border-[#BBBBBB] rounded-[12px] bg-[#EAEAEA] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={projectForm.featured}
+                    onChange={(e) => setProjectForm({ ...projectForm, featured: e.target.checked })}
+                    className="w-[20px] h-[20px]"
+                  />
+                  <span className="font-['Outfit'] text-[14px]">Rekomenduojamas projektas</span>
+                </label>
+                <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                  Pažymėkite, jei projektas turi būti rodomas „rekomenduojamų“ sąrašuose.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <AdminInput
+                type="text"
+                value={projectForm.productsUsed}
+                onChange={(e) => setProjectForm({ ...projectForm, productsUsed: e.target.value })}
+                placeholder="Produktai (atskirti kableliais, pvz., Black larch, Brown larch)"
+              />
+              <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Pvz.: Black larch, Brown larch.</p>
+            </div>
+
+            <div className="space-y-[12px]">
+              <label className="block">
+                <span className="font-['Outfit'] text-[14px] font-medium text-[#161616] mb-[8px] block">
+                  Featured Image (katalogo nuotrauka)
+                </span>
+                <div className="relative">
+                  <input
+                    ref={featuredImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFeaturedImageUpload}
+                    className="hidden"
+                    id="featuredImageInput"
+                  />
+                  <label
+                    htmlFor="featuredImageInput"
+                    className="flex items-center justify-center w-full px-[16px] py-[12px] border-2 border-dashed border-[#161616] rounded-[12px] font-['Outfit'] text-[14px] cursor-pointer hover:bg-[#EAEAEA] transition-colors"
+                  >
+                    <span className="text-[#161616] font-medium">{featuredUploadLabel}</span>
+                  </label>
+                </div>
+                {uploadingTarget === 'featured' && isUploadingImages && (
+                  <div className="mt-[8px] space-y-[6px]">
+                    <p className="font-['Outfit'] text-[12px] text-[#535353]">{uploadProgressHint}</p>
+                    <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#D9D9D9]">
+                      <div className="h-full rounded-full bg-[#161616] transition-[width] duration-300" style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
+                )}
+                <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                  Pagrindinė (16:9). Rodoma sąrašuose, jei nustatyta.
+                </p>
+              </label>
+
+              {featuredImageFile && (
+                <div className="relative w-full aspect-[16/9] rounded-[12px] overflow-hidden border-2 border-[#161616]">
+                  <Image src={featuredImageFile} alt="Featured preview" fill sizes="(min-width: 1024px) 640px, 100vw" unoptimized className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFeaturedImageFile('')
+                      if (featuredImageInputRef.current) {
+                        featuredImageInputRef.current.value = ''
+                      }
+                    }}
+                    className="absolute top-[8px] right-[8px] w-[32px] h-[32px] bg-red-500 text-white rounded-full flex items-center justify-center text-[18px] hover:bg-red-600 transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-[12px]">
+              <label className="block">
+                <span className="font-['Outfit'] text-[14px] text-[#535353] mb-[8px] block">
+                  Galerijos nuotraukos (papildomos)
+                </span>
+                <div className="relative">
+                  <input
+                    ref={projectFileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => {
+                      handleProjectFileInputChange(e)
+                      handleProjectImageUpload(e)
+                    }}
+                    className="hidden"
+                    id="projectFileInput"
+                  />
+                  <label
+                    htmlFor="projectFileInput"
+                    className="flex items-center justify-center w-full px-[16px] py-[12px] border border-[#BBBBBB] rounded-[12px] font-['Outfit'] text-[14px] cursor-pointer hover:bg-[#EAEAEA] transition-colors"
+                  >
+                    <span className="text-[#535353] text-center">{galleryUploadLabel}</span>
+                  </label>
+                </div>
+                {uploadingTarget === 'gallery' && isUploadingImages && (
+                  <div className="mt-[8px] space-y-[6px]">
+                    <p className="font-['Outfit'] text-[12px] text-[#535353]">{uploadProgressHint}</p>
+                    <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#D9D9D9]">
+                      <div className="h-full rounded-full bg-[#161616] transition-[width] duration-300" style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
+                )}
+                {projectSelectedFileNames.length > 0 && (
+                  <div className="mt-[10px] flex flex-wrap gap-[8px]">
+                    {projectSelectedFileNames.map((fileName) => (
+                      <span
+                        key={fileName}
+                        className="max-w-full rounded-[999px] bg-[#EAEAEA] px-[10px] py-[6px] font-['Outfit'] text-[12px] leading-[1.2] text-[#535353] break-all"
+                      >
+                        {fileName}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Papildomos galerijos nuotraukos (kvadratinės miniatiūros).</p>
+              </label>
+
+              {projectImageFiles.length > 0 && (
+                <div className="grid grid-cols-4 gap-[12px] mt-[12px]">
+                  {projectImageFiles.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-[8px] overflow-hidden border border-[#BBBBBB]">
+                      <Image src={img} alt={`Preview ${idx + 1}`} fill sizes="(min-width: 1024px) 240px, (min-width: 768px) 25vw, 50vw" unoptimized className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setProjectImageFiles((prev) => prev.filter((_, i) => i !== idx))}
+                        className="absolute top-[4px] right-[4px] w-[24px] h-[24px] bg-red-500 text-white rounded-full flex items-center justify-center text-[12px] hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="font-['Outfit'] text-[12px] text-[#535353]">Arba įklijuokite paveikslėlių URL (atskirti kableliais):</p>
+              <AdminInput
+                type="text"
+                value={projectForm.images}
+                onChange={(e) => setProjectForm({ ...projectForm, images: e.target.value })}
+                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+              />
+            </div>
+
+            <div className="flex gap-[12px]">
+              <AdminButton type="submit" className="flex-1">
+                {editingProjectId ? t('projects.actions.save') : t('projects.actions.addProject')}
+              </AdminButton>
+              {editingProjectId && (
+                <AdminButton type="button" variant="secondary" onClick={() => handleProjectCancelEdit()}>
+                  {t('ui.close')}
+                </AdminButton>
+              )}
+            </div>
+          </form>
+        )}
+      </AdminCard>
+
+      <AdminCard>
+        <div className="mb-[24px] flex flex-col gap-[12px] xl:flex-row xl:items-center xl:justify-between">
+          <h2 className="font-['DM_Sans'] font-light text-[clamp(24px,3vw,32px)] tracking-[-1.28px] text-[#161616] whitespace-nowrap">
+            Projektai ({projects.length})
+          </h2>
+          <div className="flex flex-wrap gap-[8px]">
+            <label
+              htmlFor="projectImportInput"
+              className="h-[40px] px-[16px] rounded-[100px] bg-[#E1E1E1] text-[#161616] hover:bg-[#BBBBBB] transition-colors cursor-pointer flex items-center font-['Outfit'] text-[12px] tracking-[0.6px] uppercase"
+            >
+              {t('projects.actions.import')}
+            </label>
+            <input id="projectImportInput" type="file" accept=".json" onChange={handleProjectImport} className="hidden" />
+            <AdminButton size="sm" onClick={handleProjectExport}>
+              {t('projects.actions.export')}
+            </AdminButton>
+            <AdminButton size="sm" variant="outline" onClick={handleRegenerateProjectSlugs} disabled={isRegeneratingSlugs}>
+              {t('projects.actions.regenerateSlugs')}
+            </AdminButton>
+            <AdminButton size="sm" variant="outline" onClick={handleMigrateLtTextsFromDefaults} disabled={isMigratingLtTexts}>
+              {t('projects.actions.migrateLtTexts')}
+            </AdminButton>
+          </div>
+        </div>
+
+        {projects.length === 0 ? (
+          <p className="font-['Outfit'] text-[14px] text-[#535353] text-center py-[40px]">
+            Projektų dar nėra. Pridėkite pirmą projektą.
+          </p>
+        ) : (
+          <div className="space-y-[16px]">
+            {projects.map((project) => (
+              <div
+                key={project.id}
+                ref={(element) => {
+                  projectCardRefs.current[project.id] = element
+                }}
+                className="border border-[#BBBBBB] rounded-[16px] overflow-hidden"
+              >
+                <div className="p-[20px]">
+                  <div className="flex flex-col gap-[16px] sm:flex-row">
+                    {project.images && project.images.length > 0 && (
+                      <div className="relative w-full h-[180px] sm:w-[120px] sm:h-[80px] rounded-[8px] overflow-hidden flex-shrink-0">
+                        <Image
+                          src={typeof project.images[0] === 'string' ? project.images[0] : (project.images[0] as any).url || ''}
+                          alt={getProjectTitle(project, currentLocale) || 'Projektas'}
+                          fill
+                          sizes="(min-width: 640px) 120px, 100vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col gap-[12px] sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-['DM_Sans'] text-[20px] tracking-[-0.8px] break-words">
+                            {getProjectTitle(project, currentLocale)}
+                            {getProjectSubtitle(project, currentLocale) && (
+                              <span className="text-[#535353] ml-[8px]">- {getProjectSubtitle(project, currentLocale)}</span>
+                            )}
+                            {project.featured && (
+                              <span className="ml-[8px]">
+                                <AdminBadge>Rekomenduojamas</AdminBadge>
+                              </span>
+                            )}
+                          </h3>
+                          <p className="font-['Outfit'] text-[12px] text-[#535353] mt-[4px]">{getProjectLocation(project, currentLocale)}</p>
+                          <p className="font-['Outfit'] text-[14px] text-[#161616] mt-[8px] line-clamp-2">
+                            {getProjectDescription(project, currentLocale)}
+                          </p>
+                          {project.productsUsed && (project as any).productsUsed.length > 0 && (
+                            <p className="font-['Outfit'] text-[12px] text-[#535353] mt-[4px]">
+                              Produktai:{' '}
+                              {Array.isArray(project.productsUsed)
+                                ? project.productsUsed.map((p) => (typeof p === 'string' ? p : p.name)).join(', ')
+                                : (project.productsUsed as any)}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap sm:flex-nowrap justify-start sm:justify-end gap-[8px] flex-shrink-0">
+                          <AdminButton
+                            size="sm"
+                            variant={editingProjectId === project.id ? 'secondary' : 'outline'}
+                            onClick={() => handleProjectEdit(project)}
+                            className="w-[136px]"
+                          >
+                            {editingProjectId === project.id ? t('ui.close') : t('projects.actions.edit')}
+                          </AdminButton>
+                          <AdminButton size="sm" variant="danger" onClick={() => handleProjectDelete(project.id)} className="w-[136px]">
+                            {t('projects.actions.delete')}
+                          </AdminButton>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {editingProjectId === project.id && (
+                  <div className="border-t border-[#BBBBBB] bg-[#EAEAEA] p-[clamp(20px,3vw,32px)]">
+                    <h3 className="font-['DM_Sans'] text-[18px] tracking-[-0.72px] text-[#161616] mb-[24px]">Projekto redagavimas</h3>
+                    <form onSubmit={handleProjectSubmit} className="space-y-[20px]">
+                      <div className="rounded-[16px] border border-[#BBBBBB] bg-white/50 p-[16px]">
+                        <p className="font-['Outfit'] text-[12px] tracking-[0.6px] uppercase text-[#535353]">Lietuvių (pagrindinė)</p>
+
+                        <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                          <div>
+                            <AdminInput
+                              type="text"
+                              required
+                              value={projectForm.title}
+                              onChange={(e) => {
+                                const nextTitle = e.target.value
+                                setProjectForm((prev) => {
+                                  const prevAutoSlug = slugify(prev.title)
+                                  const shouldAuto = !prev.slug || prev.slug === prevAutoSlug
+                                  return { ...prev, title: nextTitle, slug: shouldAuto ? slugify(nextTitle) : prev.slug }
+                                })
+                              }}
+                              placeholder="Projekto pavadinimas"
+                            />
+                            <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Rodomas sąrašuose ir projekto puslapyje.</p>
+                          </div>
+
+                          <div>
+                            <AdminInput
+                              type="text"
+                              value={projectForm.subtitle}
+                              onChange={(e) => setProjectForm({ ...projectForm, subtitle: e.target.value })}
+                              placeholder="Paantraštė (nebūtina)"
+                            />
+                            <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Trumpa paantraštė šalia pavadinimo.</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                          <div>
+                            <AdminInput
+                              type="text"
+                              required
+                              value={projectForm.slug}
+                              onChange={(e) => setProjectForm({ ...projectForm, slug: slugify(e.target.value) })}
+                              placeholder="projekto-slug"
+                            />
+                            <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                              URL identifikatorius (mažosios raidės, brūkšneliai). Sugeneruojamas automatiškai, bet galima keisti.
+                            </p>
+                          </div>
+
+                          <div>
+                            <AdminInput
+                              type="text"
+                              required
+                              value={projectForm.location}
+                              onChange={(e) => setProjectForm({ ...projectForm, location: e.target.value })}
+                              placeholder="Vieta (pvz., Vilnius, Lietuva)"
+                            />
+                            <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Miestas, šalis (pvz., Vilnius, Lietuva).</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-[12px]">
+                          <AdminTextarea
+                            required
+                            value={projectForm.description}
+                            onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                            rows={3}
+                            placeholder="Trumpas aprašymas (kortelėms)"
+                          />
+                          <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Trumpas tekstas, rodomas projekto kortelėje.</p>
+                        </div>
+
+                        <div className="mt-[12px]">
+                          <AdminTextarea
+                            value={projectForm.fullDescription}
+                            onChange={(e) => setProjectForm({ ...projectForm, fullDescription: e.target.value })}
+                            rows={4}
+                            placeholder="Pilnas aprašymas (nebūtina)"
+                          />
+                          <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Išsamesnis tekstas projekto puslapiui.</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-[16px] border border-[#BBBBBB] bg-white/50 p-[16px]">
+                        <p className="font-['Outfit'] text-[12px] tracking-[0.6px] uppercase text-[#535353]">English (optional)</p>
+                        <p className="mt-[4px] font-['Outfit'] text-[12px] text-[#535353]">Palikite tuščia - bus naudojamas LT tekstas.</p>
+
+                        <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                          <div>
+                            <AdminInput
+                              type="text"
+                              value={projectForm.titleEn}
+                              onChange={(e) => {
+                                const nextTitle = e.target.value
+                                setProjectForm((prev) => {
+                                  const prevAutoSlug = slugify(prev.titleEn)
+                                  const shouldAuto = !prev.slugEn || prev.slugEn === prevAutoSlug
+                                  return {
+                                    ...prev,
+                                    titleEn: nextTitle,
+                                    slugEn: shouldAuto ? slugify(nextTitle) : prev.slugEn,
+                                  }
+                                })
+                              }}
+                              placeholder="Project title (EN)"
+                            />
+                          </div>
+                          <div>
+                            <AdminInput
+                              type="text"
+                              value={projectForm.subtitleEn}
+                              onChange={(e) => setProjectForm({ ...projectForm, subtitleEn: e.target.value })}
+                              placeholder="Subtitle (EN)"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-[12px] grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                          <div>
+                            <AdminInput
+                              type="text"
+                              value={projectForm.slugEn}
+                              onChange={(e) => setProjectForm({ ...projectForm, slugEn: slugify(e.target.value) })}
+                              placeholder="project-slug (EN)"
+                            />
+                          </div>
+                          <div>
+                            <AdminInput
+                              type="text"
+                              value={projectForm.locationEn}
+                              onChange={(e) => setProjectForm({ ...projectForm, locationEn: e.target.value })}
+                              placeholder="Location (EN)"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-[12px]">
+                          <AdminTextarea
+                            value={projectForm.descriptionEn}
+                            onChange={(e) => setProjectForm({ ...projectForm, descriptionEn: e.target.value })}
+                            rows={3}
+                            placeholder="Short description (EN)"
+                          />
+                        </div>
+
+                        <div className="mt-[12px]">
+                          <AdminTextarea
+                            value={projectForm.fullDescriptionEn}
+                            onChange={(e) => setProjectForm({ ...projectForm, fullDescriptionEn: e.target.value })}
+                            rows={4}
+                            placeholder="Full description (EN)"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                        <div>
+                          <AdminInput
+                            type="text"
+                            value={projectForm.productsUsed}
+                            onChange={(e) => setProjectForm({ ...projectForm, productsUsed: e.target.value })}
+                            placeholder="Produktai (atskirti kableliais)"
+                          />
+                          <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Pvz.: Black larch, Brown larch.</p>
+                        </div>
+
+                        <div>
+                          <AdminSelect
+                            value={projectForm.category}
+                            onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                          >
+                            <option value="residential">Gyvenamieji</option>
+                            <option value="commercial">Komerciniai</option>
+                            <option value="public">Viešieji</option>
+                          </AdminSelect>
+                          <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">Projekto kategorija.</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="flex items-center gap-[12px] px-[16px] py-[12px] border border-[#BBBBBB] rounded-[12px] bg-[#EAEAEA] cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={projectForm.featured}
+                            onChange={(e) => setProjectForm({ ...projectForm, featured: e.target.checked })}
+                            className="w-[20px] h-[20px]"
+                          />
+                          <span className="font-['Outfit'] text-[14px]">Rekomenduojamas projektas</span>
+                        </label>
+                        <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                          Pažymėkite, jei projektas turi būti rodomas „rekomenduojamų“ sąrašuose.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block">
+                          <span className="font-['Outfit'] text-[14px] font-medium text-[#161616] mb-[8px] block">Pagrindinė nuotrauka</span>
+                          <div className="relative">
+                            <input
+                              ref={featuredImageInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFeaturedImageUpload}
+                              className="hidden"
+                              id="editFeaturedImageInput"
+                            />
+                            <label
+                              htmlFor="editFeaturedImageInput"
+                              className="flex items-center justify-center w-full px-[16px] py-[12px] border-2 border-dashed border-[#161616] rounded-[12px] font-['Outfit'] text-[14px] cursor-pointer hover:bg-[#f0f0f0] transition-colors bg-[#EAEAEA]"
+                            >
+                              <span className="text-[#161616] font-medium">{featuredUploadLabel}</span>
+                            </label>
+                          </div>
+                          {uploadingTarget === 'featured' && isUploadingImages && (
+                            <div className="mt-[8px] space-y-[6px]">
+                              <p className="font-['Outfit'] text-[12px] text-[#535353]">{uploadProgressHint}</p>
+                              <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#D9D9D9]">
+                                <div className="h-full rounded-full bg-[#161616] transition-[width] duration-300" style={{ width: `${uploadProgress}%` }} />
+                              </div>
+                            </div>
+                          )}
+                          <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                            Pagrindinė (16:9). Rodoma sąrašuose, jei nustatyta.
+                          </p>
+                        </label>
+
+                        {featuredImageFile && (
+                          <div className="relative w-full aspect-[16/9] rounded-[12px] overflow-hidden border-2 border-[#161616]">
+                            <Image src={featuredImageFile} alt="Featured preview" fill sizes="(min-width: 1024px) 640px, 100vw" unoptimized className="object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFeaturedImageFile('')
+                                if (featuredImageInputRef.current) {
+                                  featuredImageInputRef.current.value = ''
+                                }
+                              }}
+                              className="absolute top-[8px] right-[8px] w-[32px] h-[32px] bg-red-500 text-white rounded-full flex items-center justify-center text-[18px] hover:bg-red-600 transition-colors"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block font-['Outfit'] text-[14px] text-[#535353] mb-[8px]">
+                          Galerijos nuotraukos {projectImageFiles.length > 0 && `(${projectImageFiles.length} pasirinkta)`}
+                        </label>
+                        <input
+                          ref={projectFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            handleProjectFileInputChange(e)
+                            handleProjectImageUpload(e)
+                          }}
+                          className="hidden"
+                          id="project-file-upload"
+                        />
+                        <label
+                          htmlFor="project-file-upload"
+                          className="flex items-center justify-center w-full h-[48px] px-[16px] border-2 border-dashed border-[#BBBBBB] rounded-[12px] font-['Outfit'] text-[14px] text-[#535353] hover:border-[#161616] hover:text-[#161616] transition-colors cursor-pointer bg-[#EAEAEA]"
+                        >
+                          {galleryUploadLabel}
+                        </label>
+                        {uploadingTarget === 'gallery' && isUploadingImages && (
+                          <div className="mt-[8px] space-y-[6px]">
+                            <p className="font-['Outfit'] text-[12px] text-[#535353]">{uploadProgressHint}</p>
+                            <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#D9D9D9]">
+                              <div className="h-full rounded-full bg-[#161616] transition-[width] duration-300" style={{ width: `${uploadProgress}%` }} />
+                            </div>
+                          </div>
+                        )}
+                        {projectSelectedFileNames.length > 0 && (
+                          <div className="mt-[10px] flex flex-wrap gap-[8px]">
+                            {projectSelectedFileNames.map((fileName) => (
+                              <span
+                                key={fileName}
+                                className="max-w-full rounded-[999px] bg-[#EAEAEA] px-[10px] py-[6px] font-['Outfit'] text-[12px] leading-[1.2] text-[#535353] break-all"
+                              >
+                                {fileName}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {projectImageFiles.length > 0 && (
+                          <div className="grid grid-cols-4 gap-[8px] mt-[12px]">
+                            {projectImageFiles.map((img, i) => (
+                              <div key={i} className="relative aspect-square rounded-[8px] overflow-hidden border border-[#BBBBBB]">
+                                <Image src={img} alt={`Preview ${i + 1}`} fill sizes="(min-width: 1024px) 240px, (min-width: 768px) 25vw, 50vw" unoptimized className="object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setProjectImageFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                                  className="absolute top-[4px] right-[4px] w-[24px] h-[24px] bg-red-500 text-white rounded-full flex items-center justify-center text-[12px] hover:bg-red-600 transition-colors"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <p className="mt-[8px] font-['Outfit'] text-[12px] text-[#535353]">
+                          Papildomos galerijos nuotraukos (kvadratinės miniatiūros).
+                        </p>
+                      </div>
+
+                      <div className="flex gap-[12px] pt-[12px]">
+                        <AdminButton type="submit" className="flex-1">
+                          {t('projects.actions.save')}
+                        </AdminButton>
+                        <AdminButton type="button" variant="secondary" onClick={() => handleProjectCancelEdit(project.id)}>
+                          {t('ui.close')}
+                        </AdminButton>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </AdminCard>
+    </AdminStack>
+  )
+}

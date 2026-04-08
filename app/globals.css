@@ -1,0 +1,464 @@
+@import "tailwindcss";
+
+:root {
+  --Background-Grey: #E1E1E1;
+  --background: var(--Background-Grey, #E1E1E1);
+  --foreground: #161616;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-dm-sans);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Shared select styling: move dropdown chevron away from right edge */
+.yw-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Keep room for the chevron */
+  padding-right: 48px;
+
+  /* Custom chevron icon so we can control the inset */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23161616' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 16px 16px;
+}
+
+.yw-select::-ms-expand {
+  display: none;
+}
+
+/* Consistent input background + autofill */
+.yw-input:-webkit-autofill,
+.yw-input:-webkit-autofill:hover,
+.yw-input:-webkit-autofill:focus,
+.yw-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #E1E1E1 inset;
+  box-shadow: 0 0 0 1000px #E1E1E1 inset;
+  -webkit-text-fill-color: #161616;
+  caret-color: #161616;
+}
+
+/* Admin UI helpers (no white surfaces) */
+.yw-admin-surface {
+  background: #E1E1E1;
+  border: 1px solid #BBBBBB;
+}
+
+.yw-admin-surface-strong {
+  background: #E1E1E1;
+  border: 1px solid #BBBBBB;
+}
+
+.yw-admin-input {
+  background: #E1E1E1;
+  border: 1px solid #BBBBBB;
+  color: #161616;
+}
+
+.yw-admin-input:focus {
+  outline: none;
+  border-color: #161616;
+}
+
+.yw-admin-modal {
+  background: #E1E1E1;
+  border: 1px solid #BBBBBB;
+}
+
+/* Admin scoped theme overrides */
+.yw-admin-scope {
+  background: #E1E1E1;
+  color: #161616;
+}
+
+.yw-admin-scope .bg-white {
+  background-color: #E1E1E1 !important;
+}
+
+/* Force any remaining Tailwind arbitrary bg shades inside admin */
+.yw-admin-scope .bg-\[\#EAEAEA\],
+.yw-admin-scope .bg-\[\#eaeaea\] {
+  background-color: #E1E1E1 !important;
+}
+
+.yw-admin-scope .hover\:bg-\[\#EAEAEA\]:hover,
+.yw-admin-scope .hover\:bg-\[\#eaeaea\]:hover {
+  background-color: #E1E1E1 !important;
+}
+
+.yw-admin-scope .bg-\[\#EAEAEA\]\/90,
+.yw-admin-scope .bg-\[\#eaeaea\]\/90 {
+  background-color: rgba(225, 225, 225, 0.9) !important;
+}
+
+.yw-admin-scope input,
+.yw-admin-scope textarea,
+.yw-admin-scope select {
+  background: #E1E1E1;
+  border-color: #BBBBBB;
+  color: #161616;
+}
+
+.yw-admin-scope select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 48px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23161616' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 16px 16px;
+}
+
+.yw-admin-scope select::-ms-expand {
+  display: none;
+}
+
+.yw-admin-scope input:focus,
+.yw-admin-scope textarea:focus,
+.yw-admin-scope select:focus {
+  outline: none;
+  border-color: #161616;
+}
+
+/* Brand system font declarations */
+.font-dm-sans {
+  font-family: var(--font-dm-sans);
+}
+
+.font-outfit {
+  font-family: var(--font-outfit);
+}
+
+.font-tiro-tamil {
+  font-family: var(--font-tiro-tamil);
+}
+
+/* Custom animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+@keyframes yaki-letter-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.yaki-loader-letter {
+  display: inline-block;
+  animation: yaki-letter-bounce 850ms ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yaki-loader-letter {
+    animation: none;
+  }
+}
+
+@keyframes mount-board-in {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translate3d(-180px, -90px, 0) rotate(-10deg);
+  }
+  30%,
+  72% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  79% {
+    transform: translate3d(0, 8px, 0) rotate(0deg);
+  }
+  87%,
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes mount-nail-drop {
+  0%,
+  34% {
+    opacity: 0;
+    transform: translate3d(0, -110px, 0);
+  }
+  42% {
+    opacity: 1;
+    transform: translate3d(0, -12px, 0);
+  }
+  48% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  54% {
+    opacity: 1;
+    transform: translate3d(0, -10px, 0);
+  }
+  62%,
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes mount-hit-ring {
+  0%,
+  44% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  48% {
+    opacity: 0.95;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+@keyframes mount-distance-fade {
+  0%,
+  46% {
+    opacity: 0;
+  }
+  58%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.mount-board-group {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mount-board-in 5.8s cubic-bezier(0.2, 0.9, 0.2, 1) infinite;
+}
+
+.mount-nail-left,
+.mount-nail-right {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: mount-nail-drop 5.8s cubic-bezier(0.18, 0.88, 0.32, 1) infinite;
+}
+
+.mount-nail-right {
+  animation-delay: 240ms;
+}
+
+.mount-hit-left,
+.mount-hit-right {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mount-hit-ring 5.8s ease-out infinite;
+}
+
+.mount-hit-right {
+  animation-delay: 240ms;
+}
+
+.mount-distance-fade {
+  animation: mount-distance-fade 5.8s ease-out infinite;
+}
+
+@keyframes hero-seq-right {
+  from {
+    opacity: 0;
+    transform: translate3d(-64px, 0, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.hero-seq-item {
+  opacity: 0;
+  transform: translate3d(-64px, 0, 0) scale(0.96);
+  animation-duration: 1400ms;
+  animation-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.hero-seq-right {
+  animation-name: hero-seq-right;
+}
+
+.hero-ease-in {
+  animation-timing-function: ease-in;
+}
+
+.hero-animate-root .hero-seq-item {
+  animation-play-state: paused;
+}
+
+.hero-animate-root.is-inview .hero-seq-item {
+  animation-play-state: running;
+}
+
+.hero-seq-1 {
+  animation-delay: 0ms;
+  animation-duration: 900ms;
+}
+
+.hero-seq-2 {
+  animation-delay: 300ms;
+  animation-duration: 1100ms;
+}
+
+.hero-seq-3 {
+  animation-delay: 600ms;
+  animation-duration: 1250ms;
+}
+
+.hero-seq-4 {
+  animation-delay: 900ms;
+  animation-duration: 1400ms;
+}
+
+.hero-seq-5 {
+  animation-delay: 1200ms;
+  animation-duration: 1550ms;
+}
+
+/* Custom scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #BBBBBB;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #7C7C7C;
+}
+
+/* Icon hover effects: apply a negative/inverted color on hover */
+.icon-image {
+  transition: filter 180ms ease-in-out, opacity 180ms ease-in-out;
+  will-change: filter, opacity;
+}
+
+/* When the wrapper (feature or icon-wrapper) is hovered, invert the image colors */
+.feature:hover .icon-image,
+.icon-wrapper:hover .icon-image,
+.group:hover .icon-image {
+  filter: invert(1) hue-rotate(180deg) saturate(1.1);
+}
+
+/* Reduce opacity slightly on hover for a softer effect */
+.feature:hover .icon-image,
+.icon-wrapper:hover .icon-image {
+  opacity: 0.95;
+}
+
+/* Partners marquee (judanti eilutė) */
+@keyframes yw-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.yw-marquee-track {
+  width: max-content;
+  will-change: transform;
+  animation: yw-marquee var(--yw-marquee-duration, 28s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yw-marquee-track {
+    animation: none;
+    transform: translateX(0);
+  }
+
+  .mount-board-group,
+  .mount-nail-left,
+  .mount-nail-right,
+  .mount-hit-left,
+  .mount-hit-right,
+  .mount-distance-fade {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-seq-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Prevent accidental horizontal overflow (e.g., running/marquee rows) from enabling horizontal scroll */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@supports not (overflow: clip) {
+	html,
+	body {
+    overflow-x: hidden;
+	}
+}
+
+#__next {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+	.scrollbar-hide {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Opera */
+	}
+}

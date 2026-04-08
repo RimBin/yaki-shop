@@ -1,0 +1,1635 @@
+'use client';
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
+import { createPortal } from 'react-dom';
+import Link from 'next/link';
+import { PageCover } from '@/components/shared';
+import { PageLayout } from '@/components/shared/PageLayout';
+import InView from '@/components/InView';
+import RangeSlider from '@/components/ui/RangeSlider';
+import SeoImage from '@/components/ui/SeoImage';
+import {
+  localizeColorLabel,
+  fetchProducts,
+  mergeProductLists,
+  type Product,
+  type ProductProfileVariant,
+} from '@/lib/products.supabase';
+import { useLocale, useTranslations } from 'next-intl';
+import { createClient } from '@/lib/supabase/client';
+import { applyRoleDiscount, type RoleDiscount } from '@/lib/pricing/roleDiscounts';
+import { toLocalePath } from '@/i18n/paths';
+import { trackEvent, trackSearch, trackSelectItem } from '@/lib/analytics';
+import { compactProductsForList } from '@/lib/products/compact';
+import { ensureProductListCoverage } from '@/lib/products/coverage';
+import { buildProductImageSeo } from '@/lib/seo/images';
+
+type DropdownOption = { value: string; label: string };
+
+type ProductsPageClientProps = {
+  initialProducts: Product[];
+  initialTotalCount?: number;
+  initialError?: string | null;
+};
+
+function optimizeSupabasePublicImage(
+  src: string,
+  {
+    width,
+    quality = 70,
+    format = 'webp',
+  }: { width: number; quality?: number; format?: 'webp' | 'avif' | 'jpg' | 'png' }
+): string {
+  if (!src) return src;
+  if (src.startsWith('/')) return src;
+
+  try {
+    const url = new URL(src);
+
+    const publicPrefix = '/storage/v1/object/public/';
+    const renderPrefix = '/storage/v1/render/image/public/';
+
+    if (url.pathname.includes(renderPrefix)) {
+      if (!url.searchParams.has('width')) url.searchParams.set('width', String(width));
+      if (!url.searchParams.has('quality')) url.searchParams.set('quality', String(quality));
+      if (!url.searchParams.has('format')) url.searchParams.set('format', format);
+      return url.toString();
+    }
+
+    if (!url.pathname.includes(publicPrefix)) return src;
+
+    url.pathname = url.pathname.replace(publicPrefix, renderPrefix);
+    url.searchParams.set('width', String(width));
+    url.searchParams.set('quality', String(quality));
+    url.searchParams.set('format', format);
+    return url.toString();
+  } catch {
+    return src;
+  }
+}
+
+function FilterDropdown({
+  id,
+  label,
+  options,
+  selected,
+  onToggle,
+  allLabel,
+  emptyLabel,
+  openId,
+  setOpenId,
+}: {
+  id: string;
+  label: string;
+  options: DropdownOption[];
+  selected: string[];
+  onToggle: (value: string) => void;
+  allLabel: string;
+  emptyLabel: string;
+  openId: string | null;
+  setOpenId: (value: string | null) => void;
+}) {
+  const isOpen = openId === id;
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const selectedLabels = useMemo(
+    () => options.filter((o) => selected.includes(o.value)).map((o) => o.label),
+    [options, selected]
+  );
+
+  const summaryValue = selectedLabels.length > 0 ? selectedLabels.join(', ') : allLabel;
+
+  const updatePosition = useCallback(() => {
+    const el = buttonRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const minWidth = Math.max(220, rect.width);
+    const left = Math.min(rect.left, Math.max(8, window.innerWidth - minWidth - 8));
+    const top = rect.bottom + 8;
+    setPos({ top, left, width: minWidth });
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    updatePosition();
+
+    const onResizeOrScroll = () => updatePosition();
+    window.addEventListener('resize', onResizeOrScroll);
+    window.addEventListener('scroll', onResizeOrScroll, true);
+    return () => {
+      window.removeEventListener('resize', onResizeOrScroll);
+      window.removeEventListener('scroll', onResizeOrScroll, true);
+    };
+  }, [isOpen, updatePosition]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (buttonRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      setOpenId(null);
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenId(null);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isOpen, setOpenId]);
+
+  return (
+    <div className="relative w-full sm:w-auto">
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => setOpenId(isOpen ? null : id)}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        className="h-[40px] w-full sm:w-auto px-[14px] rounded-[100px] border border-[#BBBBBB] font-['Outfit'] text-[12px] tracking-[0.6px] flex items-center gap-[8px] max-w-none sm:max-w-[220px] select-none"
+      >
+        <span className="flex min-w-0 items-center gap-[8px]">
+          <span className="shrink-0">{label}:</span>
+          <span className="min-w-0 truncate text-[#535353]">{summaryValue}</span>
+        </span>
+        <svg
+          className={`ml-auto shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="#161616"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {isOpen && pos
+        ? createPortal(
+            <div
+              ref={menuRef}
+              className="z-50 max-h-[260px] overflow-auto rounded-[24px] border border-[#BBBBBB] bg-[#EAEAEA] p-[14px] shadow-lg"
+              style={{ position: 'fixed', top: pos.top, left: pos.left, minWidth: pos.width }}
+              role="dialog"
+              aria-label={label}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              {options.length === 0 ? (
+                <p className="text-[12px] text-[#7C7C7C]">{emptyLabel}</p>
+              ) : (
+                <div className="flex flex-col gap-[8px]">
+                  {options.map((option) => (
+                    <label key={option.value} className="flex items-center gap-[8px] text-[13px]">
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(option.value)}
+                        onChange={() => onToggle(option.value)}
+                        className={[
+                          'relative grid h-[16px] w-[16px] appearance-none place-items-center rounded-[3px]',
+                          'border border-[#7C7C7C] bg-[#EAEAEA] transition-colors',
+                          'after:h-[10px] after:w-[10px] after:rounded-[1px] after:bg-[#161616] after:opacity-0 after:transition-opacity after:content-[\'\']',
+                          'checked:border-[#161616] checked:bg-[#EAEAEA] checked:after:opacity-100',
+                        ].join(' ')}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>,
+            document.body
+          )
+        : null}
+    </div>
+  );
+}
+
+function PriceRangeDropdown({
+  id,
+  label,
+  value,
+  bounds,
+  onChange,
+  onReset,
+  isActive,
+  allLabel,
+  openId,
+  setOpenId,
+  formatValue,
+}: {
+  id: string;
+  label: string;
+  value: [number, number];
+  bounds: [number, number];
+  onChange: (value: [number, number]) => void;
+  onReset: () => void;
+  isActive: boolean;
+  allLabel: string;
+  openId: string | null;
+  setOpenId: (value: string | null) => void;
+  formatValue: (value: number) => string;
+}) {
+  const isOpen = openId === id;
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const summaryValue = isActive
+    ? `${formatValue(value[0])} - ${formatValue(value[1])}`
+    : allLabel;
+
+  const updatePosition = useCallback(() => {
+    const el = buttonRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const width = Math.min(320, Math.max(280, window.innerWidth - 16));
+    const preferredLeft = rect.right - width;
+    const left = Math.max(8, Math.min(preferredLeft, window.innerWidth - width - 8));
+    const top = rect.bottom + 8;
+    setPos({ top, left, width });
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    updatePosition();
+
+    const onResizeOrScroll = () => updatePosition();
+    window.addEventListener('resize', onResizeOrScroll);
+    window.addEventListener('scroll', onResizeOrScroll, true);
+
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (buttonRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      setOpenId(null);
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenId(null);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('resize', onResizeOrScroll);
+      window.removeEventListener('scroll', onResizeOrScroll, true);
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isOpen, setOpenId, updatePosition]);
+
+  return (
+    <div className="relative w-full sm:w-auto">
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => setOpenId(isOpen ? null : id)}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        className={`h-[40px] w-full sm:w-auto px-[14px] rounded-[100px] border font-['Outfit'] text-[12px] tracking-[0.6px] flex items-center gap-[8px] max-w-none sm:max-w-[280px] select-none transition-colors ${
+          isOpen
+            ? 'border-[#A9A9A9] bg-[#EAEAEA]'
+            : 'border-[#BBBBBB] bg-transparent'
+        }`}
+      >
+        <span className="flex min-w-0 items-center gap-[8px]">
+          <span className="shrink-0">{label}:</span>
+          <span className="min-w-0 truncate text-[#535353]">{summaryValue}</span>
+        </span>
+        <svg
+          className={`ml-auto shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="#161616"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {isOpen && pos
+        ? createPortal(
+            <div
+              ref={menuRef}
+              className="z-50 rounded-[24px] border border-[#BBBBBB] bg-[#EAEAEA] px-[18px] py-[14px] shadow-lg"
+              style={{ position: 'fixed', top: pos.top, left: pos.left, width: pos.width }}
+              role="dialog"
+              aria-label={label}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <div className="mb-[12px] flex items-center justify-between gap-[12px]">
+                <span className="font-['Outfit'] text-[12px] tracking-[0.6px] uppercase text-[#161616]">
+                  {label}
+                </span>
+                {isActive ? (
+                  <button
+                    type="button"
+                    onClick={onReset}
+                    className="text-[11px] font-['Outfit'] uppercase tracking-[0.6px] text-[#535353] underline underline-offset-4"
+                  >
+                    {allLabel}
+                  </button>
+                ) : null}
+              </div>
+              <RangeSlider
+                min={bounds[0]}
+                max={bounds[1]}
+                value={value}
+                onChange={onChange}
+                step={10}
+                formatLabel={formatValue}
+                className="mt-[2px] w-full"
+              />
+            </div>,
+            document.body
+          )
+        : null}
+    </div>
+  );
+}
+
+export default function ProductsPageClient({
+  initialProducts,
+  initialTotalCount = initialProducts.length,
+  initialError = null,
+}: ProductsPageClientProps) {
+  const t = useTranslations('productsPage');
+  const locale = useLocale();
+  const currentLocale = locale === 'lt' ? 'lt' : 'en';
+
+  const [selectedUsage, setSelectedUsage] = useState<string[]>([]);
+  const [selectedWood, setSelectedWood] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string[]>([]);
+  const [selectedProfile, setSelectedProfile] = useState<string[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<[number, number]>([0, 500]);
+  const [selectedWidth, setSelectedWidth] = useState<string[]>([]);
+  const [selectedLength, setSelectedLength] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allProducts, setAllProducts] = useState<Product[]>(initialProducts);
+  const [error, setError] = useState<string | null>(initialError);
+  const [showStickyFilters, setShowStickyFilters] = useState(false);
+  const [isStickyOpen, setIsStickyOpen] = useState(false);
+  const [totalCount, setTotalCount] = useState(initialTotalCount);
+  const [baseProductsVersion, setBaseProductsVersion] = useState(0);
+
+  const [openFilterId, setOpenFilterId] = useState<string | null>(null);
+
+  const [hasTrackedListView, setHasTrackedListView] = useState(false);
+
+  const baseProductsRef = useRef<Product[]>(initialProducts);
+  const fullListLoadStartedRef = useRef(false);
+  const previousPriceBoundsRef = useRef<[number, number] | null>(null);
+  const filtersRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    baseProductsRef.current = initialProducts;
+    fullListLoadStartedRef.current = false;
+    setAllProducts(initialProducts);
+    setError(initialError);
+    setTotalCount(initialTotalCount);
+    setBaseProductsVersion((v) => v + 1);
+  }, [initialProducts, initialError, initialTotalCount]);
+
+  const loadFullProductList = useCallback(async () => {
+    if (initialProducts.length === 0) return;
+    if (initialProducts.length >= initialTotalCount) return;
+    if (fullListLoadStartedRef.current) return;
+
+    fullListLoadStartedRef.current = true;
+
+    try {
+      const [activeProducts, stockItems] = await Promise.all([
+        fetchProducts({ mode: 'active' }),
+        fetchProducts({ mode: 'stock-items' }).catch(() => []),
+      ]);
+
+      const full = mergeProductLists(stockItems, activeProducts);
+
+      const compact = compactProductsForList(ensureProductListCoverage(full));
+      baseProductsRef.current = compact;
+      setAllProducts(compact);
+      setTotalCount(compact.length);
+      setBaseProductsVersion((v) => v + 1);
+    } catch (e) {
+      fullListLoadStartedRef.current = false;
+
+      console.warn('Failed to load full product list:', e);
+    }
+  }, [initialProducts.length, initialTotalCount]);
+
+  useEffect(() => {
+    if (initialProducts.length === 0) return;
+    if (initialProducts.length >= initialTotalCount) return;
+
+    let cancelled = false;
+
+    const schedule =
+      typeof window !== 'undefined' && 'requestIdleCallback' in window
+        ? (window.requestIdleCallback as unknown as (cb: () => void, opts?: { timeout: number }) => void)
+        : (cb: () => void) => window.setTimeout(cb, 1200);
+
+    schedule(
+      async () => {
+        if (cancelled) return;
+        await loadFullProductList();
+      },
+      { timeout: 4000 }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialProducts.length, initialTotalCount, loadFullProductList]);
+
+  useEffect(() => {
+    if (baseProductsRef.current.length === 0) return;
+
+    let isMounted = true;
+    async function applyRolePricing() {
+      try {
+        const supabase = createClient();
+        if (!supabase) return;
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          if (isMounted) setAllProducts(baseProductsRef.current);
+          return;
+        }
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        const role = (profile as any)?.role as string | undefined;
+        if (!role) {
+          if (isMounted) setAllProducts(baseProductsRef.current);
+          return;
+        }
+
+        const { data: discountRow } = await supabase
+          .from('role_discounts')
+          .select('role,discount_type,discount_value,currency,is_active')
+          .eq('role', role)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        const discount = (discountRow as RoleDiscount | null) ?? null;
+        if (!discount) {
+          if (isMounted) setAllProducts(baseProductsRef.current);
+          return;
+        }
+
+        const discounted = baseProductsRef.current.map((p) => ({
+          ...p,
+          price: applyRoleDiscount(p.price, discount),
+          salePrice:
+            typeof p.salePrice === 'number'
+              ? applyRoleDiscount(p.salePrice, discount)
+              : undefined,
+        }));
+
+        if (isMounted) setAllProducts(discounted);
+      } catch (e) {
+        console.warn('Failed to apply role pricing:', e);
+      }
+    }
+
+    applyRolePricing();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [baseProductsVersion]);
+
+  useEffect(() => {
+    const target = filtersRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const shouldShow = !entry.isIntersecting;
+        setShowStickyFilters(shouldShow);
+        if (!shouldShow) setIsStickyOpen(false);
+      },
+      { rootMargin: '-220px 0px 0px 0px', threshold: 0 }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const usageFilters = useMemo(
+    () => [
+      { id: 'facade', label: t('usageFilters.facade') },
+      { id: 'terrace', label: t('usageFilters.terrace') },
+    ],
+    [t]
+  );
+
+  const woodFilters = useMemo(
+    () => [
+      { id: 'spruce', label: t('woodFilters.spruce') },
+      { id: 'larch', label: t('woodFilters.larch') },
+      { id: 'thermo', label: t('woodFilters.thermo') },
+    ],
+    [t]
+  );
+
+  const usageLabels: Record<string, string> = useMemo(() => {
+    return {
+      facade: t('usageFilters.facade'),
+      terrace: t('usageFilters.terrace'),
+    };
+  }, [t]);
+
+  const woodLabels: Record<string, string> = useMemo(() => {
+    return {
+      spruce: t('woodFilters.spruce'),
+      larch: t('woodFilters.larch'),
+      thermo: t('woodFilters.thermo'),
+    };
+  }, [t]);
+
+  const normalizeToken = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/[_\s]+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+  const normalizeUsageId = (value: string | undefined) => {
+    const token = normalizeToken(value ?? '');
+    if (!token) return null;
+    if (token === 'facade' || token === 'terrace') return token;
+    if (token.includes('facade') || token.includes('fasad')) return 'facade';
+    if (token.includes('terrace') || token.includes('teras') || token.includes('deck')) return 'terrace';
+    return token;
+  };
+
+  const normalizeWoodId = (value: string | undefined) => {
+    const token = normalizeToken(value ?? '');
+    if (!token) return null;
+    if (token === 'spruce' || token === 'larch' || token === 'thermo') return token;
+    if (token.includes('spruce') || token.includes('egle') || token.includes('egl')) return 'spruce';
+    if (token.includes('larch') || token.includes('maumed') || token.includes('maum')) return 'larch';
+    if (token.includes('thermo') || token.includes('termo') || token.includes('termomed')) return 'thermo';
+    return null;
+  };
+
+  const parseStockItemSlug = (slug: string) => {
+    const parts = slug.split('--');
+    if (parts.length < 4) return null;
+    const [baseSlug, profile, color, size] = parts;
+    if (!baseSlug || !profile || !color || !size) return null;
+    return { baseSlug, profile, color, size };
+  };
+
+  const formatSizeLabel = (value: string) => {
+    if (!value) return value;
+    const normalized = value.replace(/x/gi, '×');
+    return `${normalized} mm`;
+  };
+
+  const parseSizeDimensions = (value: string) => {
+    const match = value.trim().match(/^(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)$/i);
+    if (!match) return null;
+    const width = match[1]!.replace(',', '.');
+    const length = match[2]!.replace(',', '.');
+    return { width, length };
+  };
+
+  const formatDimensionLabel = (value: string) => {
+    if (!value) return value;
+    return `${value} mm`;
+  };
+
+  const formatProductDisplayName = (product: Product) => {
+    const parsed = product.slug.includes('--') ? parseStockItemSlug(product.slug) : null;
+    const colorName = product.colors?.[0]?.name ?? parsed?.color ?? '';
+    const colorLabel = colorName ? localizeColorLabel(colorName, 'en') : '';
+
+    const woodKey = typeof product.woodType === 'string' ? product.woodType.trim().toLowerCase() : '';
+    const woodLabel =
+      woodKey === 'larch'
+        ? currentLocale === 'lt'
+          ? 'Maumedis'
+          : 'Larch'
+        : woodKey === 'thermo'
+          ? currentLocale === 'lt'
+            ? 'Termo'
+            : 'Thermo'
+        : woodKey === 'spruce'
+          ? currentLocale === 'lt'
+            ? 'Eglė'
+            : 'Spruce'
+          : product.woodType ?? '';
+
+    const title = [colorLabel, woodLabel].filter(Boolean).join(' ');
+    return title || (currentLocale === 'en' && product.nameEn ? product.nameEn : product.name);
+  };
+
+  const PROFILE_LABELS: Record<string, { lt: string; en: string }> = {
+    'half-taper': { lt: 'Pusė špunto', en: 'Half Taper' },
+    'half-taper-45': { lt: 'Pusė špunto 45°', en: 'Half Taper 45°' },
+    rectangle: { lt: 'Stačiakampis', en: 'Rectangle' },
+    rhombus: { lt: 'Rombas', en: 'Rhombus' },
+  };
+
+  const normalizeProfileKey = (input: string) => normalizeToken(input);
+
+  const localizeProfileLabel = (input: string, locale: 'lt' | 'en') => {
+    const normalized = normalizeProfileKey(input);
+    if (!normalized) return input;
+    const mapped = PROFILE_LABELS[normalized];
+    if (mapped) return locale === 'lt' ? mapped.lt : mapped.en;
+    return input;
+  };
+
+  const resolveProfileKey = useCallback((profile?: ProductProfileVariant | null) => {
+    const raw = profile?.code ?? profile?.nameEn ?? profile?.name ?? profile?.nameLt ?? '';
+    return normalizeProfileKey(raw);
+  }, []);
+
+  const resolveProfileLabel = useCallback(
+    (profile?: ProductProfileVariant | null) => {
+      if (!profile) return '';
+      if (currentLocale === 'lt') {
+        const raw = profile.nameLt ?? profile.name ?? profile.nameEn ?? profile.code ?? '';
+        return localizeProfileLabel(raw, 'lt');
+      }
+      const raw = profile.nameEn ?? profile.name ?? profile.nameLt ?? profile.code ?? '';
+      return localizeProfileLabel(raw, 'en');
+    },
+    [currentLocale]
+  );
+
+  const formatProductAttributes = (product: Product) => {
+    const parsed = product.slug.includes('--') ? parseStockItemSlug(product.slug) : null;
+    const profileLabel = product.profiles?.[0]
+      ? resolveProfileLabel(product.profiles[0])
+      : parsed?.profile
+        ? localizeProfileLabel(parsed.profile, currentLocale)
+        : '';
+    const profileSuffix = currentLocale === 'lt' ? 'Profilis' : 'Profile';
+    const sizeLabel = parsed?.size ? formatSizeLabel(parsed.size) : '';
+    const parts = [profileLabel ? `${profileLabel} ${profileSuffix}` : '', sizeLabel].filter(Boolean);
+    return parts.length > 0 ? parts.join(' · ') : '';
+  };
+
+  const formatCardPrice = (price: number) => {
+    const rounded = price.toFixed(0);
+    return currentLocale === 'lt' ? `${rounded} €/m²` : `€${rounded}/m²`;
+  };
+
+  const roundUpToCents = (value: number) => Math.ceil(value * 100) / 100;
+
+  const formatUnitPrice = (price: number) => {
+    const rounded = roundUpToCents(price);
+    const formatted = rounded.toFixed(2);
+    return currentLocale === 'lt' ? `${formatted} €/vnt` : `€${formatted}/pc`;
+  };
+
+  const getUnitPrice = (pricePerM2: number, size: { width: string; length: string } | null) => {
+    if (!size) return null;
+    const widthMm = Number(size.width);
+    const lengthMm = Number(size.length);
+    if (!Number.isFinite(widthMm) || !Number.isFinite(lengthMm)) return null;
+    const areaM2 = (widthMm / 1000) * (lengthMm / 1000);
+    if (!Number.isFinite(areaM2) || areaM2 <= 0) return null;
+    return pricePerM2 * areaM2;
+  };
+
+  const formatMaybeLabel = (value: string | undefined) => {
+    if (!value) return undefined;
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  };
+
+  const colorOptions = useMemo(() => {
+    const sourceProducts = allProducts.filter((product) => {
+      const matchesUsage =
+        selectedUsage.length === 0 ||
+        (() => {
+          const usageId = normalizeUsageId(product.category);
+          return usageId ? selectedUsage.includes(usageId) : false;
+        })();
+
+      const matchesWood =
+        selectedWood.length === 0 ||
+        (() => {
+          const woodId = normalizeWoodId(product.woodType);
+          return woodId ? selectedWood.includes(woodId) : false;
+        })();
+
+      return matchesUsage && matchesWood;
+    });
+
+    const set = new Set<string>();
+    for (const product of sourceProducts) {
+      for (const color of product.colors ?? []) {
+        if (color?.name) set.add(color.name);
+      }
+    }
+    return Array.from(set)
+      .sort((a, b) => a.localeCompare(b))
+      .map((value) => ({
+        value,
+        label: localizeColorLabel(value, 'en'),
+      }));
+  }, [allProducts, selectedUsage, selectedWood]);
+
+  const profileDropdownOptions = useMemo(() => {
+    const map = new Map<string, string>();
+
+    for (const [key, labels] of Object.entries(PROFILE_LABELS)) {
+      map.set(key, currentLocale === 'lt' ? labels.lt : labels.en);
+    }
+
+    for (const product of allProducts) {
+      for (const profile of product.profiles ?? []) {
+        const key = resolveProfileKey(profile);
+        if (!key) continue;
+        const label = resolveProfileLabel(profile) || profile.name || profile.code || key;
+        if (!map.has(key)) map.set(key, label);
+      }
+    }
+
+    return Array.from(map.entries())
+      .sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([value, label]) => ({ value, label }));
+  }, [allProducts, currentLocale, resolveProfileKey, resolveProfileLabel]);
+
+  const sizeOptions = useMemo(() => {
+    const widths = new Set<string>();
+    const lengths = new Set<string>();
+
+    for (const product of allProducts) {
+      if (!product.slug.includes('--')) continue;
+      const parsed = parseStockItemSlug(product.slug);
+      if (!parsed?.size) continue;
+      const dims = parseSizeDimensions(parsed.size);
+      if (!dims) continue;
+      widths.add(dims.width);
+      lengths.add(dims.length);
+    }
+
+    return {
+      widths: Array.from(widths)
+        .sort((a, b) => Number(a) - Number(b))
+        .map((value) => ({ value, label: formatDimensionLabel(value) })),
+      lengths: Array.from(lengths)
+        .sort((a, b) => Number(a) - Number(b))
+        .map((value) => ({ value, label: formatDimensionLabel(value) })),
+    };
+  }, [allProducts]);
+
+  const getEffectivePrice = useCallback((product: Product) => {
+    return typeof product.salePrice === 'number' && product.salePrice > 0 && product.salePrice < product.price
+      ? product.salePrice
+      : product.price;
+  }, []);
+
+  const priceBounds = useMemo<[number, number]>(() => {
+    const prices = allProducts
+      .map((product) => getEffectivePrice(product))
+      .filter((price) => Number.isFinite(price) && price >= 0);
+
+    if (prices.length === 0) return [0, 500];
+
+    const minPrice = Math.max(0, Math.floor(Math.min(...prices) / 10) * 10);
+    const maxPrice = Math.ceil(Math.max(...prices) / 10) * 10;
+
+    if (minPrice === maxPrice) {
+      return [Math.max(0, minPrice - 10), maxPrice + 10];
+    }
+
+    return [minPrice, maxPrice];
+  }, [allProducts, getEffectivePrice]);
+
+  useEffect(() => {
+    const previousBounds = previousPriceBoundsRef.current;
+
+    setSelectedPriceRange((currentRange) => {
+      previousPriceBoundsRef.current = priceBounds;
+
+      if (!previousBounds) {
+        return priceBounds;
+      }
+
+      const wasUsingFullRange =
+        currentRange[0] === previousBounds[0] && currentRange[1] === previousBounds[1];
+
+      if (wasUsingFullRange) {
+        return priceBounds;
+      }
+
+      const nextRange: [number, number] = [
+        Math.max(priceBounds[0], currentRange[0]),
+        Math.min(priceBounds[1], currentRange[1]),
+      ];
+
+      if (nextRange[0] > nextRange[1]) {
+        return priceBounds;
+      }
+
+      return nextRange;
+    });
+  }, [priceBounds]);
+
+  const isPriceRangeActive =
+    selectedPriceRange[0] > priceBounds[0] || selectedPriceRange[1] < priceBounds[1];
+
+  const usageOptions = useMemo(
+    () => usageFilters.map((filter) => ({ value: filter.id, label: filter.label })),
+    [usageFilters]
+  );
+
+  const woodOptions = useMemo(
+    () => woodFilters.map((filter) => ({ value: filter.id, label: filter.label })),
+    [woodFilters]
+  );
+
+  const renderDropdown = (
+    id: string,
+    label: string,
+    options: Array<{ value: string; label: string }>,
+    selected: string[],
+    onToggle: (value: string) => void,
+    allLabel?: string
+  ) => {
+    return (
+      <FilterDropdown
+        id={id}
+        label={label}
+        options={options}
+        selected={selected}
+        onToggle={onToggle}
+        allLabel={allLabel ?? t('filtersAll')}
+        emptyLabel={t('filtersEmpty')}
+        openId={openFilterId}
+        setOpenId={setOpenFilterId}
+      />
+    );
+  };
+
+  const renderSearchField = (wrapperClassName?: string) => (
+    <div className={`relative w-full ${wrapperClassName ?? ''}`.trim()}>
+      <label className="sr-only">{t('searchLabel')}</label>
+      <svg
+        className="absolute left-[14px] top-1/2 -translate-y-1/2"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
+          stroke="#161616"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M21 21l-4.35-4.35"
+          stroke="#161616"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <input
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter') return;
+          const q = searchQuery.trim();
+          if (!q) return;
+          trackSearch(q, orderedProducts.length);
+        }}
+        placeholder={t('searchPlaceholder')}
+        className="w-full h-[40px] pl-[42px] pr-[16px] rounded-[100px] border border-[#BBBBBB] font-['Outfit'] font-normal text-[14px] leading-[1.5] text-[#161616] bg-[#EAEAEA]"
+      />
+    </div>
+  );
+
+  const toggleFilterValue = (
+    list: string[],
+    value: string,
+    setter: Dispatch<SetStateAction<string[]>>
+  ) => {
+    setter((prev) =>
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+    );
+  };
+
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      const usageId = normalizeUsageId(product.category);
+      const matchesUsage =
+        selectedUsage.length === 0 ||
+        (usageId ? selectedUsage.includes(usageId) : false);
+      const woodId = normalizeWoodId(product.woodType);
+      const matchesWood =
+        selectedWood.length === 0 ||
+        (woodId ? selectedWood.includes(woodId) : false);
+
+      const normalizedColors = (product.colors ?? [])
+        .map((c) => normalizeToken(c?.name ?? ''))
+        .filter(Boolean);
+      const matchesColor =
+        selectedColor.length === 0 ||
+        selectedColor.some((value) => normalizedColors.includes(normalizeToken(value)));
+
+      const normalizedProfiles = (product.profiles ?? [])
+        .map((p) => resolveProfileKey(p))
+        .filter(Boolean);
+      const matchesProfile =
+        selectedProfile.length === 0 ||
+        selectedProfile.some((value) => normalizedProfiles.includes(normalizeToken(value)));
+
+      const effectivePrice = getEffectivePrice(product);
+      const matchesPrice =
+        effectivePrice >= selectedPriceRange[0] && effectivePrice <= selectedPriceRange[1];
+
+      const parsed = product.slug.includes('--') ? parseStockItemSlug(product.slug) : null;
+      const dims = parsed?.size ? parseSizeDimensions(parsed.size) : null;
+      const matchesWidth =
+        selectedWidth.length === 0 || (dims?.width ? selectedWidth.includes(dims.width) : false);
+      const matchesLength =
+        selectedLength.length === 0 || (dims?.length ? selectedLength.includes(dims.length) : false);
+
+      const q = searchQuery.trim().toLowerCase();
+      const displayName = formatProductDisplayName(product).toLowerCase();
+      const attributeText = formatProductAttributes(product).toLowerCase();
+      const matchesQuery = q.length === 0 || displayName.includes(q) || attributeText.includes(q);
+
+      return (
+        matchesUsage &&
+        matchesWood &&
+        matchesColor &&
+        matchesProfile &&
+        matchesPrice &&
+        matchesWidth &&
+        matchesLength &&
+        matchesQuery
+      );
+    });
+  }, [
+    allProducts,
+    formatProductDisplayName,
+    formatProductAttributes,
+    searchQuery,
+    selectedColor,
+    selectedLength,
+    selectedPriceRange,
+    selectedProfile,
+    selectedUsage,
+    selectedWidth,
+    selectedWood,
+    getEffectivePrice,
+  ]);
+
+  const isDefaultListing =
+    selectedUsage.length === 0 &&
+    selectedWood.length === 0 &&
+    selectedColor.length === 0 &&
+    selectedProfile.length === 0 &&
+    !isPriceRangeActive &&
+    selectedWidth.length === 0 &&
+    selectedLength.length === 0 &&
+    searchQuery.trim().length === 0;
+
+  const shouldMixByColor = selectedColor.length === 0 && (isDefaultListing || selectedWood.length > 0);
+
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const orderedProducts = useMemo(() => {
+    if (!shouldMixByColor) return filteredProducts;
+
+    const colorOrder = [
+      'black',
+      'carbon-light',
+      'carbon',
+      'dark-brown',
+      'graphite',
+      'latte',
+      'natural',
+      'silver',
+    ] as const;
+
+    const getWoodKey = (product: Product) => normalizeToken(product.woodType ?? '') || 'unknown';
+
+    const getColorKey = (product: Product) => {
+      const parsed = product.slug.includes('--') ? parseStockItemSlug(product.slug) : null;
+      const rawColor = product.colors?.[0]?.name ?? parsed?.color ?? '';
+      return normalizeToken(rawColor) || 'unknown';
+    };
+
+    const byGroup = new Map<string, { wood: string; color: string; items: Product[] }>();
+    for (const product of filteredProducts) {
+      const wood = getWoodKey(product);
+      const color = getColorKey(product);
+      const key = `${wood}:${color}`;
+      const existing = byGroup.get(key);
+      if (existing) existing.items.push(product);
+      else byGroup.set(key, { wood, color, items: [product] });
+    }
+
+    const result: Product[] = [];
+
+    const preferredWoods = isDefaultListing
+      ? (['spruce', 'larch'] as const)
+      : (Array.from(new Set(filteredProducts.map((product) => getWoodKey(product)))) as string[]);
+
+    // 1) Start with a visible color mix across the currently relevant wood types.
+    for (const color of colorOrder) {
+      for (const wood of preferredWoods) {
+        const group = byGroup.get(`${wood}:${color}`);
+        if (group?.items.length) {
+          result.push(group.items.shift()!);
+        }
+      }
+    }
+
+    // 2) Fill the rest round-robin, avoiding repeating the same wood/color in a row when possible.
+    let lastWood: string | null = result.at(-1)?.woodType ? normalizeToken(result.at(-1)!.woodType!) : null;
+    let lastColor: string | null = (() => {
+      const last = result.at(-1);
+      if (!last) return null;
+      const parsed = last.slug.includes('--') ? parseStockItemSlug(last.slug) : null;
+      const rawColor = last.colors?.[0]?.name ?? parsed?.color ?? '';
+      return normalizeToken(rawColor) || null;
+    })();
+
+    const groups = Array.from(byGroup.values()).filter((g) => g.items.length > 0);
+
+    const colorRank = new Map<string, number>(colorOrder.map((c, idx) => [c, idx]));
+    groups.sort((a, b) => {
+      const ra = colorRank.get(a.color) ?? 999;
+      const rb = colorRank.get(b.color) ?? 999;
+      if (ra !== rb) return ra - rb;
+      return a.wood.localeCompare(b.wood);
+    });
+
+    while (result.length < filteredProducts.length) {
+      const pickIndex = (() => {
+        const idxStrict = groups.findIndex((g) =>
+          g.items.length > 0 && g.wood !== lastWood && g.color !== lastColor
+        );
+        if (idxStrict !== -1) return idxStrict;
+
+        const idxColor = groups.findIndex((g) => g.items.length > 0 && g.color !== lastColor);
+        if (idxColor !== -1) return idxColor;
+
+        const idxAny = groups.findIndex((g) => g.items.length > 0);
+        return idxAny;
+      })();
+
+      if (pickIndex === -1) break;
+      const group = groups[pickIndex]!;
+      const next = group.items.shift();
+      if (!next) continue;
+
+      result.push(next);
+      lastWood = group.wood;
+      lastColor = group.color;
+    }
+
+    return result;
+  }, [filteredProducts, isDefaultListing, shouldMixByColor]);
+
+  const shownProducts = orderedProducts;
+
+  useEffect(() => {
+    if (error) return;
+    if (hasTrackedListView) return;
+    if (allProducts.length === 0) return;
+
+    trackEvent('view_item_list', {
+      item_list_id: 'products',
+      item_list_name: currentLocale === 'lt' ? 'Produktai' : 'Products',
+      filters: {
+        usage: selectedUsage,
+        wood: selectedWood,
+        color: selectedColor,
+        profile: selectedProfile,
+        price: selectedPriceRange,
+        width: selectedWidth,
+        length: selectedLength,
+      },
+      shown_items_count: shownProducts.length,
+    });
+
+    setHasTrackedListView(true);
+  }, [
+    selectedColor,
+    selectedPriceRange,
+    selectedProfile,
+    selectedUsage,
+    selectedWood,
+    selectedWidth,
+    selectedLength,
+    currentLocale,
+    error,
+    hasTrackedListView,
+    shownProducts.length,
+    allProducts.length,
+  ]);
+
+  const hasActiveFilters =
+    selectedUsage.length > 0 ||
+    selectedWood.length > 0 ||
+    selectedColor.length > 0 ||
+    selectedProfile.length > 0 ||
+    isPriceRangeActive ||
+    selectedWidth.length > 0 ||
+    selectedLength.length > 0 ||
+    searchQuery.trim().length > 0;
+
+  const isFullListLoaded = allProducts.length >= totalCount;
+
+  useEffect(() => {
+    if (!hasActiveFilters) return;
+    if (isFullListLoaded) return;
+    void loadFullProductList();
+  }, [hasActiveFilters, isFullListLoaded, loadFullProductList]);
+
+  const displayCount = hasActiveFilters || isFullListLoaded ? orderedProducts.length : totalCount;
+
+  useEffect(() => {
+    if (error) return;
+    if (allProducts.length === 0) return;
+
+    trackEvent('filter_products', {
+      filters: {
+        usage: selectedUsage,
+        wood: selectedWood,
+        color: selectedColor,
+        profile: selectedProfile,
+        price: selectedPriceRange,
+        width: selectedWidth,
+        length: selectedLength,
+      },
+      shown_items_count: shownProducts.length,
+    });
+  }, [
+    selectedColor,
+    selectedPriceRange,
+    selectedProfile,
+    selectedUsage,
+    selectedWood,
+    selectedWidth,
+    selectedLength,
+    error,
+    shownProducts.length,
+    allProducts.length,
+  ]);
+
+  return (
+    <section className="w-full bg-[#E1E1E1] min-h-screen">
+      {/* Cover */}
+      <InView className="hero-animate-root is-inview">
+        <PageCover>
+          <div className="flex flex-col gap-[16px] hero-seq-item hero-seq-right" style={{ animationDelay: '0ms' }}>
+            <div className="flex items-start gap-[8px]">
+            <h1
+              className="font-['DM_Sans'] font-light text-[56px] md:text-[128px] leading-[0.95] text-[#161616] tracking-[-2.8px] md:tracking-[-6.4px]"
+              style={{ fontVariationSettings: "'opsz' 14" }}
+            >
+              {t('title')}
+            </h1>
+            <p
+              className="font-['DM_Sans'] font-normal text-[18px] md:text-[32px] leading-[1.1] text-[#161616] tracking-[-0.72px] md:tracking-[-1.28px]"
+              style={{ fontVariationSettings: "'opsz' 14" }}
+            >
+              ({displayCount})
+            </p>
+            </div>
+
+          </div>
+        </PageCover>
+      </InView>
+
+      {/* Mobile + Tablet Sticky Filters */}
+      <div
+        className={`lg:hidden fixed top-[120px] left-0 right-0 z-40 bg-[#E1E1E1]/95 backdrop-blur-md border-b border-[#BBBBBB]/60 shadow-sm transition-all duration-500 ease-out ${
+          showStickyFilters
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 -translate-y-3 pointer-events-none'
+        }`}
+      >
+        <div className="px-[16px] py-[12px]">
+          <div className="flex items-center gap-[8px]">
+            <div className="flex-1">{renderSearchField()}</div>
+            <button
+              type="button"
+              onClick={() => setIsStickyOpen((prev) => !prev)}
+              aria-expanded={isStickyOpen}
+              className="h-[40px] px-[16px] rounded-[100px] border border-[#161616] font-['Outfit'] text-[12px] tracking-[0.6px] uppercase text-[#161616]"
+            >
+              {t('filtersToggle')}
+            </button>
+          </div>
+          {isStickyOpen ? (
+            <div className="mt-[12px] flex flex-col gap-[12px]">
+              {renderDropdown(
+                'usage',
+                t('filtersUsage'),
+                usageOptions,
+                selectedUsage,
+                (value) => toggleFilterValue(selectedUsage, value, setSelectedUsage),
+                t('usageFilters.all')
+              )}
+              {renderDropdown(
+                'wood',
+                t('filtersWood'),
+                woodOptions,
+                selectedWood,
+                (value) => toggleFilterValue(selectedWood, value, setSelectedWood),
+                t('woodFilters.all')
+              )}
+              {renderDropdown(
+                'color',
+                t('filtersColor'),
+                colorOptions,
+                selectedColor,
+                (value) => toggleFilterValue(selectedColor, value, setSelectedColor),
+                t('colorFilterAll')
+              )}
+              {renderDropdown(
+                'profile',
+                t('filtersProfile'),
+                profileDropdownOptions,
+                selectedProfile,
+                (value) => toggleFilterValue(selectedProfile, value, setSelectedProfile),
+                t('profileFilterAll')
+              )}
+              <PriceRangeDropdown
+                id="price"
+                label={t('filtersPrice')}
+                value={selectedPriceRange}
+                bounds={priceBounds}
+                onChange={setSelectedPriceRange}
+                onReset={() => setSelectedPriceRange(priceBounds)}
+                isActive={isPriceRangeActive}
+                allLabel={t('priceFilterAll')}
+                openId={openFilterId}
+                setOpenId={setOpenFilterId}
+                formatValue={(value) => (currentLocale === 'lt' ? `${value} €/m²` : `€${value}/m²`)}
+              />
+              {renderDropdown(
+                'width',
+                t('filtersWidth'),
+                sizeOptions.widths,
+                selectedWidth,
+                (value) => toggleFilterValue(selectedWidth, value, setSelectedWidth),
+                t('filtersAny')
+              )}
+              {renderDropdown(
+                'length',
+                t('filtersLength'),
+                sizeOptions.lengths,
+                selectedLength,
+                (value) => toggleFilterValue(selectedLength, value, setSelectedLength),
+                t('filtersAny')
+              )}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <InView className="hero-animate-root">
+        <PageLayout>
+          <div
+            ref={filtersRef}
+            className="py-[24px] flex flex-col gap-4"
+          >
+            <div className="flex flex-col gap-[12px] sm:flex-row sm:flex-wrap sm:items-center hero-seq-item hero-seq-right" style={{ animationDelay: '0ms' }}>
+            {renderSearchField('sm:flex-[1_1_260px] sm:min-w-[220px] sm:max-w-[520px]')}
+            {renderDropdown(
+              'usage',
+              t('filtersUsage'),
+              usageOptions,
+              selectedUsage,
+              (value) => toggleFilterValue(selectedUsage, value, setSelectedUsage),
+              t('usageFilters.all')
+            )}
+            {renderDropdown(
+              'wood',
+              t('filtersWood'),
+              woodOptions,
+              selectedWood,
+              (value) => toggleFilterValue(selectedWood, value, setSelectedWood),
+              t('woodFilters.all')
+            )}
+            {renderDropdown(
+              'color',
+              t('filtersColor'),
+              colorOptions,
+              selectedColor,
+              (value) => toggleFilterValue(selectedColor, value, setSelectedColor),
+              t('colorFilterAll')
+            )}
+            {renderDropdown(
+              'profile',
+              t('filtersProfile'),
+              profileDropdownOptions,
+              selectedProfile,
+              (value) => toggleFilterValue(selectedProfile, value, setSelectedProfile),
+              t('profileFilterAll')
+            )}
+            <PriceRangeDropdown
+              id="price"
+              label={t('filtersPrice')}
+              value={selectedPriceRange}
+              bounds={priceBounds}
+              onChange={setSelectedPriceRange}
+              onReset={() => setSelectedPriceRange(priceBounds)}
+              isActive={isPriceRangeActive}
+              allLabel={t('priceFilterAll')}
+              openId={openFilterId}
+              setOpenId={setOpenFilterId}
+              formatValue={(value) => (currentLocale === 'lt' ? `${value} €/m²` : `€${value}/m²`)}
+            />
+            {renderDropdown(
+              'width',
+              t('filtersWidth'),
+              sizeOptions.widths,
+              selectedWidth,
+              (value) => toggleFilterValue(selectedWidth, value, setSelectedWidth),
+              t('filtersAny')
+            )}
+            {renderDropdown(
+              'length',
+              t('filtersLength'),
+              sizeOptions.lengths,
+              selectedLength,
+              (value) => toggleFilterValue(selectedLength, value, setSelectedLength),
+              t('filtersAny')
+            )}
+            </div>
+          </div>
+        </PageLayout>
+      </InView>
+
+      {/* Product Grid */}
+      <InView className="hero-animate-root is-inview">
+        <PageLayout>
+        <div className="pb-[80px]">
+        <h3 className="absolute top-0 left-0 opacity-0 pointer-events-none select-none">
+          {t('emptyTitle')}
+        </h3>
+        {error ? (
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 className="font-['DM_Sans'] text-xl font-medium text-[#161616] mb-2">
+              {t('errorTitle')}
+            </h3>
+            <p className="font-['Outfit'] text-[#7C7C7C] mb-2">
+              {error}
+            </p>
+            <p className="font-['Outfit'] text-[#7C7C7C] mb-6">
+              {t('errorHelp')}{' '}
+              <Link href={toLocalePath('/kontaktai', currentLocale)} className="text-[#161616] underline">
+                {t('errorContactLink')}
+              </Link>{' '}
+              {t('errorContactSuffix')}
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-6 py-2 bg-[#161616] text-white rounded-full hover:opacity-90"
+            >
+              {t('retry')}
+            </button>
+          </div>
+        ) : orderedProducts.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#EAEAEA] rounded-full mb-4">
+              <svg className="w-8 h-8 text-[#BBBBBB]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h3 className="font-['DM_Sans'] text-xl font-medium text-[#161616] mb-2">
+              {t('emptyTitle')}
+            </h3>
+            <p className="font-['Outfit'] text-[#7C7C7C] mb-6">
+              {t('emptyDescriptionPrefix')}{' '}
+              <Link href={toLocalePath('/kontaktai', currentLocale)} className="text-[#161616] underline">
+                {t('emptyContactLink')}
+              </Link>
+              {t('emptyDescriptionSuffix')}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-[16px] md:gap-x-[19px] gap-y-[40px] md:gap-y-[56px]">
+            {shownProducts.map((product, idx) => (
+              (() => {
+                const localizedDisplayName = formatProductDisplayName(product);
+                const attributeLabel = formatProductAttributes(product);
+                const hasSale =
+                  typeof product.salePrice === 'number' &&
+                  product.salePrice > 0 &&
+                  product.salePrice < product.price;
+                const effectivePrice = getEffectivePrice(product);
+                const discountPercent = hasSale
+                  ? Math.max(1, Math.round(((product.price - effectivePrice) / product.price) * 100))
+                  : null;
+                const hrefSlug = currentLocale === 'en' ? (product.slugEn ?? product.slug) : product.slug;
+                const parsedStock = hrefSlug.includes('--') ? parseStockItemSlug(hrefSlug) : null;
+                const detailSlug = parsedStock?.baseSlug ?? hrefSlug;
+                const detailPath = toLocalePath(`/products/${detailSlug}`, currentLocale);
+                const detailParams = new URLSearchParams();
+                if (parsedStock?.size) {
+                  const dims = parseSizeDimensions(parsedStock.size);
+                  if (dims?.width) detailParams.set('w', String(dims.width));
+                  if (dims?.length) detailParams.set('l', String(dims.length));
+                }
+                const cardColorName = parsedStock?.color ?? product.colors?.[0]?.name ?? '';
+                if (cardColorName) detailParams.set('ct', normalizeToken(cardColorName));
+
+                const cardProfileToken = parsedStock?.profile
+                  ? parsedStock.profile
+                  : product.profiles?.[0]
+                    ? resolveProfileKey(product.profiles[0])
+                    : '';
+                if (cardProfileToken) detailParams.set('ft', normalizeToken(cardProfileToken));
+                if (product.image) detailParams.set('img', product.image);
+                const detailHref = detailParams.toString()
+                  ? `${detailPath}?${detailParams.toString()}`
+                  : detailPath;
+
+                const parsed = product.slug.includes('--') ? parseStockItemSlug(product.slug) : null;
+                const dims = parsed?.size ? parseSizeDimensions(parsed.size) : null;
+                const unitPrice = getUnitPrice(effectivePrice, dims);
+                const unitPriceLabel = unitPrice ? formatUnitPrice(unitPrice) : null;
+
+                const shouldAnimateCard = idx >= 6;
+                const delay = 180 + ((idx % 4) * 120) + (Math.floor(idx / 4) * 80);
+                const rawCardImageSrc = product.image || '/images/ui/wood/imgSpruce.png';
+                const cardImageSrc = optimizeSupabasePublicImage(rawCardImageSrc, {
+                  width: 720,
+                  quality: 60,
+                  format: 'webp',
+                });
+                const isLocalAssetImage =
+                  typeof cardImageSrc === 'string' &&
+                  cardImageSrc.startsWith('/assets/');
+                const isSupabaseRenderImage =
+                  typeof cardImageSrc === 'string' &&
+                  cardImageSrc.includes('/storage/v1/render/image/public/');
+                const cardImageSeo = buildProductImageSeo(currentLocale, {
+                  name: localizedDisplayName,
+                  attributeLabel,
+                  shortDescription: [
+                    product.category
+                      ? usageLabels[product.category] ?? formatMaybeLabel(product.category)
+                      : undefined,
+                    product.woodType ? (woodLabels[product.woodType] ?? product.woodType) : undefined,
+                  ]
+                    .filter(Boolean)
+                    .join(' • '),
+                });
+                return (
+            <Link
+              key={product.id}
+              href={detailHref}
+              className={`flex flex-col gap-[8px] group ${shouldAnimateCard ? 'hero-seq-item hero-seq-right' : ''}`.trim()}
+              style={shouldAnimateCard ? { animationDelay: `${delay}ms` } : undefined}
+              onClick={() => {
+                trackSelectItem({
+                  id: product.id,
+                  name: localizedDisplayName,
+                  price: effectivePrice,
+                  category: product.category,
+                  position: idx + 1,
+                });
+              }}
+            >
+              <div data-testid="product-card" className="relative w-full h-[250px] border border-[#161616] border-opacity-30 overflow-hidden">
+                <SeoImage
+                  src={cardImageSrc}
+                  alt={cardImageSeo.alt}
+                  title={cardImageSeo.title}
+                  description={cardImageSeo.description}
+                  fill
+                  priority={idx === 0}
+                  unoptimized={isSupabaseRenderImage || isLocalAssetImage}
+                  fetchPriority={idx === 0 ? 'high' : undefined}
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
+                {unitPriceLabel ? (
+                  <div className="absolute top-[10px] left-[10px] text-[14px] font-['DM_Sans'] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]">
+                    {unitPriceLabel}
+                  </div>
+                ) : null}
+                {discountPercent ? (
+                  <div className="absolute top-[10px] right-[10px] rounded-[100px] bg-[#161616] px-[10px] py-[6px] text-[12px] font-['DM_Sans'] text-white">
+                    -{discountPercent}%
+                  </div>
+                ) : null}
+              </div>
+              <p
+                className="font-['DM_Sans'] font-medium text-[18px] leading-[1.2] text-[#161616] tracking-[-0.36px]"
+                style={{ fontVariationSettings: "'opsz' 14" }}
+              >
+                {localizedDisplayName}
+              </p>
+              {attributeLabel ? (
+                <p
+                  className="font-['Outfit'] font-normal text-[12px] leading-[1.2] text-[#7C7C7C] tracking-[0.6px] uppercase"
+                >
+                  {attributeLabel}
+                </p>
+              ) : null}
+              {(product.category || product.woodType) && (
+                <p
+                  className="font-['DM_Sans'] font-normal text-[14px] leading-[1.2] text-[#535353] tracking-[-0.28px]"
+                  style={{ fontVariationSettings: "'opsz' 14" }}
+                >
+                  {[
+                    product.category
+                      ? usageLabels[product.category] ?? formatMaybeLabel(product.category)
+                      : undefined,
+                    product.woodType ? (woodLabels[product.woodType] ?? product.woodType) : undefined,
+                  ]
+                    .filter(Boolean)
+                    .join(' • ')}
+                </p>
+              )}
+              <p
+                className="flex items-center justify-between gap-[12px] font-['DM_Sans'] font-normal text-[16px] leading-[1.2] text-[#535353] tracking-[-0.32px]"
+                style={{ fontVariationSettings: "'opsz' 14" }}
+              >
+                <span className="flex items-center gap-[10px]">
+                  <span className={hasSale ? 'text-[#161616]' : undefined}>
+                    {formatCardPrice(effectivePrice)}
+                  </span>
+                  {hasSale ? (
+                    <span className="text-[#7C7C7C] line-through">
+                      {formatCardPrice(product.price)}
+                    </span>
+                  ) : null}
+                </span>
+                
+              </p>
+            </Link>
+              );
+            })()
+          ))}
+          </div>
+        )}
+
+        </div>
+        </PageLayout>
+      </InView>
+    </section>
+  );
+}

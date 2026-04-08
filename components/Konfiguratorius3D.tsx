@@ -1,0 +1,2297 @@
+"use client";
+
+import React, { Suspense, useMemo, useState, useEffect, useLayoutEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, useGLTF, useProgress } from '@react-three/drei';
+import * as THREE from 'three';
+import type { ProductColorVariant, ProductProfileVariant } from '@/lib/products.supabase';
+import { getLocalizedColorName, getLocalizedProfileName } from '@/lib/products.supabase';
+import { useLocale, useTranslations } from 'next-intl';
+import { useCartStore } from '@/lib/cart/store';
+import { trackEvent } from '@/lib/analytics';
+import { downloadConfigurationPDF, type ConfigurationPDFData } from '@/lib/configurator/pdf-generator';
+import { getGenericModelUrl, getProductModelUrl, getVersionedModelUrl, hasModelPath, hasProductModel } from '@/lib/models';
+
+interface ProfileModelProps {
+  color: string;
+  finish: ProductProfileVariant | null;
+  variantKey: string;
+  autoRotate?: boolean;
+  rotationYRef?: React.MutableRefObject<number>;
+  visualDimensionsMm?: {
+    widthMm?: number;
+    lengthMm?: number;
+    thicknessMm?: number;
+  };
+}
+
+const DEFAULT_CONFIGURATOR_GLB_PATH = getGenericModelUrl();
+
+const VISUAL_LENGTH_FACTOR = 0.1;
+
+const DRACO_DECODER_PATH = '/draco/';
+
+function hashStringToSeed(value: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function createSeededRandom(seedValue: number): () => number {
+  let seed = seedValue || 1;
+  return () => {
+    seed += 0x6d2b79f5;
+    let t = seed;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function createLongGrainTexture(variantKey: string): THREE.CanvasTexture {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }
+
+  const random = createSeededRandom(hashStringToSeed(`long:${variantKey}`));
+
+  const light = 125 + Math.round(random() * 18);
+  const mid = 98 + Math.round(random() * 16);
+  const dark = 72 + Math.round(random() * 16);
+  ctx.fillStyle = `rgb(${light}, ${mid}, ${dark})`;
+  ctx.fillRect(0, 0, size, size);
+
+  for (let x = 0; x < size; x += 2) {
+    const wave = Math.sin((x / size) * Math.PI * (7 + random() * 3));
+    const stripeStrength = 0.12 + random() * 0.2 + Math.abs(wave) * 0.18;
+    const line = Math.max(20, Math.min(235, Math.round(125 - stripeStrength * 80)));
+    ctx.fillStyle = `rgba(${line}, ${line - 12}, ${line - 26}, ${0.2 + random() * 0.25})`;
+    ctx.fillRect(x, 0, 1, size);
+  }
+
+  for (let i = 0; i < 90; i += 1) {
+    const knotX = Math.floor(random() * size);
+    const knotY = Math.floor(random() * size);
+    const knotW = 8 + random() * 24;
+    const knotH = 2 + random() * 5;
+    ctx.fillStyle = `rgba(60, 42, 28, ${0.03 + random() * 0.06})`;
+    ctx.fillRect(knotX, knotY, knotW, knotH);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(2.6, 2.6);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createEndGrainTexture(variantKey: string): THREE.CanvasTexture {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }
+
+  const random = createSeededRandom(hashStringToSeed(`end:${variantKey}`));
+  ctx.fillStyle = `rgb(${112 + Math.round(random() * 20)}, ${89 + Math.round(random() * 16)}, ${68 + Math.round(random() * 14)})`;
+  ctx.fillRect(0, 0, size, size);
+
+  const centerX = size * (0.42 + random() * 0.16);
+  const centerY = size * (0.42 + random() * 0.16);
+
+  for (let r = 8; r < size * 0.7; r += 6 + random() * 5) {
+    const jitter = (random() - 0.5) * 8;
+    const alpha = 0.08 + random() * 0.18;
+    const ring = 54 + Math.round(random() * 34);
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(${ring}, ${ring - 10}, ${ring - 24}, ${alpha})`;
+    ctx.lineWidth = 1 + random() * 2;
+    ctx.arc(centerX + jitter, centerY - jitter, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < 120; i += 1) {
+    const dotX = random() * size;
+    const dotY = random() * size;
+    const dotR = 0.6 + random() * 1.5;
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(50, 37, 27, ${0.08 + random() * 0.2})`;
+    ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1.8, 1.8);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function normalizeProfileHint(value: string): string {
+  return value
+    .normalize('NFD')
+    // Remove diacritics.
+    .replace(/\p{Diacritic}/gu, '')
+    .trim()
+    .toLowerCase();
+}
+
+function isHalfTaper45(finish: ProductProfileVariant | null): boolean {
+  if (!finish) return false;
+  const hint = normalizeProfileHint([finish.code, finish.name].filter(Boolean).join(' '));
+  return (
+    (hint.includes('taper') && hint.includes('45')) ||
+    (hint.includes('spunto') && hint.includes('45')) ||
+    (hint.includes('spon') && hint.includes('45')) ||
+    (hint.includes('half') && hint.includes('taper'))
+  );
+}
+
+function createCenteredExtrudeGeometry(shape: THREE.Shape, depth: number): THREE.ExtrudeGeometry {
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: false,
+    steps: 1,
+  });
+
+
+  geometry.center();
+  geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function ProfileModel({ color, finish, variantKey, autoRotate = true, rotationYRef, visualDimensionsMm }: ProfileModelProps) {
+  const groupRef = useRef<THREE.Group | null>(null);
+
+  useLayoutEffect(() => {
+    if (!groupRef.current || !rotationYRef) return;
+    groupRef.current.rotation.y = rotationYRef.current;
+  }, [rotationYRef]);
+
+  const geometry = useMemo(() => {
+    const widthMm = visualDimensionsMm?.widthMm ?? finish?.dimensions?.width;
+    const thicknessMm = visualDimensionsMm?.thicknessMm ?? finish?.dimensions?.thickness;
+    const lengthMm = visualDimensionsMm?.lengthMm ?? finish?.dimensions?.length;
+
+    // Keep the model roughly in the same scale as the previous placeholder box: [2, 0.2, 1].
+    // width 120mm -> ~2 units, thickness 20mm -> ~0.2 units, length 1000mm -> ~1 unit.
+    const widthUnits = (typeof widthMm === 'number' && widthMm > 0 ? widthMm : 120) / 60;
+    const thicknessUnits = (typeof thicknessMm === 'number' && thicknessMm > 0 ? thicknessMm : 20) / 100;
+    const depthUnits = ((typeof lengthMm === 'number' && lengthMm > 0 ? lengthMm : 1000) / 1000) * VISUAL_LENGTH_FACTOR;
+
+    if (isHalfTaper45(finish)) {
+      // Simple “half taper 45°” approximation:
+      // one side is a 45° chamfer (bevel length equals thickness).
+      const bevel = Math.min(thicknessUnits, widthUnits * 0.45);
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+      shape.lineTo(widthUnits, 0);
+      shape.lineTo(widthUnits - bevel, thicknessUnits);
+      shape.lineTo(0, thicknessUnits);
+      shape.lineTo(0, 0);
+      return createCenteredExtrudeGeometry(shape, depthUnits);
+    }
+
+    // Fallback: simple rectangular profile.
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.lineTo(widthUnits, 0);
+    shape.lineTo(widthUnits, thicknessUnits);
+    shape.lineTo(0, thicknessUnits);
+    shape.lineTo(0, 0);
+    return createCenteredExtrudeGeometry(shape, depthUnits);
+  }, [finish, visualDimensionsMm?.lengthMm, visualDimensionsMm?.thicknessMm, visualDimensionsMm?.widthMm]);
+
+  const longGrainMap = useMemo(() => createLongGrainTexture(variantKey), [variantKey]);
+  const endGrainMap = useMemo(() => createEndGrainTexture(variantKey), [variantKey]);
+
+  useEffect(() => {
+    return () => {
+      longGrainMap.dispose();
+      endGrainMap.dispose();
+    };
+  }, [longGrainMap, endGrainMap]);
+
+  const materials = useMemo(() => {
+    const capMaterial = new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.84,
+      metalness: 0.06,
+      map: endGrainMap,
+    });
+
+    const sideMaterial = new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.78,
+      metalness: 0.08,
+      map: longGrainMap,
+    });
+
+    return [capMaterial, sideMaterial] as THREE.Material[];
+  }, [color, endGrainMap, longGrainMap]);
+
+  useEffect(() => {
+    return () => {
+      materials.forEach((material) => material.dispose());
+    };
+  }, [materials]);
+
+  useFrame((_, delta) => {
+    if (!autoRotate) return;
+    if (!groupRef.current) return;
+    const safeDelta = Math.min(delta, 0.05);
+    groupRef.current.rotation.y += safeDelta * 0.7;
+    if (rotationYRef) {
+      rotationYRef.current = groupRef.current.rotation.y;
+    }
+  });
+
+  return (
+    <group ref={groupRef} name="yakiwood-model-root">
+      <mesh geometry={geometry} material={materials} castShadow receiveShadow frustumCulled={false} />
+    </group>
+  );
+}
+
+function cloneSceneWithUniqueMaterials(scene: THREE.Group): THREE.Group {
+  const cloned = scene.clone(true);
+
+  cloned.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.isMesh || !mesh.material) return;
+
+    if (Array.isArray(mesh.material)) {
+      mesh.material = mesh.material.map((material) => material.clone());
+      return;
+    }
+
+    mesh.material = mesh.material.clone();
+  });
+
+  return cloned;
+}
+
+function getFinishSurfacePreset(finish: ProductProfileVariant | null): { roughness: number; metalness: number } {
+  if (!finish) return { roughness: 0.78, metalness: 0.08 };
+
+  const token = normalizeProfileHint([finish.code, finish.name, finish.nameEn, finish.nameLt].filter(Boolean).join(' '));
+
+  if (token.includes('matte') || token.includes('mat') || token.includes('natur')) {
+    return { roughness: 0.86, metalness: 0.04 };
+  }
+
+  if (token.includes('semi') || token.includes('sat')) {
+    return { roughness: 0.62, metalness: 0.08 };
+  }
+
+  if (token.includes('gloss') || token.includes('polish')) {
+    return { roughness: 0.42, metalness: 0.12 };
+  }
+
+  return { roughness: 0.74, metalness: 0.08 };
+}
+
+function normalizeColorToken(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[_\s]+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function resolveColorHex(color: ProductColorVariant | null): string {
+  if (color?.hex && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color.hex)) {
+    return color.hex;
+  }
+
+  const source = [color?.id, color?.name, color?.nameEn, color?.nameLt].filter(Boolean).join(' ');
+  const token = normalizeColorToken(source);
+
+  if (token.includes('black') || token.includes('juod')) return '#1f1f1f';
+  if (token.includes('carbon-light') || token.includes('carbonlight')) return '#5b5b5b';
+  if (token.includes('carbon')) return '#333333';
+  if (token.includes('graphite') || token.includes('grafit')) return '#535353';
+  if (token.includes('silver') || token.includes('sidab')) return '#b7b7b7';
+  if (token.includes('dark-brown') || token.includes('darkbrown') || token.includes('tams') || token.includes('brown')) return '#5b3b2b';
+  if (token.includes('latte')) return '#b18e70';
+  if (token.includes('natural') || token.includes('natur') || token.includes('naturali')) return '#8f6a4d';
+
+  return '#444444';
+}
+
+type FinishTextureWood = 'larch' | 'spruce' | 'thermo';
+
+const MODEL_COLOR_SUFFIX_REGEX = /(black|carbon|carbon-light|graphite|natural|dark-brown|latte|silver)$/;
+
+function resolveColorVariantSlug(baseSlug: string, colorSlug: string): string | null {
+  if (!MODEL_COLOR_SUFFIX_REGEX.test(baseSlug)) return null;
+  return baseSlug.replace(MODEL_COLOR_SUFFIX_REGEX, colorSlug);
+}
+
+function detectModelTypeToken(value: string): 'terrace' | 'facade' | null {
+  const token = value.toLowerCase();
+  if (token.includes('terrace') || token.includes('teras')) return 'terrace';
+  if (token.includes('facade') || token.includes('fasad')) return 'facade';
+  return null;
+}
+
+function detectModelWoodToken(value: string): 'larch' | 'spruce' | 'thermo' | null {
+  const token = value.toLowerCase();
+  if (token.includes('larch') || token.includes('maumed')) return 'larch';
+  if (token.includes('spruce') || token.includes('egle')) return 'spruce';
+  if (token.includes('thermo') || token.includes('termo') || token.includes('termomed')) return 'thermo';
+  return null;
+}
+
+function buildColorVariantSlugCandidates(input: {
+  modelSlug?: string;
+  modelUrl?: string;
+  colorSlug: string;
+  profile?: ProductProfileVariant | null;
+}): string[] {
+  const candidates: string[] = [];
+  const { modelSlug, modelUrl, colorSlug, profile } = input;
+
+  if (modelSlug) {
+    const direct = resolveColorVariantSlug(modelSlug, colorSlug);
+    if (direct) candidates.push(direct);
+  }
+
+  const source = `${modelSlug ?? ''} ${modelUrl ?? ''}`;
+  let type = detectModelTypeToken(source);
+  const wood = detectModelWoodToken(source);
+  const profileSource = [profile?.code, profile?.name, profile?.nameEn, profile?.nameLt].filter(Boolean).join(' ').toLowerCase();
+  const profileToken = profileSource.includes('45') && (profileSource.includes('half') || profileSource.includes('taper') || profileSource.includes('pus') || profileSource.includes('spunto'))
+    ? 'half-taper-45'
+    : profileSource.includes('half') || profileSource.includes('taper') || profileSource.includes('pus') || profileSource.includes('spunto')
+      ? 'half-taper'
+      : profileSource.includes('rhomb') || profileSource.includes('romb')
+        ? 'rhombus'
+        : profileSource.includes('rectangle') || profileSource.includes('staciakamp')
+          ? 'rectangle'
+          : null;
+
+  // Some thermo facade selections still point to a terrace base GLB.
+  // Infer the correct model type from the chosen profile to ensure profile switching works.
+  if (profileToken && profileToken !== 'rectangle') {
+    type = 'facade';
+  } else if (profileToken === 'rectangle' && !type) {
+    type = 'terrace';
+  }
+
+  if (!type || !wood) return candidates;
+
+  const woodLt = wood === 'larch' ? 'maumedis' : wood === 'spruce' ? 'egle' : 'termomediena';
+  const typeLt = type === 'terrace' ? 'terasine-lenta-terasai' : 'dailylente-fasadui';
+
+  // When a facade profile is explicitly selected, prefer profile-specific slugs
+  // over generic product slugs. Otherwise we can accidentally match a default
+  // (e.g. half-tongue) mapping even when the UI selection is rhombus.
+  if (profileToken && type === 'facade') {
+    if (wood === 'thermo') {
+      candidates.push(`termomediena-${typeLt}-${profileToken}-${colorSlug}`);
+      candidates.push(`thermowood-for-${type}-${profileToken}-${colorSlug}`);
+    }
+    candidates.push(`shou-sugi-ban-for-${type}-${wood}-${profileToken}-${colorSlug}`);
+  }
+
+  candidates.push(`degintos-medienos-${typeLt}-${woodLt}-${colorSlug}`);
+  if (wood === 'thermo') {
+    candidates.push(`termomediena-${typeLt}-${colorSlug}`);
+    candidates.push(`thermowood-for-${type}-${colorSlug}`);
+  }
+  candidates.push(`shou-sugi-ban-for-${type}-${wood}-${colorSlug}`);
+
+  return candidates;
+}
+
+function resolveColorVariantPath(modelUrl: string | undefined, colorSlug: string): string | null {
+  if (!modelUrl) return null;
+  const cleanUrl = modelUrl.split('?')[0];
+  const replaced = cleanUrl.replace(
+    /(black|carbon|carbon-light|graphite|natural|dark-brown|latte|silver)(\.glb)$/,
+    `${colorSlug}$2`
+  );
+  if (replaced === cleanUrl) return null;
+  if (!replaced) return null;
+  if (!hasModelPath(replaced)) return null;
+  return getVersionedModelUrl(replaced);
+}
+
+function resolveColorVariantModelUrl(input: {
+  modelSlug?: string;
+  modelUrl?: string;
+  colorSlug: string;
+  profile?: ProductProfileVariant | null;
+}): string | null {
+  // If the parent already passed a per-color GLB for the currently selected
+  // color (and potentially profile), do not attempt to override it via slug
+  // matching. That matching is best-effort and can pick a generic fallback.
+  const cleanUrl = typeof input.modelUrl === 'string' ? input.modelUrl.split('?')[0] : '';
+  if (cleanUrl) {
+    const lower = cleanUrl.toLowerCase();
+    const expectedSuffix = `-${input.colorSlug}.glb`;
+    if (lower.endsWith(expectedSuffix) && hasModelPath(cleanUrl)) {
+      return null;
+    }
+  }
+
+  const directPath = resolveColorVariantPath(input.modelUrl, input.colorSlug);
+  if (directPath) return directPath;
+
+  const candidates = buildColorVariantSlugCandidates(input);
+  const matched = candidates.find((slug) => hasProductModel(slug));
+  if (!matched) return null;
+  return getProductModelUrl({ slug: matched });
+}
+
+function resolveColorSlug(color: ProductColorVariant | null):
+  | 'black'
+  | 'carbon'
+  | 'carbon-light'
+  | 'graphite'
+  | 'natural'
+  | 'dark-brown'
+  | 'latte'
+  | 'silver'
+  | null {
+  const source = [color?.id, color?.name, color?.nameEn, color?.nameLt].filter(Boolean).join(' ');
+  const token = normalizeColorToken(source);
+
+  if (token.includes('carbon-light') || token.includes('carbonlight') || token.includes('sviesi-angl') || token.includes('sviesi-anglis')) {
+    return 'carbon-light';
+  }
+  if (token.includes('carbon') || token.includes('angl')) return 'carbon';
+  if (token.includes('graphite') || token.includes('grafit')) return 'graphite';
+  if (token.includes('silver') || token.includes('sidab')) return 'silver';
+  if (token.includes('dark-brown') || token.includes('darkbrown') || token.includes('tams') || token.includes('brown') || token.includes('ruda')) return 'dark-brown';
+  if (token.includes('latte')) return 'latte';
+  if (token.includes('black') || token.includes('juod')) return 'black';
+  if (token.includes('natural') || token.includes('natur')) return 'natural';
+  return null;
+}
+
+function resolveFinishTextureWood(modelUrl: string): FinishTextureWood | null {
+  const token = modelUrl.toLowerCase();
+  if (token.includes('larch')) return 'larch';
+  if (token.includes('spruce')) return 'spruce';
+  if (token.includes('thermo')) return 'thermo';
+  return null;
+}
+
+function getFinishTextureUrl(wood: FinishTextureWood, colorSlug: string, colorImage?: string | null): string | null {
+  if (wood === 'thermo') {
+    // Thermo finish textures are not bundled under `/assets/finishes/thermo/` yet.
+    // `colorImage` is typically a color swatch or a product photo and is not a
+    // reliable repeatable material texture. To avoid accidentally applying a
+    // spruce/larch swatch as a thermo texture, only allow explicit thermo
+    // texture URLs.
+    const candidate = typeof colorImage === 'string' ? colorImage.trim() : '';
+    if (!candidate) return null;
+    if (candidate.includes('/assets/finishes/thermo/')) return candidate;
+    return null;
+  }
+  return `/assets/finishes/${wood}/shou-sugi-ban-${wood}-${colorSlug}-facade-terrace-cladding.webp`;
+}
+
+const finishTextureCache = new Map<string, THREE.Texture>();
+const finishTexturePromiseCache = new Map<string, Promise<THREE.Texture | null>>();
+
+type NetworkInfo = {
+  effectiveType?: string;
+  saveData?: boolean;
+};
+
+function resolveModelGeometryKey(modelUrl: string | null | undefined): string {
+  if (!modelUrl) return 'no-model';
+  const cleanUrl = modelUrl.split('?')[0];
+  return cleanUrl.replace(
+    /-(black|carbon|carbon-light|graphite|natural|dark-brown|latte|silver)(\.glb)$/i,
+    '$2'
+  );
+}
+
+function getNetworkInfo(): NetworkInfo {
+  if (typeof navigator === 'undefined') return {};
+  const connection = (navigator as any).connection as
+    | { effectiveType?: string; saveData?: boolean }
+    | undefined;
+  return {
+    effectiveType: connection?.effectiveType,
+    saveData: connection?.saveData,
+  };
+}
+
+function isSlowNetwork(info: NetworkInfo): boolean {
+  if (info.saveData) return true;
+  const type = (info.effectiveType ?? '').toLowerCase();
+  return type === 'slow-2g' || type === '2g' || type === '3g';
+}
+
+function useSlowNetworkFlag(): boolean {
+  const [slow, setSlow] = useState(() => isSlowNetwork(getNetworkInfo()));
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+
+    const connection = (navigator as any).connection as
+      | {
+          addEventListener?: (event: 'change', cb: () => void) => void;
+          removeEventListener?: (event: 'change', cb: () => void) => void;
+          addListener?: (cb: () => void) => void;
+          removeListener?: (cb: () => void) => void;
+        }
+      | undefined;
+    if (!connection) return;
+
+    const onChange = () => setSlow(isSlowNetwork(getNetworkInfo()));
+
+    const addEventListener = connection.addEventListener;
+    const removeEventListener = connection.removeEventListener;
+    if (typeof addEventListener === 'function' && typeof removeEventListener === 'function') {
+      addEventListener.call(connection, 'change', onChange);
+      return () => {
+        removeEventListener.call(connection, 'change', onChange);
+      };
+    }
+
+    const addListener = connection.addListener;
+    const removeListener = connection.removeListener;
+    if (typeof addListener === 'function' && typeof removeListener === 'function') {
+      addListener.call(connection, onChange);
+      return () => {
+        removeListener.call(connection, onChange);
+      };
+    }
+
+    return;
+  }, []);
+
+  return slow;
+}
+
+function safePreloadGLB(url: string) {
+  try {
+    useGLTF.preload(url, DRACO_DECODER_PATH);
+  } catch {
+    // Preload is best-effort; never crash the UI.
+  }
+}
+
+function cloneFinishTextureInstance(base: THREE.Texture): THREE.Texture {
+  const texture = base.clone();
+  // Ensure we keep the same underlying image data.
+  texture.image = base.image;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = false;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function loadFinishTexture(url: string): Promise<THREE.Texture | null> {
+  const cached = finishTextureCache.get(url);
+  if (cached) {
+    cached.colorSpace = THREE.SRGBColorSpace;
+    cached.flipY = false;
+    cached.needsUpdate = true;
+    return Promise.resolve(cached);
+  }
+
+  const cachedPromise = finishTexturePromiseCache.get(url);
+  if (cachedPromise) return cachedPromise;
+
+  const promise = new Promise<THREE.Texture | null>((resolve) => {
+    // Use TextureLoader directly to avoid browser-level fetch promise failures
+    // surfacing as runtime errors in strict environments.
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      url,
+      (texture) => {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.flipY = false;
+        texture.needsUpdate = true;
+        finishTextureCache.set(url, texture);
+        resolve(texture);
+      },
+      undefined,
+      () => resolve(null)
+    );
+  });
+
+  finishTexturePromiseCache.set(url, promise);
+  return promise;
+}
+
+function useFinishTexture(url: string | null) {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!url) {
+      setTexture(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    loadFinishTexture(url)
+      .then((loaded) => {
+        if (!isMounted) return;
+        setTexture(loaded ? cloneFinishTextureInstance(loaded) : null);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setTexture(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [url]);
+
+  return texture;
+}
+
+class GLBErrorBoundary extends React.Component<
+  {
+    modelUrl: string;
+    fallback: React.ReactNode;
+    children: React.ReactNode;
+  },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error('[Konfiguratorius3D] GLB load/render failed', {
+      modelUrl: this.props.modelUrl,
+      error,
+    });
+  }
+
+  componentDidUpdate(prevProps: Readonly<{ modelUrl: string }>) {
+    if (prevProps.modelUrl !== this.props.modelUrl && this.state.hasError) {
+      // Reset boundary when a new model is selected.
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+interface GLBProfileModelProps {
+  modelUrl: string;
+  materialVariantUrl?: string | null;
+  color: string;
+  finish: ProductProfileVariant | null;
+  overrideColorMap?: THREE.Texture | null;
+  overrideColorMapKey?: string | null;
+  applyColorTint?: boolean;
+  applyDynamicFinishSurface?: boolean;
+  autoRotate?: boolean;
+  rotationYRef?: React.MutableRefObject<number>;
+  visualDimensionsMm?: {
+    widthMm?: number;
+    lengthMm?: number;
+    thicknessMm?: number;
+  };
+}
+
+function GLBProfileModel({
+  modelUrl,
+  materialVariantUrl,
+  color,
+  finish,
+  overrideColorMap,
+  overrideColorMapKey,
+  applyColorTint = true,
+  applyDynamicFinishSurface = true,
+  autoRotate = true,
+  rotationYRef,
+  visualDimensionsMm,
+}: GLBProfileModelProps) {
+  const groupRef = useRef<THREE.Group | null>(null);
+  const gltf = useGLTF(modelUrl, DRACO_DECODER_PATH) as { scene: THREE.Group };
+  const materialVariantGltf = useGLTF(materialVariantUrl ?? modelUrl, DRACO_DECODER_PATH) as { scene: THREE.Group };
+
+  const visualScale = useMemo(() => {
+    const widthMm = visualDimensionsMm?.widthMm ?? finish?.dimensions?.width ?? 120;
+    const lengthMm = visualDimensionsMm?.lengthMm ?? finish?.dimensions?.length ?? 3300;
+    const thicknessMm = visualDimensionsMm?.thicknessMm ?? finish?.dimensions?.thickness ?? 28;
+
+    // Use fixed baseline so width/length selectors visibly affect proportions.
+    const widthScale = Math.max(0.65, Math.min(1.6, widthMm / 120));
+    const lengthScale = Math.max(0.75, Math.min(1.4, lengthMm / 3300));
+    const thicknessScale = Math.max(0.6, Math.min(1.5, thicknessMm / 28));
+
+    return { widthScale, lengthScale, thicknessScale };
+  }, [finish?.dimensions?.length, finish?.dimensions?.thickness, finish?.dimensions?.width, visualDimensionsMm?.lengthMm, visualDimensionsMm?.thicknessMm, visualDimensionsMm?.widthMm]);
+
+  const modelScene = useMemo(() => {
+    const cloned = cloneSceneWithUniqueMaterials(gltf.scene);
+
+    // Center and uniformly fit the model so it remains clearly visible in the viewport.
+    // Uniform scale preserves proportions.
+    const wrapper = new THREE.Group();
+    wrapper.add(cloned);
+
+    const box = new THREE.Box3().setFromObject(cloned);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+
+    // Center model at world origin.
+    cloned.position.set(-center.x, -center.y, -center.z);
+
+    // Normalize each axis to a consistent baseline before applying user
+    // dimension multipliers. This prevents different profile meshes (e.g.
+    // half-tongue vs half-tongue-45) from appearing to “change size” simply
+    // because their bounding boxes differ.
+    const BASE_WIDTH_MM = 120;
+    const BASE_THICKNESS_MM = 28;
+    const BASE_LENGTH_MM = 3300;
+    const baseLengthUnits = 2.0;
+    const baseWidthUnits = baseLengthUnits * (BASE_WIDTH_MM / BASE_LENGTH_MM);
+    const baseThicknessUnits = baseLengthUnits * (BASE_THICKNESS_MM / BASE_LENGTH_MM);
+
+    const dims = {
+      x: size.x,
+      y: size.y,
+      z: size.z,
+    };
+
+    const axes: Array<'x' | 'y' | 'z'> = ['x', 'y', 'z'];
+    const finiteAxes = axes.filter((axis) => Number.isFinite(dims[axis]) && dims[axis] > 0);
+
+    if (finiteAxes.length === 3) {
+      const lengthAxis = axes.reduce((maxAxis, axis) => (dims[axis] > dims[maxAxis] ? axis : maxAxis), 'x');
+      const thicknessAxis = axes.reduce((minAxis, axis) => (dims[axis] < dims[minAxis] ? axis : minAxis), 'x');
+      const widthAxis = axes.find((axis) => axis !== lengthAxis && axis !== thicknessAxis) ?? 'z';
+
+      const scaleMap: Record<'x' | 'y' | 'z', number> = { x: 1, y: 1, z: 1 };
+
+      scaleMap[lengthAxis] = (baseLengthUnits / dims[lengthAxis]) * visualScale.lengthScale * VISUAL_LENGTH_FACTOR;
+      scaleMap[widthAxis] = (baseWidthUnits / dims[widthAxis]) * visualScale.widthScale;
+      scaleMap[thicknessAxis] = (baseThicknessUnits / dims[thicknessAxis]) * visualScale.thicknessScale;
+
+      if ([scaleMap.x, scaleMap.y, scaleMap.z].every((v) => Number.isFinite(v) && v > 0)) {
+        wrapper.scale.set(scaleMap.x, scaleMap.y, scaleMap.z);
+      }
+    } else {
+      const maxDim = Math.max(size.x, size.y, size.z);
+      if (Number.isFinite(maxDim) && maxDim > 0) {
+        const scale = (baseLengthUnits * 0.86) / maxDim;
+        wrapper.scale.set(
+          scale * visualScale.widthScale,
+          scale * visualScale.thicknessScale,
+          scale * visualScale.lengthScale * VISUAL_LENGTH_FACTOR
+        );
+      }
+    }
+
+    wrapper.name = 'yakiwood-model-root';
+    return wrapper;
+  }, [gltf.scene, visualScale.lengthScale, visualScale.thicknessScale, visualScale.widthScale]);
+
+  const variantMaterialsByName = useMemo(() => {
+    const map = new Map<string, THREE.MeshStandardMaterial>();
+
+    materialVariantGltf.scene.traverse((object) => {
+      const mesh = object as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.material) return;
+
+      const register = (material: THREE.Material) => {
+        const standardMaterial = material as THREE.MeshStandardMaterial;
+        const key = (standardMaterial.name ?? '').trim().toLowerCase();
+        if (!key) return;
+        if (!map.has(key)) {
+          map.set(key, standardMaterial);
+        }
+      };
+
+      if (Array.isArray(mesh.material)) {
+        mesh.material.forEach(register);
+      } else {
+        register(mesh.material);
+      }
+    });
+
+    return map;
+  }, [materialVariantGltf.scene]);
+
+  useLayoutEffect(() => {
+    const surface = getFinishSurfacePreset(finish);
+    const tintColor = new THREE.Color(color);
+    const tintLuminance = 0.2126 * tintColor.r + 0.7152 * tintColor.g + 0.0722 * tintColor.b;
+    const tintStrengthWithMap = tintLuminance < 0.25 ? 0.22 : tintLuminance < 0.5 ? 0.28 : 0.35;
+    const tintWithMap = new THREE.Color('#ffffff').lerp(tintColor, tintStrengthWithMap);
+
+    // Scene-level fallback surface map: used when a small edge is exported as a
+    // separate mesh/material without a texture. This happens in some thermo
+    // facade exports where the tiny side strip is its own object.
+    let sceneFallbackSurfaceMap: THREE.Texture | null = null;
+    modelScene.traverse((object) => {
+      if (sceneFallbackSurfaceMap) return;
+      const mesh = object as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.material) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const material of materials) {
+        const standardMaterial = material as THREE.MeshStandardMaterial;
+        const name = (standardMaterial?.name ?? '').toLowerCase();
+        const clearlyFixed = name.includes('end_grain') || name.includes('end grain') || name === 'bottom';
+        if (clearlyFixed) continue;
+        if (standardMaterial && standardMaterial.map) {
+          sceneFallbackSurfaceMap = standardMaterial.map as THREE.Texture;
+          return;
+        }
+      }
+    });
+
+    modelScene.traverse((object) => {
+      const mesh = object as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.material) return;
+
+      // Some thermo facade exports (half-tongue / 45) have a tiny side edge
+      // assigned to a separate material slot without a baseColor texture.
+      // If another material on the SAME mesh has a wood surface map, reuse it
+      // so the small edge doesn't render as an untextured black strip.
+      const meshFallbackSurfaceMap: THREE.Texture | null = Array.isArray(mesh.material)
+        ? (mesh.material
+            .map((material) => material as THREE.MeshStandardMaterial)
+            .find((material) => {
+              const name = (material?.name ?? '').toLowerCase();
+              const clearlyFixed = name.includes('end_grain') || name.includes('end grain') || name === 'bottom';
+              return !!material && !!material.map && !clearlyFixed;
+            })
+            ?.map as THREE.Texture | undefined) ?? null
+        : null;
+
+      const applyMaterial = (material: THREE.Material) => {
+        const standardMaterial = material as THREE.MeshStandardMaterial;
+        // Our wood boards should never be transparent. Some exports can carry
+        // alpha/BLEND settings which make the model effectively invisible on
+        // light backgrounds. Force an opaque baseline.
+        if ('transparent' in standardMaterial) standardMaterial.transparent = false;
+        if ('opacity' in standardMaterial) standardMaterial.opacity = 1;
+        if ('alphaTest' in standardMaterial) standardMaterial.alphaTest = 0;
+        if ('depthWrite' in standardMaterial) standardMaterial.depthWrite = true;
+        if ('side' in standardMaterial) standardMaterial.side = THREE.FrontSide;
+        const materialName = (standardMaterial.name ?? '').toLowerCase();
+        const hasBaseMap = 'map' in standardMaterial && !!standardMaterial.map;
+        const isFixedMaterial =
+          // End-grain textures should stay as-authored.
+          materialName.includes('end_grain') ||
+          materialName.includes('end grain') ||
+          // "bottom" is often used for the underside cap; keep it fixed only
+          // when it already has a valid map. Some exports label a small edge as
+          // bottom even though it needs the regular wood surface map.
+          (hasBaseMap && materialName.includes('bottom'));
+
+        const cloneMapLike = (source: THREE.Texture | null | undefined): THREE.Texture | null => {
+          if (!source) return null;
+          const cloned = source.clone();
+          cloned.image = source.image;
+          cloned.colorSpace = source.colorSpace;
+          cloned.flipY = source.flipY;
+          cloned.wrapS = source.wrapS;
+          cloned.wrapT = source.wrapT;
+          cloned.repeat.copy(source.repeat);
+          cloned.offset.copy(source.offset);
+          cloned.center.copy(source.center);
+          cloned.rotation = source.rotation;
+          if ('channel' in source && typeof (source as any).channel === 'number') {
+            (cloned as any).channel = (source as any).channel;
+          }
+          cloned.needsUpdate = true;
+          return cloned;
+        };
+
+        // Keep GLB textures enabled. If the model uses embedded textures,
+        // GLTFLoader will create blob: URLs for them — we only need to ensure
+        // the correct color space for color textures.
+        if ('map' in standardMaterial && standardMaterial.map) {
+          standardMaterial.map.colorSpace = THREE.SRGBColorSpace;
+          standardMaterial.map.needsUpdate = true;
+        }
+        if ('emissiveMap' in standardMaterial && standardMaterial.emissiveMap) {
+          standardMaterial.emissiveMap.colorSpace = THREE.SRGBColorSpace;
+          standardMaterial.emissiveMap.needsUpdate = true;
+        }
+
+        // Keep bottom/end materials as-authored in the GLB.
+        // For the main wood surface:
+        // - if we have an override texture, apply it as baseColor map (real texture switch)
+        // - otherwise, fall back to tinting (brightness/color shift)
+        if (!isFixedMaterial) {
+          const variantSource = variantMaterialsByName.get((standardMaterial.name ?? '').trim().toLowerCase());
+
+          if (variantSource && materialVariantUrl) {
+            if ('map' in standardMaterial) {
+              standardMaterial.map = cloneMapLike(variantSource.map);
+              if (standardMaterial.map) {
+                standardMaterial.map.colorSpace = THREE.SRGBColorSpace;
+                standardMaterial.map.needsUpdate = true;
+              }
+            }
+
+            if ('normalMap' in standardMaterial) {
+              standardMaterial.normalMap = cloneMapLike(variantSource.normalMap);
+            }
+            if ('roughnessMap' in standardMaterial) {
+              standardMaterial.roughnessMap = cloneMapLike(variantSource.roughnessMap);
+            }
+            if ('metalnessMap' in standardMaterial) {
+              standardMaterial.metalnessMap = cloneMapLike(variantSource.metalnessMap);
+            }
+            if ('aoMap' in standardMaterial) {
+              standardMaterial.aoMap = cloneMapLike(variantSource.aoMap);
+            }
+            if ('displacementMap' in standardMaterial) {
+              standardMaterial.displacementMap = cloneMapLike(variantSource.displacementMap);
+            }
+            if ('emissiveMap' in standardMaterial) {
+              standardMaterial.emissiveMap = cloneMapLike(variantSource.emissiveMap);
+            }
+
+            if ('roughness' in standardMaterial) {
+              standardMaterial.roughness = variantSource.roughness;
+            }
+            if ('metalness' in standardMaterial) {
+              standardMaterial.metalness = variantSource.metalness;
+            }
+            if ('aoMapIntensity' in standardMaterial) {
+              standardMaterial.aoMapIntensity = variantSource.aoMapIntensity;
+            }
+            if ('displacementScale' in standardMaterial) {
+              standardMaterial.displacementScale = variantSource.displacementScale;
+            }
+            if ('displacementBias' in standardMaterial) {
+              standardMaterial.displacementBias = variantSource.displacementBias;
+            }
+            if ('normalScale' in standardMaterial && standardMaterial.normalScale && variantSource.normalScale) {
+              standardMaterial.normalScale.copy(variantSource.normalScale);
+            }
+
+            if ('color' in standardMaterial && standardMaterial.color) {
+              standardMaterial.color.set('#ffffff');
+            }
+          } else
+          if (overrideColorMap && 'map' in standardMaterial) {
+            const existingKey = (standardMaterial.userData as any)?.__finishTextureKey as string | undefined;
+            const existingTexture = (standardMaterial.userData as any)?.__finishTexture as THREE.Texture | undefined;
+
+            const prevMap = standardMaterial.map;
+
+            const nextTexture =
+              overrideColorMapKey && existingKey === overrideColorMapKey && existingTexture
+                ? existingTexture
+                : cloneFinishTextureInstance(overrideColorMap);
+
+            // Preserve UV channel and mapping transforms from the original GLB texture.
+            if (prevMap) {
+              nextTexture.wrapS = prevMap.wrapS;
+              nextTexture.wrapT = prevMap.wrapT;
+              nextTexture.repeat.copy(prevMap.repeat);
+              nextTexture.offset.copy(prevMap.offset);
+              nextTexture.center.copy(prevMap.center);
+              nextTexture.rotation = prevMap.rotation;
+
+              if ('channel' in prevMap && typeof (prevMap as any).channel === 'number') {
+                (nextTexture as any).channel = (prevMap as any).channel;
+              }
+            }
+
+            nextTexture.needsUpdate = true;
+
+            (standardMaterial.userData as any).__finishTextureKey = overrideColorMapKey ?? undefined;
+            (standardMaterial.userData as any).__finishTexture = nextTexture;
+
+            standardMaterial.map = nextTexture;
+            if ('color' in standardMaterial && standardMaterial.color) {
+              standardMaterial.color.set('#ffffff');
+            }
+          } else if (!hasBaseMap && meshFallbackSurfaceMap && 'map' in standardMaterial) {
+            // Reuse the mesh's main surface map for small edge materials.
+            standardMaterial.map = cloneMapLike(meshFallbackSurfaceMap);
+            if (standardMaterial.map) {
+              standardMaterial.map.colorSpace = THREE.SRGBColorSpace;
+              standardMaterial.map.needsUpdate = true;
+            }
+            if ('color' in standardMaterial && standardMaterial.color) {
+              standardMaterial.color.set('#ffffff');
+            }
+          } else if (!hasBaseMap && sceneFallbackSurfaceMap && 'map' in standardMaterial) {
+            // Reuse a scene-level surface map when this mesh has no other maps.
+            standardMaterial.map = cloneMapLike(sceneFallbackSurfaceMap);
+            if (standardMaterial.map) {
+              standardMaterial.map.colorSpace = THREE.SRGBColorSpace;
+              standardMaterial.map.needsUpdate = true;
+            }
+            if ('color' in standardMaterial && standardMaterial.color) {
+              standardMaterial.color.set('#ffffff');
+            }
+          } else if (applyColorTint && 'color' in standardMaterial && standardMaterial.color) {
+            // Even when the GLB has an authored baseColor map, tinting `material.color`
+            // multiplies with the map and gives immediate visual feedback on selection.
+            // Use a conservative tint when a texture is present to avoid over-darkening.
+            if (hasBaseMap) {
+              standardMaterial.color.copy(tintWithMap);
+            } else {
+              standardMaterial.color.copy(tintColor);
+            }
+          }
+        }
+
+        if (applyDynamicFinishSurface && 'roughness' in standardMaterial) {
+          standardMaterial.roughness = surface.roughness;
+        }
+
+        if (applyDynamicFinishSurface && 'metalness' in standardMaterial) {
+          standardMaterial.metalness = surface.metalness;
+        }
+
+        standardMaterial.needsUpdate = true;
+      };
+
+      if (Array.isArray(mesh.material)) {
+        mesh.material.forEach(applyMaterial);
+      } else {
+        applyMaterial(mesh.material);
+      }
+    });
+  }, [
+    applyColorTint,
+    applyDynamicFinishSurface,
+    color,
+    finish,
+    materialVariantUrl,
+    modelScene,
+    overrideColorMap,
+    overrideColorMapKey,
+    variantMaterialsByName,
+  ]);
+
+  useLayoutEffect(() => {
+    if (!groupRef.current || !rotationYRef) return;
+    groupRef.current.rotation.y = rotationYRef.current;
+  }, [modelScene, rotationYRef]);
+
+  useFrame((_, delta) => {
+    if (!autoRotate) return;
+    if (!groupRef.current) return;
+    const safeDelta = Math.min(delta, 0.05);
+    groupRef.current.rotation.y += safeDelta * 0.35;
+    if (rotationYRef) {
+      rotationYRef.current = groupRef.current.rotation.y;
+    }
+  });
+
+  return <primitive ref={groupRef} object={modelScene} />;
+}
+
+function GLBPreloadGate({
+  modelUrl,
+  materialVariantUrl,
+  onReady,
+}: {
+  modelUrl: string;
+  materialVariantUrl?: string | null;
+  onReady: () => void;
+}) {
+  useGLTF(modelUrl, DRACO_DECODER_PATH);
+  useGLTF(materialVariantUrl ?? modelUrl, DRACO_DECODER_PATH);
+
+  useEffect(() => {
+    onReady();
+  }, [onReady]);
+
+  return null;
+}
+
+function AutoFrameCamera({ enabled, depsKey, controlsRef }: { enabled: boolean; depsKey: string; controlsRef: React.RefObject<any> }) {
+  const { camera, scene, size } = useThree();
+  const framedKeyRef = useRef<string | null>(null);
+  const framedViewportKeyRef = useRef<string | null>(null);
+  const retryFramesLeftRef = useRef(0);
+  const viewportKey = `${Math.round(size.width / 48)}x${Math.round(size.height / 48)}`;
+
+  const tryFrame = useCallback((): boolean => {
+    const root = scene.getObjectByName('yakiwood-model-root');
+    if (!root) return false;
+
+    const box = new THREE.Box3().setFromObject(root);
+    if (box.isEmpty()) return false;
+
+    const center = box.getCenter(new THREE.Vector3());
+    if (![center.x, center.y, center.z].every((v) => Number.isFinite(v))) return false;
+
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const radius = Number.isFinite(sphere.radius) && sphere.radius > 0 ? sphere.radius : 1;
+
+    const perspective = camera as THREE.PerspectiveCamera;
+    const fov = (Number.isFinite(perspective.fov) ? perspective.fov : 45) * (Math.PI / 180);
+    const safeHalfFov = Math.max(0.35, fov / 2);
+    const aspect = size.width > 0 && size.height > 0 ? size.width / size.height : 1;
+    const horizontalHalfFov = Math.atan(Math.tan(safeHalfFov) * Math.max(aspect, 0.75));
+    const baseDistance = Math.max(radius / Math.sin(safeHalfFov), radius / Math.sin(Math.max(horizontalHalfFov, 0.35)));
+    const framingPadding = aspect < 1.15 ? 1.28 : aspect < 1.45 ? 1.18 : aspect < 1.8 ? 1.1 : 1.04;
+    const distance = baseDistance * framingPadding;
+    if (!Number.isFinite(distance) || distance <= 0) return false;
+
+    const direction = new THREE.Vector3(1, 0.55, 1).normalize();
+    const framedTarget = center.clone();
+
+    const nextPosition = framedTarget.clone().add(direction.multiplyScalar(distance));
+    if (![nextPosition.x, nextPosition.y, nextPosition.z].every((v) => Number.isFinite(v))) return false;
+
+    camera.position.copy(nextPosition);
+    camera.near = Math.max(0.01, distance / 100);
+    camera.far = Math.max(camera.near + 10, distance * 100);
+    camera.lookAt(framedTarget);
+    camera.updateProjectionMatrix();
+
+    const controls = controlsRef.current;
+    if (controls && controls.target) {
+      controls.target.copy(framedTarget);
+      if (typeof controls.update === 'function') controls.update();
+    }
+
+    return true;
+  }, [camera, controlsRef, scene]);
+
+  useLayoutEffect(() => {
+    if (!enabled) return;
+
+    // Frame only once (initial load). Re-framing on every model/profile switch
+    // makes the view snap and looks like the rotation restarts.
+    if (framedViewportKeyRef.current !== viewportKey) {
+      framedKeyRef.current = null;
+    }
+
+    if (framedKeyRef.current) return;
+
+    retryFramesLeftRef.current = 60; // ~1s at 60fps to catch late-mounting GLB
+
+    if (tryFrame()) {
+      framedKeyRef.current = depsKey;
+      framedViewportKeyRef.current = viewportKey;
+      retryFramesLeftRef.current = 0;
+    }
+  }, [depsKey, enabled, tryFrame, viewportKey]);
+
+  useFrame(() => {
+    if (!enabled) return;
+    if (framedKeyRef.current) return;
+    if (retryFramesLeftRef.current <= 0) return;
+
+    retryFramesLeftRef.current -= 1;
+    if (tryFrame()) {
+      framedKeyRef.current = depsKey;
+      framedViewportKeyRef.current = viewportKey;
+      retryFramesLeftRef.current = 0;
+    }
+  });
+
+  return null;
+}
+
+/** Handle exposed by Konfiguratorius3D via React ref. */
+export interface Konfiguratorius3DHandle {
+  /** Capture the current 3D canvas as a PNG data-URL. */
+  takeScreenshot: () => string | null;
+
+  /** Capture a PNG for PDF/print with a deterministic camera angle. */
+  takePdfScreenshot: () => Promise<string | null>;
+}
+
+type ScreenshotRequestMode = 'pdf';
+
+type ScreenshotRequest = {
+  mode: ScreenshotRequestMode;
+  resolve: (dataUrl: string | null) => void;
+};
+
+export interface Konfiguratorius3DProps {
+  productId: string;
+  woodType?: string;
+  availableColors: ProductColorVariant[];
+  availableFinishes: ProductProfileVariant[];
+  modelUrl?: string;
+  modelSlug?: string;
+  mode?: 'full' | 'viewport';
+  autoRotate?: boolean;
+  selectedColorId?: string;
+  selectedFinishId?: string;
+  onColorChange?: (color: ProductColorVariant) => void;
+  onFinishChange?: (finish: ProductProfileVariant) => void;
+  className?: string;
+  isLoading?: boolean;
+  canvasClassName?: string;
+  basePrice?: number;
+  visualDimensionsMm?: {
+    widthMm?: number;
+    lengthMm?: number;
+    thicknessMm?: number;
+  };
+}
+
+/**
+ * Internal helper rendered inside <Canvas> to expose the WebGL renderer
+ * so the parent can call `renderer.domElement.toDataURL()`.
+ */
+function RendererBridge({ onRenderer }: { onRenderer: (gl: THREE.WebGLRenderer) => void }) {
+  const { gl } = useThree();
+  useEffect(() => { onRenderer(gl); }, [gl, onRenderer]);
+  return null;
+}
+
+function PdfScreenshotBridge({
+  requestRef,
+  controlsRef,
+}: {
+  requestRef: React.RefObject<ScreenshotRequest | null>;
+  controlsRef: React.RefObject<any>;
+}) {
+  const { gl, camera, scene, size } = useThree();
+
+  useFrame(() => {
+    const req = requestRef.current;
+    if (!req) return;
+
+    // Clear the request first to avoid re-entrancy.
+    requestRef.current = null;
+
+    const controls = controlsRef.current;
+    const prevPosition = camera.position.clone();
+    const prevQuaternion = camera.quaternion.clone();
+    const prevNear = camera.near;
+    const prevFar = camera.far;
+    const prevTarget = controls?.target?.clone?.() ?? null;
+
+    try {
+      // Capture the current visible camera pose so PDF / print matches
+      // the angle the user sees in the configurator.
+      gl.render(scene, camera);
+
+      let dataUrl: string | null = null;
+      try {
+        dataUrl = gl.domElement.toDataURL('image/png');
+      } catch {
+        dataUrl = null;
+      }
+
+      req.resolve(dataUrl);
+    } finally {
+      // Restore the user's view.
+      camera.position.copy(prevPosition);
+      camera.quaternion.copy(prevQuaternion);
+      camera.near = prevNear;
+      camera.far = prevFar;
+      camera.updateProjectionMatrix();
+
+      if (controls && controls.target && prevTarget) {
+        controls.target.copy(prevTarget);
+      }
+      if (controls && typeof controls.update === 'function') controls.update();
+    }
+  });
+
+  return null;
+}
+
+const Konfiguratorius3D = forwardRef<Konfiguratorius3DHandle, Konfiguratorius3DProps>(function Konfiguratorius3D({
+  productId,
+  woodType,
+  availableColors, 
+  availableFinishes,
+  modelUrl = DEFAULT_CONFIGURATOR_GLB_PATH,
+  modelSlug,
+  mode = 'full',
+  autoRotate = true,
+  selectedColorId,
+  selectedFinishId,
+  onColorChange,
+  onFinishChange,
+  className = '',
+  isLoading = false,
+  canvasClassName,
+  basePrice,
+  visualDimensionsMm,
+}, ref) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const currentLocale = locale === 'lt' ? 'lt' : 'en';
+  const [selectedColor, setSelectedColor] = useState<ProductColorVariant | null>(
+    availableColors[0] || null
+  );
+  const [selectedFinish, setSelectedFinish] = useState<ProductProfileVariant | null>(
+    availableFinishes[0] || null
+  );
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [modelColor, setModelColor] = useState('#ffffff');
+  const sharedRotationYRef = useRef(0);
+  const orbitControlsRef = useRef<any>(null);
+  const slowNetwork = useSlowNetworkFlag();
+  const [resolvedModelUrl, setResolvedModelUrl] = useState<string | null>(null);
+  const [isModelResolved, setIsModelResolved] = useState(false);
+  const { active: isGltfLoading } = useProgress();
+  const textureVariantKey = useMemo(
+    () => [
+      selectedColor?.id ?? 'default-color',
+      selectedColor?.image ?? 'no-image',
+      selectedColor?.name ?? 'no-name',
+      selectedFinish?.id ?? 'default-finish',
+      selectedFinish?.code ?? 'no-code',
+    ].join('|'),
+    [selectedColor?.id, selectedColor?.image, selectedColor?.name, selectedFinish?.id, selectedFinish?.code]
+  );
+
+  // -- Screenshot support -------------------------------------------------
+  const glRef = useRef<THREE.WebGLRenderer | null>(null);
+  const screenshotRequestRef = useRef<ScreenshotRequest | null>(null);
+  const handleRendererReady = useCallback((gl: THREE.WebGLRenderer) => {
+    glRef.current = gl;
+
+  // Make wood textures look more natural/bright.
+  // Important: requires a full dev-server restart to update CSP headers
+  // if you recently changed them.
+  gl.outputColorSpace = THREE.SRGBColorSpace;
+  gl.toneMapping = THREE.ACESFilmicToneMapping;
+  gl.toneMappingExposure = 1.2;
+  if ('physicallyCorrectLights' in gl) {
+    (gl as THREE.WebGLRenderer & { physicallyCorrectLights?: boolean }).physicallyCorrectLights = true;
+  }
+  }, []);
+
+  useImperativeHandle(ref, () => ({
+    takeScreenshot(): string | null {
+      const gl = glRef.current;
+      if (!gl) return null;
+      try {
+        return gl.domElement.toDataURL('image/png');
+      } catch {
+        return null;
+      }
+    },
+
+    takePdfScreenshot(): Promise<string | null> {
+      return new Promise((resolve) => {
+        screenshotRequestRef.current = { mode: 'pdf', resolve };
+      });
+    },
+  }), []);
+
+  const [inputMode, setInputMode] = useState<'boards' | 'area'>('boards');
+  const [quantityBoards, setQuantityBoards] = useState<number>(1);
+  const [targetAreaM2, setTargetAreaM2] = useState<number>(1);
+
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+  const [quote, setQuote] = useState<null | {
+    unitPricePerM2: number;
+    areaM2: number;
+    totalAreaM2: number;
+    unitPricePerBoard: number;
+    quantityBoards: number;
+    lineTotal: number;
+    inputMode: 'boards' | 'area';
+    roundingInfo?: {
+      requestedAreaM2: number;
+      actualAreaM2: number;
+      deltaAreaM2: number;
+      rounding: 'ceil' | 'round' | 'floor';
+    };
+  }>(null);
+
+  // -- PDF download ---------------------------------------------------------
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const handleDownloadPdf = useCallback(async () => {
+    setPdfLoading(true);
+    try {
+      // Capture 3D screenshot
+      const gl = glRef.current;
+      let screenshotDataUrl: string | null = null;
+      if (gl) {
+        try { screenshotDataUrl = gl.domElement.toDataURL('image/png'); } catch { /* ignore */ }
+      }
+
+      const pdfData: ConfigurationPDFData = {
+        productName: productId,
+        colorName: selectedColor
+          ? getLocalizedColorName(selectedColor, currentLocale)
+          : '',
+        colorHex: selectedColor?.hex,
+        profileName: selectedFinish
+          ? getLocalizedProfileName(selectedFinish, currentLocale)
+          : '',
+        widthMm: selectedFinish?.dimensions?.width,
+        lengthMm: selectedFinish?.dimensions?.length,
+        thicknessMm: selectedFinish?.dimensions?.thickness,
+        pricePerM2: quote?.unitPricePerM2,
+        pricePerBoard: quote?.unitPricePerBoard,
+        quantityBoards: quote?.quantityBoards,
+        totalAreaM2: quote?.totalAreaM2,
+        lineTotal: quote?.lineTotal,
+        screenshotDataUrl,
+        configUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+      };
+
+      await downloadConfigurationPDF(pdfData, currentLocale);
+
+      trackEvent('configurator_download_pdf', {
+        product_id: productId,
+        color: selectedColor?.name,
+        profile: selectedFinish?.name,
+      });
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+    } finally {
+      setPdfLoading(false);
+    }
+  }, [productId, selectedColor, selectedFinish, quote, currentLocale]);
+
+  const cartItems = useCartStore((state) => state.items);
+
+  const cartTotalAreaM2 = useMemo(() => {
+    return cartItems.reduce((sum, item) => {
+      const a = item.pricingSnapshot?.totalAreaM2;
+      if (typeof a === 'number' && Number.isFinite(a) && a > 0) return sum + a;
+      return sum;
+    }, 0);
+  }, [cartItems]);
+
+  const currency = useMemo(
+    () =>
+      new Intl.NumberFormat(locale === 'lt' ? 'lt-LT' : 'en-US', {
+        style: 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const numberM2 = useMemo(
+    () =>
+      new Intl.NumberFormat(locale === 'lt' ? 'lt-LT' : 'en-US', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const basePriceLabel = useMemo(() => {
+    const key = 'configurator.basePriceLabel';
+    if (typeof t.has === 'function' && t.has(key)) return t(key);
+    return currentLocale === 'lt' ? 'Bazinė kaina' : 'Base price';
+  }, [t, currentLocale]);
+
+  useEffect(() => {
+    if (!selectedColorId) return;
+    const next = availableColors.find((c) => c.id === selectedColorId) ?? null;
+    setSelectedColor(next);
+  }, [availableColors, selectedColorId, productId]);
+
+  useEffect(() => {
+    if (!selectedFinishId) return;
+    const next = availableFinishes.find((f) => f.id === selectedFinishId) ?? null;
+    setSelectedFinish(next);
+  }, [availableFinishes, selectedFinishId, productId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(pointer: coarse)');
+    const updateTouchState = () => {
+      const hasTouchPoints = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
+      setIsTouchDevice(mediaQuery.matches || hasTouchPoints);
+    };
+
+    updateTouchState();
+    mediaQuery.addEventListener('change', updateTouchState);
+    return () => mediaQuery.removeEventListener('change', updateTouchState);
+  }, []);
+
+  useEffect(() => {
+    setModelColor(resolveColorHex(selectedColor));
+  }, [selectedColor]);
+
+  const isFinishTextureSwapEnabled = useMemo(() => {
+    const raw = process.env.NEXT_PUBLIC_ENABLE_3D_FINISH_TEXTURE_SWAP;
+    if (!raw) return false;
+    const value = raw.trim().toLowerCase();
+    return value === 'true' || value === '1';
+  }, []);
+
+  const selectedColorSlug = useMemo(() => {
+    if (!selectedColor) return null;
+    return resolveColorSlug(selectedColor);
+  }, [selectedColor]);
+
+  const finishTextureUrl = useMemo(() => {
+    if (!isFinishTextureSwapEnabled) return null;
+    if (!selectedColorSlug) return null;
+    if (!resolvedModelUrl && !modelUrl) return null;
+
+    // IMPORTANT: thermo products can temporarily fall back to a spruce GLB.
+    // If we infer wood type only from the GLB URL, thermo ends up rendering
+    // spruce finish textures. Prefer explicit product context when available.
+    const wood =
+      detectModelWoodToken([woodType, modelSlug, resolvedModelUrl ?? modelUrl].filter(Boolean).join(' ')) ??
+      resolveFinishTextureWood(resolvedModelUrl ?? modelUrl);
+    if (!wood) return null;
+
+    return getFinishTextureUrl(wood, selectedColorSlug, selectedColor?.image ?? null);
+  }, [isFinishTextureSwapEnabled, modelSlug, modelUrl, resolvedModelUrl, selectedColor?.image, selectedColorSlug, woodType]);
+
+  const finishTexture = useFinishTexture(finishTextureUrl);
+
+  const useTextureSwap = useMemo(() => {
+    return isFinishTextureSwapEnabled && !!finishTextureUrl;
+  }, [isFinishTextureSwapEnabled, finishTextureUrl]);
+
+  const resolvedVariantMaterialUrl = useMemo(() => {
+    if (useTextureSwap) return null;
+    if (!selectedColorSlug) return null;
+
+    return resolveColorVariantModelUrl({
+      modelSlug,
+      modelUrl,
+      colorSlug: selectedColorSlug,
+      profile: selectedFinish,
+    });
+  }, [modelSlug, modelUrl, selectedColorSlug, selectedFinish, useTextureSwap]);
+
+  // Prefer loading the full per-color GLB when available. This is the most
+  // reliable path (materials + slot assignments + textures are authored in the
+  // exported file) and avoids “nothing changes” issues when material names
+  // differ across exports.
+  const effectiveModelUrl = useMemo(() => {
+    return resolvedVariantMaterialUrl ?? resolvedModelUrl;
+  }, [resolvedVariantMaterialUrl, resolvedModelUrl]);
+
+  // Only use a separate material-variant source when we're rendering a
+  // different base model. When `effectiveModelUrl` is already the variant, we
+  // don't need to load a second GLB.
+  const effectiveMaterialVariantUrl = useMemo(() => {
+    if (!resolvedVariantMaterialUrl) return null;
+    if (effectiveModelUrl === resolvedVariantMaterialUrl) return null;
+    return resolvedVariantMaterialUrl;
+  }, [effectiveModelUrl, resolvedVariantMaterialUrl]);
+
+  const isPerColorVariantModel = useMemo(() => {
+    return !!resolvedVariantMaterialUrl;
+  }, [resolvedVariantMaterialUrl]);
+
+  const [activeModelUrl, setActiveModelUrl] = useState<string | null>(null);
+  const [activeMaterialVariantUrl, setActiveMaterialVariantUrl] = useState<string | null>(null);
+  const lastProductIdRef = useRef<string>(productId);
+
+  const desiredModelUrl = effectiveModelUrl;
+  const desiredMaterialVariantUrl = effectiveMaterialVariantUrl;
+
+  useEffect(() => {
+    // On product change, clear the active model and let the preload gate commit
+    // the next one. This avoids showing the procedural fallback board.
+    const productChanged = lastProductIdRef.current !== productId;
+    if (!productChanged) return;
+
+    lastProductIdRef.current = productId;
+    setActiveModelUrl(null);
+    setActiveMaterialVariantUrl(null);
+  }, [productId]);
+
+  const shouldPreloadDesired = useMemo(() => {
+    if (!desiredModelUrl) return false;
+
+    // Initial load: preload and commit before rendering any GLB.
+    if (!activeModelUrl) return true;
+
+    // Switch: keep last GLB visible while the next GLB is preloaded.
+    if (desiredModelUrl !== activeModelUrl) return true;
+    const desiredMaterial = (desiredMaterialVariantUrl ?? null) as string | null;
+    if (desiredMaterial !== activeMaterialVariantUrl) return true;
+    return false;
+  }, [activeMaterialVariantUrl, activeModelUrl, desiredMaterialVariantUrl, desiredModelUrl]);
+
+  const commitDesiredUrls = useCallback(() => {
+    if (!desiredModelUrl) return;
+    setActiveModelUrl(desiredModelUrl);
+    setActiveMaterialVariantUrl((desiredMaterialVariantUrl ?? null) as string | null);
+  }, [desiredMaterialVariantUrl, desiredModelUrl]);
+
+  const modelGeometryKey = useMemo(() => {
+    return resolveModelGeometryKey(activeModelUrl);
+  }, [activeModelUrl]);
+
+  const autoFrameDepsKey = useMemo(() => {
+    return [
+      modelGeometryKey,
+      selectedFinish?.id ?? 'no-finish',
+      visualDimensionsMm?.widthMm ?? 'w',
+      visualDimensionsMm?.lengthMm ?? 'l',
+      visualDimensionsMm?.thicknessMm ?? 't',
+    ].join('|');
+  }, [modelGeometryKey, selectedFinish?.id, visualDimensionsMm?.lengthMm, visualDimensionsMm?.thicknessMm, visualDimensionsMm?.widthMm]);
+
+  useEffect(() => {
+    const controls = orbitControlsRef.current;
+    if (!controls?.target) return;
+
+    // Keep the orbit pivot locked to the model center after configuration changes.
+    controls.target.set(0, 0, 0);
+    if (typeof controls.update === 'function') controls.update();
+  }, [autoFrameDepsKey, activeModelUrl]);
+
+  useEffect(() => {
+    if (slowNetwork) return;
+    if (useTextureSwap) return;
+
+    availableColors.forEach((colorOption) => {
+      const colorSlug = resolveColorSlug(colorOption);
+      if (!colorSlug) return;
+
+      const variantUrl = resolveColorVariantModelUrl({
+        modelSlug,
+        modelUrl,
+        colorSlug,
+        profile: selectedFinish,
+      });
+
+      if (!variantUrl) return;
+      safePreloadGLB(variantUrl);
+    });
+  }, [availableColors, modelSlug, modelUrl, selectedFinish, slowNetwork, useTextureSwap]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    // eslint-disable-next-line no-console
+    console.log('[Konfiguratorius3D] selection', {
+      modelSlug,
+      modelUrl,
+      resolvedModelUrl,
+      effectiveModelUrl,
+      activeModelUrl,
+      selectedColorId: selectedColor?.id ?? null,
+      selectedColorName: selectedColor?.name ?? null,
+      colorSlug: selectedColor ? resolveColorSlug(selectedColor) : null,
+      resolvedVariantMaterialUrl,
+      effectiveMaterialVariantUrl,
+    });
+  }, [modelSlug, modelUrl, resolvedModelUrl, effectiveModelUrl, activeModelUrl, resolvedVariantMaterialUrl, effectiveMaterialVariantUrl, selectedColor?.id, selectedColor?.name]);
+
+  useEffect(() => {
+    // We used to issue a HEAD request to check if the model exists before
+    // passing it to `useGLTF()`. In some environments (dev proxies / server
+    // configs), HEAD can be blocked or behave inconsistently for large static
+    // assets with query strings, causing the viewer to fall back to the
+    // placeholder model and making color switching appear “broken”.
+    //
+    // Instead, always attempt to load the model URL; failures are handled by
+    // `GLBErrorBoundary`, which keeps UX stable and logs the error.
+    if (!modelUrl) {
+      setResolvedModelUrl(null);
+      setIsModelResolved(true);
+      return;
+    }
+
+    setResolvedModelUrl(modelUrl);
+    setIsModelResolved(true);
+  }, [modelUrl]);
+
+  useEffect(() => {
+    // Preload the base GLB to improve perceived load time.
+    // (This is a single request; per-color variants are handled separately.)
+    if (!resolvedModelUrl) return;
+    safePreloadGLB(resolvedModelUrl);
+  }, [resolvedModelUrl]);
+
+  useEffect(() => {
+    if (!productId) return;
+    trackEvent('configurator_view', {
+      product_id: productId,
+      mode,
+    });
+  }, [productId, mode]);
+
+  // Realtime price quote for current configuration.
+  useEffect(() => {
+    if (mode === 'viewport') {
+      setQuote(null);
+      setQuoteError(null);
+      setQuoteLoading(false);
+      return;
+    }
+
+    const widthMm = selectedFinish?.dimensions?.width;
+    const lengthMm = selectedFinish?.dimensions?.length;
+
+    if (!productId) return;
+    if (typeof widthMm !== 'number' || typeof lengthMm !== 'number') {
+      setQuote(null);
+      setQuoteError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const run = async () => {
+      setQuoteLoading(true);
+      setQuoteError(null);
+      try {
+        type QuoteRequestBody = {
+          productId: string;
+          profileVariantId?: string;
+          colorVariantId?: string;
+          widthMm: number;
+          lengthMm: number;
+          inputMode: 'boards' | 'area';
+          quantityBoards?: number;
+          targetAreaM2?: number;
+          rounding?: 'ceil' | 'round' | 'floor';
+          cartTotalAreaM2?: number;
+        };
+
+        const unitAreaM2 =
+          typeof widthMm === 'number' && typeof lengthMm === 'number'
+            ? (widthMm / 1000) * (lengthMm / 1000)
+            : 0;
+
+        const currentLineAreaM2 =
+          inputMode === 'boards'
+            ? (typeof quantityBoards === 'number' ? quantityBoards : 0) * unitAreaM2
+            : typeof targetAreaM2 === 'number' && unitAreaM2 > 0
+              ? Math.ceil(targetAreaM2 / unitAreaM2) * unitAreaM2
+              : 0;
+
+        const body: QuoteRequestBody =
+          inputMode === 'boards'
+            ? {
+                productId,
+                profileVariantId: selectedFinish?.id,
+                colorVariantId: selectedColor?.id,
+                widthMm,
+                lengthMm,
+                inputMode,
+                quantityBoards,
+                cartTotalAreaM2: cartTotalAreaM2 + currentLineAreaM2,
+              }
+            : {
+                productId,
+                profileVariantId: selectedFinish?.id,
+                colorVariantId: selectedColor?.id,
+                widthMm,
+                lengthMm,
+                inputMode,
+                targetAreaM2,
+                rounding: 'ceil',
+                cartTotalAreaM2: cartTotalAreaM2 + currentLineAreaM2,
+              };
+
+        const res = await fetch('/api/pricing/quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          setQuote(null);
+          try {
+            const data = await res.json();
+            setQuoteError(typeof data?.error === 'string' ? data.error : t('configurator.priceNotAvailable'));
+          } catch {
+            setQuoteError(t('configurator.priceNotAvailable'));
+          }
+          return;
+        }
+
+        const data: any = await res.json();
+
+        const next = {
+          unitPricePerM2: Number(data?.unitPricePerM2),
+          areaM2: Number(data?.areaM2),
+          totalAreaM2: Number(data?.totalAreaM2),
+          unitPricePerBoard: Number(data?.unitPricePerBoard),
+          quantityBoards: Number(data?.quantityBoards),
+          lineTotal: Number(data?.lineTotal),
+          inputMode: data?.inputMode === 'area' ? 'area' : 'boards',
+          roundingInfo: data?.roundingInfo as
+            | {
+                requestedAreaM2: number;
+                actualAreaM2: number;
+                deltaAreaM2: number;
+                rounding: 'ceil' | 'round' | 'floor';
+              }
+            | undefined,
+        } as const;
+
+        if (!Number.isFinite(next.unitPricePerM2) || next.unitPricePerM2 <= 0) {
+          setQuote(null);
+          setQuoteError(t('configurator.priceNotAvailable'));
+          return;
+        }
+
+        setQuote(next);
+        setQuoteError(null);
+
+        // Keep UI values in sync with server-resolved quantity.
+        if (inputMode === 'boards') {
+          if (Number.isFinite(next.quantityBoards) && next.quantityBoards > 0 && next.quantityBoards !== quantityBoards) {
+            setQuantityBoards(next.quantityBoards);
+          }
+        }
+      } catch (e: any) {
+        const message = typeof e?.message === 'string' ? e.message.toLowerCase() : '';
+        if (controller.signal.aborted || e?.name === 'AbortError' || message.includes('failed to fetch')) return;
+        setQuote(null);
+        setQuoteError(t('configurator.priceNotAvailable'));
+      } finally {
+        if (!controller.signal.aborted) {
+          setQuoteLoading(false);
+        }
+      }
+    };
+
+    run();
+    return () => controller.abort();
+  }, [mode, productId, selectedFinish?.id, selectedFinish?.dimensions?.width, selectedFinish?.dimensions?.length, selectedColor?.id, inputMode, quantityBoards, targetAreaM2, cartTotalAreaM2, t]);
+
+  const handleColorSelect = (color: ProductColorVariant) => {
+    setSelectedColor(color);
+    onColorChange?.(color);
+
+    trackEvent('configurator_select_color', {
+      product_id: productId,
+      color_id: color.id,
+      color_name: color.name,
+      price_modifier: color.priceModifier ?? 0,
+    });
+  };
+
+  const handleFinishSelect = (finish: ProductProfileVariant) => {
+    setSelectedFinish(finish);
+    onFinishChange?.(finish);
+
+    trackEvent('configurator_select_finish', {
+      product_id: productId,
+      finish_id: finish.id,
+      finish_name: finish.name,
+      price_modifier: finish.priceModifier ?? 0,
+    });
+  };
+
+  return (
+    <div className={mode === 'viewport' ? `w-full h-full ${className}` : `w-full flex flex-col gap-6 ${className}`}>
+      {/* 3D Canvas */}
+      <div
+        className={`relative w-full border border-[#BBBBBB] rounded-[24px] overflow-hidden bg-[#EAEAEA] ${
+          canvasClassName ?? (mode === 'viewport' ? 'h-full' : 'h-[400px] md:h-[500px]')
+        }`}
+      >
+        {(isLoading || !isModelResolved || !activeModelUrl) && (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#EAEAEA] z-10">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 border-4 border-[#BBBBBB] border-t-[#161616] rounded-full animate-spin" />
+              <p className="font-['Outfit'] text-sm text-[#7C7C7C]">{t('configurator.loadingModel')}</p>
+            </div>
+          </div>
+        )}
+        
+        <Canvas
+          dpr={[1, 1.5]}
+          camera={{ position: [2.4, 1.4, 2.4], fov: 45 }}
+          gl={{ preserveDrawingBuffer: true, powerPreference: 'high-performance' }}
+          onCreated={({ gl, camera }) => {
+            gl.setClearColor('#EAEAEA', 1);
+            // Ensure initial camera direction isn't "default -Z" (which can miss the origin).
+            camera.lookAt(0, 0, 0);
+          }}
+        >
+          <RendererBridge onRenderer={handleRendererReady} />
+          <PdfScreenshotBridge requestRef={screenshotRequestRef} controlsRef={orbitControlsRef} />
+            <ambientLight intensity={0.75} />
+            <hemisphereLight args={['#FFFFFF', '#DCDCDC', 0.55]} />
+      {/* Key */}
+          <directionalLight position={[5, 5, 5]} intensity={1.05} />
+      {/* Fill */}
+          <directionalLight position={[-5, 2, 4]} intensity={0.7} />
+      {/* Front lift for dark finishes */}
+          <directionalLight position={[0, 1.8, 6]} intensity={0.6} />
+      {/* Rim/back */}
+          <directionalLight position={[0, 6, -6]} intensity={0.35} />
+          <Suspense
+            fallback={null}
+          >
+            {activeModelUrl ? (
+              <GLBErrorBoundary
+                modelUrl={activeModelUrl}
+                fallback={<ProfileModel color={modelColor} finish={selectedFinish} variantKey={textureVariantKey} autoRotate={autoRotate} rotationYRef={sharedRotationYRef} visualDimensionsMm={visualDimensionsMm} />}
+              >
+                <GLBProfileModel
+                  modelUrl={activeModelUrl}
+                  materialVariantUrl={activeMaterialVariantUrl}
+                  color={modelColor}
+                  finish={selectedFinish}
+                  overrideColorMap={finishTexture}
+                  overrideColorMapKey={finishTextureUrl}
+                  applyColorTint={!isPerColorVariantModel && !finishTexture}
+                  applyDynamicFinishSurface={!isPerColorVariantModel}
+                  autoRotate={autoRotate}
+                  rotationYRef={sharedRotationYRef}
+                  visualDimensionsMm={visualDimensionsMm}
+                />
+              </GLBErrorBoundary>
+            ) : (
+              null
+            )}
+          </Suspense>
+
+          {shouldPreloadDesired && desiredModelUrl && (
+            <Suspense fallback={null}>
+              <GLBPreloadGate
+                modelUrl={desiredModelUrl}
+                materialVariantUrl={desiredMaterialVariantUrl}
+                onReady={commitDesiredUrls}
+              />
+            </Suspense>
+          )}
+          <AutoFrameCamera enabled={true} depsKey={autoFrameDepsKey} controlsRef={orbitControlsRef} />
+          <OrbitControls 
+            ref={orbitControlsRef}
+            enablePan={!isTouchDevice}
+            enableZoom={true} 
+            enableRotate={true}
+            target={[0, 0, 0]}
+            touches={{
+              ONE: THREE.TOUCH.ROTATE,
+              TWO: isTouchDevice ? THREE.TOUCH.DOLLY_ROTATE : THREE.TOUCH.DOLLY_PAN,
+            }}
+            // Must allow closer zoom because we intentionally show length shortened
+            // (visual scale). Otherwise auto-framing gets clamped and the model
+            // looks tiny.
+            minDistance={0.15}
+            maxDistance={10}
+          />
+        </Canvas>
+
+        {mode === 'full' && (
+          <div className="absolute bottom-4 left-4 bg-[#EAEAEA]/90 px-3 py-2 rounded-lg text-xs font-['Outfit'] text-[#535353]">
+            {t('configurator.controlsHint')}
+          </div>
+        )}
+      </div>
+
+      {mode === 'full' && (
+        <>
+          {/* Color Selector */}
+          {availableColors.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <label className="font-['DM_Sans'] text-sm font-medium text-[#161616]">
+                {t('configurator.colorLabel')}
+                {selectedColor && (
+                  <span className="ml-2 font-['Outfit'] font-normal text-[#7C7C7C]">
+                    ({getLocalizedColorName(selectedColor, currentLocale)})
+                  </span>
+                )}
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {availableColors.map((color) => {
+                  const colorLabel = getLocalizedColorName(color, currentLocale);
+                  const priceModifier = color.priceModifier ?? 0;
+
+                  return (
+                    <button
+                      key={color.id}
+                      onClick={() => handleColorSelect(color)}
+                      className={`relative group ${
+                        selectedColor?.id === color.id ? 'ring-2 ring-[#161616] ring-offset-2' : ''
+                      }`}
+                      aria-label={t('configurator.selectColorAria', { name: colorLabel })}
+                      title={colorLabel}
+                    >
+                    {(color.productImage || color.image) ? (
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-[#EAEAEA] group-hover:border-[#BBBBBB] transition-colors">
+                        <img 
+                          src={color.productImage || color.image || ''} 
+                          alt={colorLabel}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        style={{ backgroundColor: color.hex }}
+                        className="w-12 h-12 rounded-lg border-2 border-[#EAEAEA] group-hover:border-[#BBBBBB] transition-colors"
+                      />
+                    )}
+                    
+                    {priceModifier !== 0 && (
+                      <span className="absolute -top-2 -right-2 bg-[#161616] text-white text-[10px] px-1.5 py-0.5 rounded-full font-['Outfit']">
+                        {priceModifier > 0 ? '+' : ''}€{priceModifier.toFixed(0)}
+                      </span>
+                    )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Finish Selector */}
+          {availableFinishes.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <label className="font-['DM_Sans'] text-sm font-medium text-[#161616]">
+                {t('configurator.profileLabel')}
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {availableFinishes.map((finish) => {
+                  const finishLabel = getLocalizedProfileName(finish, currentLocale);
+                  const priceModifier = finish.priceModifier ?? 0;
+
+                  return (
+                    <label
+                      key={finish.id}
+                      className={`relative flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        selectedFinish?.id === finish.id
+                          ? 'border-[#161616] bg-[#EAEAEA]'
+                          : 'border-[#EAEAEA] hover:border-[#BBBBBB]'
+                      }`}
+                    >
+                    <input
+                      type="radio"
+                      name="finish"
+                      value={finish.id}
+                      checked={selectedFinish?.id === finish.id}
+                      onChange={() => handleFinishSelect(finish)}
+                      className="mt-0.5 w-4 h-4 text-[#161616] focus:ring-[#161616]"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-['DM_Sans'] font-medium text-[#161616]">
+                          {finishLabel}
+                        </span>
+                        {priceModifier !== 0 && (
+                          <span className="font-['Outfit'] text-sm text-[#535353]">
+                            {priceModifier > 0 ? '+' : ''}€{priceModifier.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                      {finish.description && (
+                        <p className="mt-1 font-['Outfit'] text-xs text-[#7C7C7C]">
+                          {finish.description}
+                        </p>
+                      )}
+                    </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Info Note */}
+          <div className="p-4 bg-[#EAEAEA] rounded-lg border border-[#BBBBBB]">
+            <p className="font-['Outfit'] text-xs text-[#535353]">
+              <strong>{t('configurator.noteTitle')}</strong> {t('configurator.noteBody')}
+            </p>
+          </div>
+
+          {/* Pricing */}
+          <div className="p-4 bg-[#EAEAEA] rounded-lg border border-[#BBBBBB]">
+            <div className="flex items-center justify-between gap-4">
+              <h3 className="font-['DM_Sans'] text-sm font-medium text-[#161616]">{t('configurator.pricingTitle')}</h3>
+
+              <div className="flex items-center gap-2">
+                <span className="font-['Outfit'] text-xs text-[#7C7C7C]">{t('configurator.inputModeLabel')}</span>
+                <div className="flex rounded-[100px] border border-[#BBBBBB] overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode('boards');
+                      if (quote?.quantityBoards) setQuantityBoards(quote.quantityBoards);
+
+                      trackEvent('configurator_input_mode_change', {
+                        product_id: productId,
+                        input_mode: 'boards',
+                      });
+                    }}
+                    className={`h-[28px] px-3 font-['Outfit'] text-[12px] ${
+                      inputMode === 'boards' ? 'bg-[#161616] text-white' : 'bg-[#EAEAEA] text-[#161616]'
+                    }`}
+                  >
+                    {t('configurator.inputModeBoards')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode('area');
+                      if (quote?.totalAreaM2) setTargetAreaM2(Number(quote.totalAreaM2.toFixed(2)));
+
+                      trackEvent('configurator_input_mode_change', {
+                        product_id: productId,
+                        input_mode: 'area',
+                      });
+                    }}
+                    className={`h-[28px] px-3 font-['Outfit'] text-[12px] ${
+                      inputMode === 'area' ? 'bg-[#161616] text-white' : 'bg-[#EAEAEA] text-[#161616]'
+                    }`}
+                  >
+                    {t('configurator.inputModeArea')}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3">
+              {typeof basePrice === 'number' && Number.isFinite(basePrice) && basePrice > 0 && (
+                <div className="mb-3 flex items-center justify-between rounded-md bg-[#EAEAEA] px-3 py-2">
+                  <span className="font-['Outfit'] text-xs text-[#535353]">{basePriceLabel}</span>
+                  <span className="font-['Outfit'] text-xs text-[#161616]">{currency.format(basePrice)}</span>
+                </div>
+              )}
+              {inputMode === 'boards' ? (
+                <label className="block">
+                  <span className="block font-['Outfit'] text-xs text-[#535353] mb-1">{t('configurator.quantityBoardsLabel')}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={quantityBoards}
+                    onChange={(e) => setQuantityBoards(Math.max(1, Math.round(Number(e.target.value) || 1)))}
+                    className="w-full h-[40px] px-[12px] rounded-[8px] border border-[#BBBBBB] bg-[#EAEAEA] font-['Outfit'] text-[14px] text-[#161616]"
+                  />
+                </label>
+              ) : (
+                <label className="block">
+                  <span className="block font-['Outfit'] text-xs text-[#535353] mb-1">{t('configurator.targetAreaLabel')}</span>
+                  <input
+                    type="number"
+                    min={0.01}
+                    step={0.01}
+                    value={targetAreaM2}
+                    onChange={(e) => setTargetAreaM2(Math.max(0.01, Number(e.target.value) || 0.01))}
+                    className="w-full h-[40px] px-[12px] rounded-[8px] border border-[#BBBBBB] bg-[#EAEAEA] font-['Outfit'] text-[14px] text-[#161616]"
+                  />
+                </label>
+              )}
+            </div>
+
+            {quoteLoading && (
+              <p className="mt-3 font-['Outfit'] text-xs text-[#7C7C7C]">{t('configurator.calculatingPrice')}</p>
+            )}
+
+            {quoteError && !quoteLoading && (
+              <p className="mt-3 font-['Outfit'] text-xs text-[#7C7C7C]">{quoteError}</p>
+            )}
+
+            {quote && !quoteLoading && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {quote.roundingInfo && quote.roundingInfo.deltaAreaM2 > 0.000001 && (
+                  <div className="sm:col-span-2">
+                    <p className="font-['Outfit'] text-xs text-[#7C7C7C]">
+                      ~{' '}
+                      {t('configurator.roundingNotice', {
+                        boards: String(quote.quantityBoards),
+                        actualArea: numberM2.format(quote.roundingInfo.actualAreaM2),
+                      })}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between rounded-md bg-[#EAEAEA] px-3 py-2">
+                  <span className="font-['Outfit'] text-xs text-[#535353]">{t('configurator.unitPricePerM2Label')}</span>
+                  <span className="font-['Outfit'] text-xs text-[#161616]">{currency.format(quote.unitPricePerM2)}</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-md bg-[#EAEAEA] px-3 py-2">
+                  <span className="font-['Outfit'] text-xs text-[#535353]">{t('configurator.unitPricePerBoardLabel')}</span>
+                  <span className="font-['Outfit'] text-xs text-[#161616]">{currency.format(quote.unitPricePerBoard)}</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-md bg-[#EAEAEA] px-3 py-2">
+                  <span className="font-['Outfit'] text-xs text-[#535353]">{t('configurator.totalAreaLabel')}</span>
+                  <span className="font-['Outfit'] text-xs text-[#161616]">{numberM2.format(quote.totalAreaM2)} m²</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-md bg-[#EAEAEA] px-3 py-2">
+                  <span className="font-['Outfit'] text-xs text-[#535353]">{t('configurator.lineTotalLabel')}</span>
+                  <span className="font-['Outfit'] text-xs text-[#161616]">{currency.format(quote.lineTotal)}</span>
+                </div>
+              </div>
+            )}
+
+            {/* PDF download button */}
+            {selectedColor && selectedFinish && (
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                disabled={pdfLoading}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-[100px] border border-[#BBBBBB] bg-[#EAEAEA] px-6 py-3 font-['DM_Sans'] text-sm font-medium text-[#161616] transition-colors hover:bg-[#E1E1E1] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {pdfLoading ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    {t('configurator.downloadingPdf')}
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    {t('configurator.downloadPdf')}
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
+
+export default Konfiguratorius3D;

@@ -1,0 +1,909 @@
+#!/usr/bin/env node
+
+/**
+ * Environment Variable Validation Script
+ * 
+ * Checks if all required environment variables are set and validates their format.
+ * Run with: node scripts/check-env.js
+ * 
+ * Options:
+ *   --validate    Also test API connections (slower)
+ *   --fix         Interactive mode to help set missing variables
+ *   --strict      Exit with error if optional vars are missing
+ *   --readiness   Run production-readiness checks and evidence checks
+ */
+
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
+
+// Minimal .env loader (no external deps)
+function loadDotEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf8');
+
+  content.split(/\r?\n/).forEach((rawLine) => {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) return;
+    const eqIndex = line.indexOf('=');
+    if (eqIndex <= 0) return;
+
+    const key = line.slice(0, eqIndex).trim();
+    let value = line.slice(eqIndex + 1).trim();
+
+    // Strip surrounding quotes
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  });
+}
+
+// Colors for terminal output
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m',
+};
+
+const { reset, bright, red, green, yellow, blue, cyan } = colors;
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const options = {
+  validate: args.includes('--validate'),
+  fix: args.includes('--fix'),
+  strict: args.includes('--strict'),
+  readiness: args.includes('--readiness'),
+  help: args.includes('--help') || args.includes('-h'),
+};
+
+// Environment variable definitions
+const envVars = {
+  // Next.js & Build
+  NEXT_PUBLIC_SITE_URL: {
+    required: true,
+    type: 'url',
+    description: 'Public site URL',
+    example: 'http://localhost:3011 or https://shop.yakiwood.co.uk',
+    category: 'Next.js & Build',
+  },
+  NODE_ENV: {
+    required: false,
+    type: 'enum',
+    values: ['development', 'production', 'test'],
+    description: 'Application environment',
+    default: 'development',
+    category: 'Next.js & Build',
+  },
+
+  // Supabase
+  NEXT_PUBLIC_SUPABASE_URL: {
+    required: 'conditional',
+    condition: 'database',
+    type: 'url',
+    pattern: /^https:\/\/[a-z0-9-]+\.supabase\.co$/,
+    description: 'Supabase project URL',
+    example: 'https://abcdefghijk.supabase.co',
+    category: 'Supabase',
+    getLink: 'https://app.supabase.com/project/_/settings/api',
+  },
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: {
+    required: 'conditional',
+    condition: 'database',
+    type: 'jwt',
+    description: 'Supabase anonymous/public key',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    category: 'Supabase',
+    getLink: 'https://app.supabase.com/project/_/settings/api',
+  },
+  SUPABASE_SERVICE_ROLE_KEY: {
+    required: 'conditional',
+    condition: 'database',
+    type: 'jwt',
+    description: 'Supabase service role key (server-side only)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    category: 'Supabase',
+    sensitive: true,
+  },
+  SUPABASE_STORAGE_BUCKET: {
+    required: false,
+    type: 'string',
+    description: 'Storage bucket name',
+    default: 'product-images',
+    category: 'Supabase',
+  },
+
+  // Stripe
+  STRIPE_SECRET_KEY: {
+    required: 'conditional',
+    condition: 'payments',
+    type: 'string',
+    pattern: /^sk_(test|live)_[a-zA-Z0-9]+$/,
+    description: 'Stripe secret key (server-side only)',
+    example: 'sk_test_... or sk_live_...',
+    category: 'Stripe',
+    sensitive: true,
+    getLink: 'https://dashboard.stripe.com/apikeys',
+  },
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: {
+    required: 'conditional',
+    condition: 'payments',
+    type: 'string',
+    pattern: /^pk_(test|live)_[a-zA-Z0-9]+$/,
+    description: 'Stripe publishable key',
+    example: 'pk_test_... or pk_live_...',
+    category: 'Stripe',
+    getLink: 'https://dashboard.stripe.com/apikeys',
+  },
+  STRIPE_WEBHOOK_SECRET: {
+    required: 'conditional',
+    condition: 'payments',
+    type: 'string',
+    pattern: /^whsec_[a-zA-Z0-9]+$/,
+    description: 'Stripe webhook signing secret',
+    example: 'whsec_...',
+    category: 'Stripe',
+    sensitive: true,
+    getLink: 'https://dashboard.stripe.com/webhooks',
+  },
+
+  // PayPal
+  PAYPAL_ENV: {
+    required: false,
+    type: 'enum',
+    values: ['sandbox', 'live', 'production'],
+    description: 'PayPal environment (sandbox/live)',
+    default: 'sandbox',
+    category: 'PayPal',
+  },
+  PAYPAL_CLIENT_ID: {
+    required: 'conditional',
+    condition: 'paypal',
+    type: 'string',
+    description: 'PayPal client ID',
+    example: 'AQ... (from PayPal developer dashboard)',
+    category: 'PayPal',
+    getLink: 'https://developer.paypal.com/dashboard/applications/sandbox',
+  },
+  PAYPAL_CLIENT_SECRET: {
+    required: 'conditional',
+    condition: 'paypal',
+    type: 'string',
+    description: 'PayPal client secret (server-side only)',
+    example: 'EL... (from PayPal developer dashboard)',
+    category: 'PayPal',
+    sensitive: true,
+    getLink: 'https://developer.paypal.com/dashboard/applications/sandbox',
+  },
+
+  // Paysera
+  PAYSERA_PROJECT_ID: {
+    required: 'conditional',
+    condition: 'paysera',
+    type: 'string',
+    description: 'Paysera project ID',
+    example: '123456',
+    category: 'Paysera',
+  },
+  PAYSERA_SIGN_PASSWORD: {
+    required: 'conditional',
+    condition: 'paysera',
+    type: 'string',
+    description: 'Paysera sign password (server-side only)',
+    example: '... (from Paysera project settings)',
+    category: 'Paysera',
+    sensitive: true,
+  },
+  PAYSERA_TEST: {
+    required: false,
+    type: 'boolean',
+    description: 'Enable Paysera test mode',
+    default: 'true',
+    category: 'Paysera',
+  },
+  PAYSERA_VERSION: {
+    required: false,
+    type: 'string',
+    description: 'Paysera API version',
+    default: '1.6',
+    category: 'Paysera',
+  },
+
+  // Pricing (quote locking)
+  PRICING_QUOTE_TOKEN_SECRET: {
+    required: false,
+    type: 'string',
+    description: 'Dedicated HMAC secret for pricing quote tokens (recommended; falls back to server-side Supabase key if omitted)',
+    example: 'a-long-random-string',
+    category: 'Pricing',
+    sensitive: true,
+  },
+  PRICING_QUOTE_TTL_MINUTES: {
+    required: false,
+    type: 'string',
+    description: 'Locked quote TTL in minutes',
+    example: '30',
+    category: 'Pricing',
+  },
+
+  // Email (Resend)
+  RESEND_API_KEY: {
+    required: 'conditional',
+    condition: 'emails',
+    type: 'string',
+    pattern: /^re_[a-zA-Z0-9_]+$/,
+    description: 'Resend API key',
+    example: 're_...',
+    category: 'Email',
+    sensitive: true,
+    getLink: 'https://resend.com/api-keys',
+  },
+  FROM_EMAIL: {
+    required: 'conditional',
+    condition: 'emails',
+    type: 'email',
+    description: 'Sender email address',
+    example: 'noreply@yakiwood.lt',
+    category: 'Email',
+  },
+  SYSTEM_EMAIL: {
+    required: false,
+    type: 'email',
+    description: 'System notifications recipient',
+    example: 'admin@yakiwood.lt',
+    category: 'Email',
+  },
+  SYSTEM_EMAIL_FROM: {
+    required: false,
+    type: 'string',
+    description: 'System email sender name and address',
+    example: 'Yakiwood <noreply@yakiwood.lt>',
+    category: 'Email',
+  },
+
+  // Analytics
+  NEXT_PUBLIC_GA_MEASUREMENT_ID: {
+    required: false,
+    type: 'string',
+    pattern: /^G-[A-Z0-9]+$/,
+    description: 'Google Analytics 4 Measurement ID',
+    example: 'G-XXXXXXXXXX',
+    category: 'Analytics',
+    getLink: 'https://analytics.google.com/',
+  },
+  NEXT_PUBLIC_GA_DEBUG: {
+    required: false,
+    type: 'boolean',
+    description: 'Enable GA in development mode',
+    default: 'false',
+    category: 'Analytics',
+  },
+
+  // Newsletter
+  NEWSLETTER_PROVIDER: {
+    required: false,
+    type: 'enum',
+    values: ['database', 'mailchimp', 'resend'],
+    description: 'Newsletter provider',
+    default: 'database',
+    category: 'Newsletter',
+  },
+  MAILCHIMP_API_KEY: {
+    required: 'conditional',
+    condition: 'NEWSLETTER_PROVIDER=mailchimp',
+    type: 'string',
+    pattern: /^[a-z0-9]+-[a-z]{2}[0-9]+$/,
+    description: 'Mailchimp API key',
+    example: 'xxxxxxxxxxxxxxxxxxxx-us19',
+    category: 'Newsletter',
+    sensitive: true,
+    getLink: 'https://mailchimp.com/help/about-api-keys/',
+  },
+  MAILCHIMP_AUDIENCE_ID: {
+    required: 'conditional',
+    condition: 'NEWSLETTER_PROVIDER=mailchimp',
+    type: 'string',
+    description: 'Mailchimp audience/list ID',
+    example: 'a1b2c3d4e5',
+    category: 'Newsletter',
+  },
+  MAILCHIMP_SERVER_PREFIX: {
+    required: 'conditional',
+    condition: 'NEWSLETTER_PROVIDER=mailchimp',
+    type: 'string',
+    description: 'Mailchimp server prefix',
+    example: 'us19',
+    default: 'us19',
+    category: 'Newsletter',
+  },
+  RESEND_AUDIENCE_ID: {
+    required: 'conditional',
+    condition: 'NEWSLETTER_PROVIDER=resend',
+    type: 'string',
+    description: 'Resend audience ID',
+    category: 'Newsletter',
+  },
+
+  // Admin
+  ADMIN_EMAILS: {
+    required: true,
+    type: 'email-list',
+    description: 'Comma-separated admin email addresses',
+    example: 'admin@yakiwood.lt,owner@yakiwood.lt',
+    category: 'Admin',
+  },
+
+  // Image CDN
+  NEXT_PUBLIC_CDN_URL: {
+    required: false,
+    type: 'url',
+    description: 'CDN base URL for images',
+    example: 'https://cdn.yakiwood.lt',
+    category: 'Image CDN',
+  },
+
+  // Development
+  ENABLE_EXPERIMENTAL_FEATURES: {
+    required: false,
+    type: 'boolean',
+    description: 'Enable experimental features',
+    default: 'false',
+    category: 'Development',
+  },
+  LOG_LEVEL: {
+    required: false,
+    type: 'enum',
+    values: ['debug', 'info', 'warn', 'error'],
+    description: 'Logging level',
+    default: 'info',
+    category: 'Development',
+  },
+  DEBUG: {
+    required: false,
+    type: 'boolean',
+    description: 'Enable verbose debugging',
+    default: 'false',
+    category: 'Development',
+  },
+};
+
+// Results tracking
+const results = {
+  errors: [],
+  warnings: [],
+  info: [],
+  passed: [],
+};
+
+// Utility functions
+function log(message, color = reset) {
+  console.log(`${color}${message}${reset}`);
+}
+
+function logSection(title) {
+  console.log(`\n${bright}${blue}═══ ${title} ═══${reset}\n`);
+}
+
+function validateUrl(value) {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function validateEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validateJWT(value) {
+  return /^eyJ[a-zA-Z0-9_-]*\.eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*$/.test(value);
+}
+
+function validateBoolean(value) {
+  return ['true', 'false', '1', '0'].includes(value.toLowerCase());
+}
+
+function validateDate(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(Date.parse(value));
+}
+
+function maskSensitive(value) {
+  if (!value || value.length < 10) return '***';
+  return value.slice(0, 8) + '...' + value.slice(-4);
+}
+
+function addIssue(kind, issue) {
+  results[kind].push(issue);
+}
+
+function isLocalUrl(value) {
+  if (!value || !validateUrl(value)) return false;
+
+  try {
+    const parsed = new URL(value);
+    return ['localhost', '127.0.0.1', '0.0.0.0'].includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function shouldUseHttps(value) {
+  return Boolean(value) && !isLocalUrl(value);
+}
+
+function getLatestPerformanceReports() {
+  const reportDir = path.join(process.cwd(), 'reports');
+  if (!fs.existsSync(reportDir)) {
+    return { json: null, markdown: null };
+  }
+
+  const files = fs.readdirSync(reportDir);
+
+  function newestMatching(prefix, suffix) {
+    const matches = files
+      .filter((file) => file.startsWith(prefix) && file.endsWith(suffix))
+      .map((file) => {
+        const fullPath = path.join(reportDir, file);
+        return {
+          file,
+          fullPath,
+          mtimeMs: fs.statSync(fullPath).mtimeMs,
+        };
+      })
+      .sort((a, b) => b.mtimeMs - a.mtimeMs);
+
+    return matches[0] || null;
+  }
+
+  return {
+    json: newestMatching('performance-summary-', '.json'),
+    markdown: newestMatching('performance-summary-', '.md'),
+  };
+}
+
+function validateProductionReadiness() {
+  logSection('Production Readiness');
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+  const legacyAppUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL || '';
+  const perfBaseUrl = process.env.PERF_BASE_URL || '';
+
+  if (!siteUrl) {
+    addIssue('errors', {
+      name: 'NEXT_PUBLIC_SITE_URL',
+      message: 'Production readiness requires NEXT_PUBLIC_SITE_URL to be set.',
+      help: 'Use the canonical public HTTPS origin, for example: https://shop.yakiwood.co.uk',
+    });
+  } else if (isLocalUrl(siteUrl)) {
+    addIssue('warnings', {
+      name: 'NEXT_PUBLIC_SITE_URL',
+      message: 'Local URL detected. Set the deployed public origin before final production review.',
+      value: siteUrl,
+    });
+  } else if (shouldUseHttps(siteUrl) && !siteUrl.startsWith('https://')) {
+    addIssue('errors', {
+      name: 'NEXT_PUBLIC_SITE_URL',
+      message: 'Production readiness requires an HTTPS public site URL.',
+      value: siteUrl,
+      help: 'Use an https:// origin for production deployments.',
+    });
+  } else {
+    addIssue('info', {
+      name: 'NEXT_PUBLIC_SITE_URL',
+      message: `Readiness target URL: ${siteUrl}`,
+    });
+  }
+
+  if (legacyAppUrl) {
+    const message = legacyAppUrl === siteUrl
+      ? 'Legacy variable detected. The app reads NEXT_PUBLIC_SITE_URL; remove NEXT_PUBLIC_APP_URL to avoid drift.'
+      : 'Legacy variable differs from NEXT_PUBLIC_SITE_URL. The app reads NEXT_PUBLIC_SITE_URL; align or remove NEXT_PUBLIC_APP_URL.';
+
+    addIssue(legacyAppUrl === siteUrl ? 'warnings' : 'errors', {
+      name: 'NEXT_PUBLIC_APP_URL',
+      message,
+      value: legacyAppUrl,
+    });
+  }
+
+  [
+    ['NEXT_PUBLIC_CDN_URL', cdnUrl],
+    ['PERF_BASE_URL', perfBaseUrl],
+  ].forEach(([name, value]) => {
+    if (!value) return;
+
+    if (shouldUseHttps(value) && !value.startsWith('https://')) {
+      addIssue('warnings', {
+        name,
+        message: 'Non-local URL should use HTTPS for production readiness.',
+        value,
+      });
+    }
+  });
+
+  [
+    ['DEBUG', process.env.DEBUG],
+    ['ENABLE_EXPERIMENTAL_FEATURES', process.env.ENABLE_EXPERIMENTAL_FEATURES],
+    ['NEXT_PUBLIC_GA_DEBUG', process.env.NEXT_PUBLIC_GA_DEBUG],
+  ].forEach(([name, value]) => {
+    if ((value || '').trim().toLowerCase() === 'true' || value === '1') {
+      addIssue('warnings', {
+        name,
+        message: 'Disable debug or experimental flags before production launch unless explicitly required.',
+        value,
+      });
+    }
+  });
+
+  const reports = getLatestPerformanceReports();
+  if (!reports.json || !reports.markdown) {
+    addIssue('warnings', {
+      name: 'performance-audit',
+      message: 'No recent performance audit evidence found in reports/.',
+      help: 'Run `npm run audit:performance -- --baseUrl https://your-domain` before final launch review.',
+    });
+  } else {
+    addIssue('info', {
+      name: 'performance-audit',
+      message: `Latest reports: ${reports.json.file} and ${reports.markdown.file}`,
+    });
+  }
+
+  addIssue('info', {
+    name: 'backup-evidence',
+    message: 'Database backups and restore drills are operational checks. Record the latest Supabase backup status and restore-test date outside the repo.',
+  });
+}
+
+// Check if env file exists
+function checkEnvFile() {
+  const envPath = path.join(process.cwd(), '.env.local');
+  if (!fs.existsSync(envPath)) {
+    log(`⚠️  No .env.local file found`, yellow);
+    log(`   Create one at project root:`, reset);
+    log(`   ${cyan}.env.local${reset}\n`, reset);
+    return false;
+  }
+  log(`✓ .env.local file exists`, green);
+  return true;
+}
+
+// Validate individual variable
+function validateVariable(name, config) {
+  const value = process.env[name];
+  
+  // Check if variable is set
+  if (!value) {
+    if (config.required === true) {
+      results.errors.push({
+        name,
+        message: `Required variable not set`,
+        help: config.example ? `Example: ${config.example}` : null,
+        link: config.getLink,
+      });
+      return false;
+    } else if (config.required === 'conditional') {
+      results.warnings.push({
+        name,
+        message: `Conditional variable not set (needed for: ${config.condition})`,
+        help: config.example ? `Example: ${config.example}` : null,
+      });
+      return true; // Don't fail, just warn
+    } else {
+      if (options.strict) {
+        results.warnings.push({
+          name,
+          message: `Optional variable not set`,
+          help: config.default ? `Default: ${config.default}` : null,
+        });
+      }
+      return true;
+    }
+  }
+
+  // Validate type/format
+  const validationChecks = {
+    url: () => validateUrl(value),
+    email: () => validateEmail(value),
+    'email-list': () => value.split(',').every(e => validateEmail(e.trim())),
+    jwt: () => validateJWT(value),
+    boolean: () => validateBoolean(value),
+    date: () => validateDate(value),
+    enum: () => config.values.includes(value),
+    string: () => value.length > 0,
+  };
+
+  const validator = validationChecks[config.type];
+  if (validator && !validator()) {
+    results.errors.push({
+      name,
+      message: `Invalid format for type: ${config.type}`,
+      help: config.example ? `Example: ${config.example}` : null,
+      value: config.sensitive ? maskSensitive(value) : value,
+    });
+    return false;
+  }
+
+  // Check pattern if specified
+  if (config.pattern && !config.pattern.test(value)) {
+    results.errors.push({
+      name,
+      message: `Value doesn't match required pattern`,
+      help: config.example ? `Example: ${config.example}` : null,
+      value: config.sensitive ? maskSensitive(value) : null,
+    });
+    return false;
+  }
+
+  results.passed.push({
+    name,
+    value: config.sensitive ? maskSensitive(value) : value,
+  });
+  return true;
+}
+
+// Test API connections
+async function testConnections() {
+  logSection('Testing API Connections');
+
+  const tests = [];
+
+  // Test Supabase
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    tests.push(testSupabase());
+  }
+
+  // Test Stripe
+  if (process.env.STRIPE_SECRET_KEY) {
+    tests.push(testStripe());
+  }
+
+  // Test Resend
+  if (process.env.RESEND_API_KEY) {
+    tests.push(testResend());
+  }
+
+  const testResults = await Promise.allSettled(tests);
+  
+  testResults.forEach((result) => {
+    if (result.status === 'fulfilled') {
+      log(result.value, green);
+    } else {
+      log(`✗ ${result.reason}`, red);
+    }
+  });
+}
+
+function testSupabase() {
+  return new Promise((resolve, reject) => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    https.get(`${url}/rest/v1/`, {
+      headers: { apikey: key },
+      timeout: 5000,
+    }, (res) => {
+      if (res.statusCode === 200 || res.statusCode === 401) {
+        resolve('✓ Supabase connection successful');
+      } else {
+        reject(`Supabase returned status ${res.statusCode}`);
+      }
+    }).on('error', (err) => {
+      reject(`Supabase connection failed: ${err.message}`);
+    });
+  });
+}
+
+function testStripe() {
+  return new Promise((resolve, reject) => {
+    const auth = Buffer.from(`${process.env.STRIPE_SECRET_KEY}:`).toString('base64');
+
+    https.get('https://api.stripe.com/v1/charges?limit=1', {
+      headers: { Authorization: `Basic ${auth}` },
+      timeout: 5000,
+    }, (res) => {
+      if (res.statusCode === 200) {
+        resolve('✓ Stripe connection successful');
+      } else {
+        reject(`Stripe returned status ${res.statusCode}`);
+      }
+    }).on('error', (err) => {
+      reject(`Stripe connection failed: ${err.message}`);
+    });
+  });
+}
+
+function testResend() {
+  return new Promise((resolve, reject) => {
+    https.get('https://api.resend.com/domains', {
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
+      timeout: 5000,
+    }, (res) => {
+      if (res.statusCode === 200 || res.statusCode === 401) {
+        resolve('✓ Resend connection successful');
+      } else {
+        reject(`Resend returned status ${res.statusCode}`);
+      }
+    }).on('error', (err) => {
+      reject(`Resend connection failed: ${err.message}`);
+    });
+  });
+}
+
+// Print results
+function printResults() {
+  // Group by category
+  const byCategory = {};
+  Object.entries(envVars).forEach(([name, config]) => {
+    const category = config.category || 'Other';
+    if (!byCategory[category]) byCategory[category] = [];
+    byCategory[category].push(name);
+  });
+
+  // Print passed variables by category
+  if (results.passed.length > 0) {
+    logSection('Environment Variables Status');
+    Object.entries(byCategory).forEach(([category, varNames]) => {
+      const categoryVars = results.passed.filter(v => varNames.includes(v.name));
+      if (categoryVars.length > 0) {
+        log(`\n${bright}${category}:${reset}`, cyan);
+        categoryVars.forEach(({ name, value }) => {
+          log(`  ${green}✓${reset} ${name}${value ? ` = ${value}` : ''}`, reset);
+        });
+      }
+    });
+  }
+
+  // Print warnings
+  if (results.warnings.length > 0) {
+    logSection('Warnings');
+    results.warnings.forEach(({ name, message, help }) => {
+      log(`${yellow}⚠${reset}  ${bright}${name}${reset}: ${message}`, yellow);
+      if (help) log(`   ${help}`, reset);
+    });
+  }
+
+  if (results.info.length > 0) {
+    logSection('Readiness Notes');
+    results.info.forEach(({ name, message }) => {
+      log(`${blue}i${reset}  ${bright}${name}${reset}: ${message}`, blue);
+    });
+  }
+
+  // Print errors
+  if (results.errors.length > 0) {
+    logSection('Errors');
+    results.errors.forEach(({ name, message, help, value, link }) => {
+      log(`${red}✗${reset}  ${bright}${name}${reset}: ${message}`, red);
+      if (value) log(`   Current value: ${value}`, reset);
+      if (help) log(`   ${help}`, reset);
+      if (link) log(`   Get it from: ${cyan}${link}${reset}`, reset);
+    });
+  }
+
+  // Summary
+  logSection('Summary');
+  log(`${green}✓${reset} Passed: ${results.passed.length}`, green);
+  if (results.warnings.length > 0) {
+    log(`${yellow}⚠${reset} Warnings: ${results.warnings.length}`, yellow);
+  }
+  if (results.errors.length > 0) {
+    log(`${red}✗${reset} Errors: ${results.errors.length}`, red);
+  }
+
+  // Exit code
+  const exitCode = results.errors.length > 0 ? 1 : 0;
+  
+  if (exitCode === 0 && results.warnings.length === 0) {
+    log(`\n${green}${bright}All checks passed!${reset}`, green);
+  } else if (exitCode === 0) {
+    log(`\n${yellow}${bright}Checks completed with warnings${reset}`, yellow);
+  } else {
+    log(`\n${red}${bright}Environment configuration has errors${reset}`, red);
+    log(`Fix the errors above and run again.`, reset);
+    log(`\nFor help, see: ${cyan}docs/ENVIRONMENT.md${reset}`, reset);
+  }
+
+  return exitCode;
+}
+
+// Show help
+function showHelp() {
+  console.log(`
+${bright}Environment Variable Checker${reset}
+
+${bright}USAGE:${reset}
+  node scripts/check-env.js [options]
+
+${bright}OPTIONS:${reset}
+  --validate    Test API connections (Supabase, Stripe, Resend)
+  --strict      Treat missing optional variables as warnings
+  --readiness   Run production-readiness and evidence checks
+  --help, -h    Show this help message
+
+${bright}EXAMPLES:${reset}
+  ${cyan}node scripts/check-env.js${reset}
+    Basic check of all environment variables
+
+  ${cyan}node scripts/check-env.js --validate${reset}
+    Check variables and test API connections
+
+  ${cyan}node scripts/check-env.js --strict${reset}
+    Warn about missing optional variables
+
+  ${cyan}node scripts/check-env.js --readiness --strict${reset}
+    Validate production-oriented settings and check for audit evidence
+
+${bright}DOCUMENTATION:${reset}
+  See ${cyan}docs/ENVIRONMENT.md${reset} for complete setup guide
+
+${bright}QUICK FIX:${reset}
+  1. Create ${cyan}.env.local${reset} in project root
+  
+  2. Fill it with your values
+  
+  3. Restart your dev server:
+     ${cyan}npm run dev${reset}
+`);
+}
+
+// Main function
+async function main() {
+  if (options.help) {
+    showHelp();
+    process.exit(0);
+  }
+
+  // Load `.env.local` (and `.env`) so checks work out-of-the-box in dev
+  loadDotEnvFile(path.join(process.cwd(), '.env.local'));
+  loadDotEnvFile(path.join(process.cwd(), '.env'));
+
+  log(`${bright}${blue}╔═══════════════════════════════════════════════════════════╗${reset}`);
+  log(`${bright}${blue}║     Yakiwood Environment Configuration Checker          ║${reset}`);
+  log(`${bright}${blue}╚═══════════════════════════════════════════════════════════╝${reset}\n`);
+
+  log(`Environment: ${bright}${process.env.NODE_ENV || 'development'}${reset}`);
+  log(`Working directory: ${process.cwd()}\n`);
+
+  // Check if .env.local exists
+  checkEnvFile();
+
+  // Validate all variables
+  logSection('Validating Variables');
+  Object.entries(envVars).forEach(([name, config]) => {
+    validateVariable(name, config);
+  });
+
+  if (options.readiness) {
+    validateProductionReadiness();
+  }
+
+  // Test connections if requested
+  if (options.validate) {
+    await testConnections();
+  }
+
+  // Print results and exit
+  const exitCode = printResults();
+  process.exit(exitCode);
+}
+
+// Run
+main().catch((error) => {
+  console.error(`${red}Fatal error:${reset}`, error);
+  process.exit(1);
+});

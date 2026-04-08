@@ -1,0 +1,2581 @@
+{
+  "nav": {
+    "produktai": "Produktai",
+    "sprendimai": "Sprendimai",
+    "projektai": "Projektai",
+    "konfiguratorius3d": "3D deginta mediena",
+    "straipsniai": "Straipsniai",
+    "euProjektai": "ES projektai",
+    "apie": "Apie mus",
+    "kontaktai": "Kontaktai",
+    "duk": "DUK",
+    "pagrindinis": "Pagrindinis",
+    "paskyra": "Paskyra"
+  },
+  "chatbot": {
+    "button": "Pokalbis",
+    "title": "Pokalbis su Yakiwood",
+    "subtitle": "Klauskite apie produktus, kainas, pristatymą ar užsakymą",
+    "welcome": "Sveiki! Esu Yakiwood asistentas. Galiu padėti su produktais, tiksliomis kainomis, pristatymu ir užsakymu.",
+    "note": "Pastaba: nerašykite jautrios informacijos (pvz., asmens kodo). Pokalbis gali būti naudojamas aptarnavimui gerinti.",
+    "handoff": "Reikia žmogaus? Susisiekime per Kontaktus",
+    "conversationLabel": "Pokalbis",
+    "quickQuestions": "Greitieji klausimai",
+    "cartAdded": "Įdėjau į krepšelį.",
+    "placeholder": "Parašykite žinutę...",
+    "send": "Siųsti",
+    "clear": "Išvalyti",
+    "typing": "Rašau...",
+    "aria": {
+      "open": "Atidaryti pokalbį",
+      "close": "Uždaryti pokalbį"
+    },
+    "errors": {
+      "generic": "Nepavyko atsakyti. Pabandykite vėliau.",
+      "network": "Klaida. Pabandykite vėliau."
+    },
+    "suggestions": {
+      "price": "Parodyk produktus ir kainas",
+      "delivery": "Pristatymo kaina ir terminas",
+      "payment": "Apmokėjimo būdai",
+      "returns": "Grąžinimas ir garantija",
+      "cart": "Kaip pateikti užsakymą?",
+      "productionTime": "Kiek trunka gamyba ir pristatymas?",
+      "maintenance": "Kaip prižiūrėti degintą medieną?"
+    }
+  },
+  "blog": {
+    "title": "Straipsniai",
+    "subtitle": "Įžvalgos apie Shou Sugi Ban, dizaino patarimai ir praktinės gairės.",
+    "readMore": "Skaityti daugiau",
+    "readTime": "{minutes} min. skaitymo",
+    "empty": "Straipsnių dar nėra.",
+    "back": "Grįžti į straipsnius",
+    "related": "Susiję straipsniai",
+    "ctaTitle": "Pasiruošę",
+    "ctaHighlight": "kurti",
+    "ctaSubtitle": "Papasakokite apie projektą - paruošime pasiūlymą.",
+    "ctaPrimary": "Gauti pasiūlymą",
+    "ctaSecondary": "Peržiūrėti produktus"
+  },
+  "account": {
+    "title": "Paskyra",
+    "signIn": "Prisijungti",
+    "signUp": "Registruotis",
+    "register": "Registruotis",
+    "login": "Prisijungti",
+    "forgotPassword": "Pamiršote slaptažodį?",
+    "resetPassword": "Atstatyti slaptažodį",
+    "forgotPasswordForm": {
+      "subtitle": "Išsiųsime jums el. laišką slaptažodžio atstatymui",
+      "submit": "Siųsti",
+      "sending": "Siunčiama...",
+      "cancel": "Atšaukti",
+      "success": "Išsiuntėme el. laišką slaptažodžio atstatymui.",
+      "successNote": "Jei laiškas neateina, patikrinkite šlamšto katalogą arba SMTP nustatymus Supabase.",
+      "errorGeneric": "Įvyko klaida. Bandykite dar kartą.",
+      "errorSupabase": "Supabase nesukonfigūruotas."
+    },
+    "rememberMe": "Prisiminti mane",
+    "createAccount": "Sukurti paskyrą",
+    "alreadyHaveAccount": "Jau turite paskyrą?",
+    "dontHaveAccount": "Neturite paskyros?",
+    "emailAddress": "El. paštas",
+    "password": "Slaptažodis",
+    "loggingIn": "Prisijungiama...",
+    "continueWithGoogle": "Tęsti su Google",
+    "oauthErrorGeneric": "Nepavyko prisijungti su Google",
+    "completeRegistrationDescription": "Norėdami tęsti, patvirtinkite, kad sutinkate su Taisyklėmis ir Privatumo politika.",
+    "completeRegistrationCta": "Užbaigti registraciją",
+    "completeRegistrationSuccess": "Sutikimas išsaugotas.",
+    "loginRequired": "Prisijunkite, kad galėtumėte tęsti",
+    "demoLogin": "Demo prisijungimas",
+    "admin": "Administratorius",
+    "user": "Vartotojas",
+    "showPassword": "Rodyti slaptažodį",
+    "hidePassword": "Slėpti slaptažodį",
+    "close": "Uždaryti",
+    "fullName": "Vardas, pavardė",
+    "agreeToTerms": "Sutinku su Taisyklėmis ir Privatumo politika",
+    "agreeToTermsError": "Turite sutikti su taisyklėmis ir privatumo politika",
+    "creatingAccount": "Kuriama...",
+    "registerForm": {
+      "title": "Registracija",
+      "subtitle": "Prisijunkite prie mūsų ir atraskite degintos medienos produktus",
+      "firstName": "Vardas",
+      "lastName": "Pavardė",
+      "firstNamePlaceholder": "Jonas",
+      "lastNamePlaceholder": "Jonaitis",
+      "emailPlaceholder": "vardas@pavyzdys.lt",
+      "passwordPlaceholder": "Bent 8 simboliai",
+      "confirmPasswordPlaceholder": "Pakartokite slaptažodį",
+      "termsPrefix": "Sutinku su",
+      "termsMiddle": "ir",
+      "termsLink": "Taisyklėmis",
+      "privacyLink": "Privatumo politika",
+      "newsletter": "Noriu gauti naujienas ir specialius pasiūlymus",
+      "passwordMismatch": "Slaptažodžiai nesutampa",
+      "termsRequired": "Turite sutikti su taisyklėmis"
+    },
+    "accountDetails": "PASKYROS DUOMENYS",
+    "myOrders": "MANO UŽSAKYMAI",
+    "invoices": "SĄSKAITOS",
+    "logout": "ATSIJUNGTI",
+    "ordersEmpty": "Užsakymų dar nėra.",
+    "invoicesEmpty": "Sąskaitų dar nėra.",
+    "changePassword": "Keisti slaptažodį",
+    "currentPassword": "Dabartinis slaptažodis",
+    "newPassword": "Naujas slaptažodis",
+    "confirmPassword": "Pakartokite slaptažodį",
+    "table": {
+      "order": "UŽSAKYMAS",
+      "date": "DATA",
+      "status": "STATUSAS",
+      "totalCost": "BENDRA KAINA"
+    },
+    "invoicesTable": {
+      "invoice": "SĄSKAITA",
+      "date": "DATA",
+      "status": "STATUSAS",
+      "totalCost": "BENDRA KAINA",
+      "actions": "VEIKSMAI"
+    },
+    "invoiceActions": {
+      "download": "Atsisiųsti",
+      "resend": "Siųsti el. paštu",
+      "languages": {
+        "lt": "LT",
+        "en": "EN"
+      }
+    },
+    "invoiceMessages": {
+      "resent": "Sąskaita išsiųsta el. paštu.",
+      "resentLt": "Lietuviška sąskaita išsiųsta el. paštu.",
+      "resentEn": "Angliška sąskaita išsiųsta el. paštu.",
+      "sending": "Siunčiama...",
+      "resendError": "Nepavyko išsiųsti sąskaitos. Bandykite vėliau."
+    },
+    "details": {
+      "dateOfDelivery": "PRISTATYMO DATA",
+      "invalidRole": "Neteisingas rolės pavadinimas (naudokite raides, skaičius, _ arba -)",
+      "deliveryAddress": "PRISTATYMO ADRESAS",
+      "paymentMethod": "MOKĖJIMO BŪDAS",
+      "paymentStatus": "MOKĖJIMO STATUSAS",
+      "shipping": "PRISTATYMAS",
+      "total": "VISO",
+      "dimensions": "Matmenys:",
+      "qty": "Kiekis:"
+    },
+    "status": {
+      "delivered": "Pristatyta",
+      "pending": "Laukiama",
+      "processing": "Vykdoma",
+      "completed": "Įvykdyta",
+      "cancelled": "Atšaukta",
+      "refunded": "Grąžinta",
+      "paid": "Apmokėta",
+      "failed": "Nepavyko",
+      "draft": "Juodraštis",
+      "issued": "Išrašyta",
+      "overdue": "Vėluoja"
+    },
+    "form": {
+      "back": "Atgal",
+      "myInformation": "Mano informacija",
+      "deliveryInformation": "Pristatymo informacija",
+      "edit": "Redaguoti",
+      "saveInline": "Išsaugoti",
+      "fullName": "Vardas, pavardė",
+      "companyNameOptional": "Įmonės pavadinimas (nebūtina)",
+      "email": "El. paštas",
+      "phoneNumber": "Tel. numeris",
+      "country": "Šalis",
+      "city": "Miestas",
+      "streetAddress": "Adresas",
+      "postcodeZip": "Pašto kodas",
+      "togglePasswordVisibility": "Rodyti / slėpti slaptažodį",
+      "save": "Išsaugoti",
+      "passwordRequired": "Užpildykite visus slaptažodžio laukus",
+      "passwordMismatch": "Slaptažodžiai nesutampa"
+    }
+  },
+  "common": {
+    "krepselis": "Krepšelis",
+    "paieska": "Paieška",
+    "filtruoti": "Filtruoti",
+    "rikiuoti": "Rikiuoti",
+    "isvalyti": "Išvalyti",
+    "taikyti": "Taikyti",
+    "atsaukti": "Atšaukti",
+    "issaugoti": "Išsaugoti",
+    "istrinti": "Ištrinti",
+    "redaguoti": "Redaguoti",
+    "uzdaryti": "Uždaryti",
+    "atgal": "Atgal",
+    "kitas": "Kitas",
+    "ankstesnis": "Ankstesnis",
+    "kraunasi": "Kraunasi...",
+    "sekmingai": "Sėkmingai!",
+    "klaida": "Klaida",
+    "bandykiteVel": "Bandykite vėl",
+    "ziuretiVisus": "Žiūrėti visus",
+    "viewAll": "Žiūrėti visus",
+    "ziuretiSmulkiau": "Žiūrėti smulkiau",
+    "suzinotiDaugiau": "Sužinoti daugiau",
+    "skaitykDaugiau": "Skaityti daugiau",
+    "rodytiDaugiau": "Rodyti daugiau",
+    "rodytiMaziau": "Rodyti mažiau",
+    "taip": "Taip",
+    "ne": "Ne",
+    "gerai": "Gerai",
+    "patvirtinti": "Patvirtinti",
+    "valiuta": "€",
+    "nuo": "Nuo",
+    "iki": "Iki",
+    "arba": "arba",
+    "ir": "ir"
+  },
+  "header": {
+    "grestasPristatymas": "Greitas pristatymas",
+    "piniguGrazinimas": "Pinigų grąžinimo garantija",
+    "ekologiskas": "Ekologiškas",
+    "fastDelivery": "Greitas pristatymas",
+    "moneyBack": "Pinigų grąžinimo garantija",
+    "ecoFriendly": "Ekologiškas",
+    "krepselis": "Krepšelis",
+    "meniu": "Meniu",
+    "atidarykMenu": "Atidaryti meniu",
+    "uzdarykMenu": "Uždaryti meniu"
+  },
+  "mobileMenu": {
+    "ctaGetInTouch": "Susisiekti"
+  },
+  "footer": {
+    "navigacija": "Navigacija",
+    "teisine": "Teisinė informacija",
+    "sekiteMus": "Sekite mus",
+    "privatumosPolitika": "Privatumo politika",
+    "naudojimoPolitika": "Naudojimo sąlygos",
+    "slapukuPolitika": "Slapukų politika",
+    "slapukuNustatymai": "Slapukų nustatymai",
+    "autorinesToises": "© 2024 Yakiwood. Visos teisės saugomos.",
+    "adresas": "Adresas",
+    "telefonas": "Telefonas",
+    "elektroninisPastas": "El. paštas",
+    "darbasLaikas": "Darbo laikas",
+    "pirmadienisPenktadienis": "Pirmadienis - Penktadienis",
+    "sestadienia": "Šeštadienis",
+    "sekmadienis": "Sekmadienis",
+    "shared": {
+      "columns": {
+        "information": "Informacija",
+        "clientCare": "Klientų aptarnavimas",
+        "social": "Socialiniai tinklai",
+        "account": "Paskyra"
+      },
+      "links": {
+        "about": "Apie mus",
+        "contacts": "Kontaktai",
+        "projects": "Projektai",
+        "blog": "Straipsniai",
+        "faqs": "DUK",
+        "policies": "Politikos",
+        "terms": "Taisyklės ir sąlygos",
+        "cookiePolicy": "Slapukų politika",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "myAccount": "Mano paskyra",
+        "shipping": "Pristatymas",
+        "refundPolicy": "Grąžinimo politika"
+      },
+      "paymentsAlt": "Mokėjimo būdai",
+      "copyright": "© {year} YAKIWOOD, LLC. Visos teisės saugomos"
+    }
+  },
+  "hero": {
+    "mainHeading": "Amžinas grožis, sustiprintas ugnies - ",
+    "brandName": "Yakiwood",
+    "description": "Atraskite deginto medienos elegancija ir ilgaamžiškumą, sukurtą naudojant senovinę japonų Shou Sugi Ban techniką.",
+    "from": "Nuo",
+    "buyNow": "Pirkti dabar",
+    "productName": "Shou sugi Ban Lentos",
+    "solutions": "Sprendimai",
+    "colors": "Spalvos",
+    "exploreCatalog": "Peržiūrėti katalogą",
+    "pagrindineAntraste": "Amžinas grožis, sustiprintas ugnies - ",
+    "prekesZenklas": "Yakiwood",
+    "aprasymas": "Atraskite deginto medienos elegancija ir ilgaamžiškumą, sukurtą naudojant senovinę japonų Shou Sugi Ban techniką.",
+    "pirktiDabar": "Pirkti dabar",
+    "pirkiniai": "Apsipirkti dabar",
+    "tirintiProduktus": "Tyrinėti produktus",
+    "produktoPavadinimas": "Shou sugi Ban Lentos",
+    "sprendimai": "Sprendimai",
+    "spalvos": "Spalvos"
+  },
+  "home": {
+    "products": {
+      "eyebrow": "Produktai",
+      "headline": {
+        "prefix": "Pasirinkite savo ",
+        "emphasis": "tobulą",
+        "suffix": " medienos apdailą"
+      },
+      "cta": {
+        "offer": "Gauti pasiūlymą",
+        "catalog": "Peržiūrėti katalogą"
+      },
+      "labels": {
+        "colors": "Spalvos"
+      },
+      "aria": {
+        "prevImage": "Ankstesnė nuotrauka",
+        "nextImage": "Kita nuotrauka",
+        "selectColor": "Pasirinkti {label} ({index}/{total})"
+      },
+      "finishes": {
+        "natural": "Natūrali",
+        "silver": "Sidabrinė",
+        "carbon": "Anglies",
+        "carbonLight": "Šviesi anglies",
+        "graphite": "Grafito",
+        "latte": "Latte",
+        "darkBrown": "Tamsiai ruda",
+        "black": "Juoda"
+      },
+      "items": {
+        "spruce": {
+          "title": "Eglė",
+          "description": "Lengva, bet tvirta eglės mediena pasižymi lygiu paviršiumi ir švaria natūralia apdaila. Dėl universalumo ir ilgaamžiškumo ji puikiai tinka tiek vidaus, tiek lauko sprendimams."
+        },
+        "larch": {
+          "title": "Maumedis",
+          "description": "Natūraliai atspari ir ilgaamžė maumedžio mediena puikiai tinka lauko sąlygoms. Tanki tekstūra ir sodrus atspalvis leidžia patikimai įrengti ilgaamžius fasadus bei paviršius."
+        },
+        "thermo": {
+          "title": "Termo",
+          "description": "Termiškai modifikuota mediena pasižymi stabilesniais matmenimis, tolygesniu tonu ir praktišku spalvų rinkiniu fasadams bei terasoms. Tai švaresnė, modernesnė alternatyva, kai norite mažiau vizualinės tekstūros."
+        }
+      }
+    }
+
+    ,
+    "whyUs": {
+      "eyebrow": "yakiwood",
+      "headline": "Esame <italic>degintos medienos</italic> paruošimo ekspertai, turintys ilgametę <italic>sėkmingą</italic> patirtį ruošiant medieną fasadams, terasoms, tvoroms ir interjerui, todėl garantuojame <italic>aukštą kokybę</italic> bei ilgalaikį <italic>rezultatą</italic>.",
+      "description": "Mūsų tikslas - padėti sukurti jaukią ir tvarią aplinką naudojant natūralų, laiko patikrintą medienos paruošimo būdą. Gaminame medieną pagal unikalią japonų deginimo technologiją \"Yakisugi\" (arba \"Shou Sugi Ban\") - tai natūraliausias būdas suteikti medienai ir apsaugines, ir estetines savybes.",
+      "benefits": {
+        "aesthetics": {
+          "title": "Graži natūrali estetika",
+          "description": "Ugnimi apdorota mediena tampa atsparesnė drėgmei, kenkėjams ir puviniui.",
+          "alt": "Ugnies piktograma - natūrali estetika"
+        },
+        "look": {
+          "title": "Išraiškinga išvaizda",
+          "description": "Gili tekstūra ir sodrūs tonai papuoš bet kokį dizainą.",
+          "alt": "Piktograma - išraiškinga išvaizda"
+        },
+        "eco": {
+          "title": "Draugiška aplinkai",
+          "description": "Tvariai gaunama mediena be kenksmingų chemikalų.",
+          "alt": "Lapo piktograma - ekologiška"
+        },
+        "versatile": {
+          "title": "Tinka bet kokiam projektui",
+          "description": "Puikiai tinka apkalimui, terasoms ir interjerui.",
+          "alt": "Kubas - universalumas"
+        }
+      }
+    },
+    "solutions": {
+      "eyebrow": "Sprendimai",
+      "headline": {
+        "prefix": "Universalūs ",
+        "emphasis": "sprendimai",
+        "suffix": " kiekvienam projektui"
+      },
+      "cta": {
+        "offer": "Gauti pasiūlymą",
+        "learnMore": "Sužinoti daugiau"
+      },
+      "items": {
+        "terrace": {
+          "title": "Terasa",
+          "description": "Lauko erdvės, sukurtos tarnauti ilgai. Ugnimi apdorotos terasinės lentos pasižymi natūralia tekstūra, neslystančiu paviršiumi ir išskirtiniu ilgaamžiškumu."
+        },
+        "facade": {
+          "title": "Fasadas",
+          "description": "Paverskite pastatą išskirtiniu - degintos medienos apdaila sujungia įspūdingą estetiką ir ilgalaikę apsaugą nuo aplinkos poveikio."
+        },
+        "fence": {
+          "title": "Tvora",
+          "description": "Privatu, elegantiška ir ilgaamžiška - degintos medienos tvora atlaiko sezonų kaitą ir išlaiko charakterį."
+        },
+        "interior": {
+          "title": "Interjeras",
+          "description": "Suteikite erdvei gylio, šilumos ir tekstūros su premium Shou Sugi Ban sienų apdailos sprendimais."
+        }
+      }
+    },
+    "projects": {
+      "eyebrow": "Projektai",
+      "headline": {
+        "prefix": "Įkvepiantys ",
+        "emphasis": "projektai",
+        "suffix": ""
+      },
+      "description": "Žmonės, pasirinkę degintą medieną, dažnai dalinasi teigiamais įspūdžiais ir patirtimis. Jie pastebi ne tik išskirtinę išvaizdą, bet ir funkcionalumą bei ilgaamžiškumą.",
+      "viewAll": "Peržiūrėti visus projektus",
+      "fallback": {
+        "project": "Projektas",
+        "title": "Projekto pavadinimas",
+        "location": "Vieta"
+      }
+    },
+    "steps": {
+      "eyebrow": "Procesas",
+      "headline": {
+        "prefix": "Paprastas ir greitas",
+        "emphasis": "užsakymo",
+        "suffix": "procesas"
+      },
+      "cta": {
+        "label": "Rinktis mediena",
+        "aria": "Rinktis mediena"
+      },
+      "items": {
+        "1": {
+          "title": "Susikonfigūruokite užsakymą",
+          "description": "Pasirinkite medienos tipą, spalvą, plotį ir ilgį pagal poreikį."
+        },
+        "2": {
+          "title": "Įdėkite į krepšelį ir apmokėkite",
+          "description": "Peržiūrėkite pasirinkimą ir tęskite saugų apmokėjimą."
+        },
+        "3": {
+          "title": "Pasirinkite pristatymą",
+          "description": "Išsirinkite jums tinkamiausią pristatymo būdą."
+        },
+        "4": {
+          "title": "Gaukite užsakymą",
+          "description": "Saugiai supakuosime ir pristatysime medieną iki jūsų durų."
+        }
+      }
+    },
+    "aboutUs": {
+      "eyebrow": "apie mus",
+      "headline": {
+        "prefix": "Mūsų istorija: kuriame ",
+        "quality": "kokybę",
+        "middle": " su ",
+        "passion": "aistra"
+      },
+      "description1": "Gerbiame senovinį japonų Shou Sugi Ban meną - ugnimi apdorojame medieną, kad sukurtume gražius, patvarius ir tvarius produktus. Kiekviena lenta pereina kruopštaus deginimo, šukavimo ir apdailos procesą, kad išryškėtų natūrali tekstūra.",
+      "description2": "Mūsų patirtis sujungia tradiciją ir inovacijas, todėl pristatome aukštos kokybės dailylentes, kurios puošia ir saugo jūsų erdves. Konsultuojame nuo idėjos iki montavimo, kad sprendimas būtų ilgaamžis ir pritaikytas jūsų projektui.",
+      "readAbout": "Skaityti apie mus",
+      "partners": "Mūsų partneriai",
+      "watch": "Žiūrėti",
+      "aria": {
+        "watchVideo": "Žiūrėti vaizdo įrašą",
+        "closeVideo": "Uždaryti vaizdo įrašą",
+        "dialog": "Vaizdo įrašas"
+      },
+      "close": "Uždaryti"
+    },
+    "cta": {
+      "headline": {
+        "prefix": "Pasiruošę ",
+        "emphasis": "kurti",
+        "suffix": " su ugnimi?"
+      },
+      "buttons": {
+        "offer": "Pirkti dabar",
+        "getInTouch": "Susisiekti",
+        "chooseWood": "Rinktis medieną"
+      }
+    },
+    "blog": {
+      "title": "Straipsniai apie Shou Sugi Ban",
+      "description": "Skaitykite straipsnius apie degintą medieną, dizaino sprendimus, priežiūrą ir projektų planavimą.",
+      "ogTitle": "Straipsniai - Yakiwood"
+    },
+    "faq": {
+      "eyebrow": "DUK",
+      "headline": {
+        "prefix": "Viskas, ką norėjote ",
+        "emphasis": "paklausti",
+        "suffix": " ir dar daugiau"
+      },
+      "items": {
+        "01": {
+          "question": "Kas yra Shou Sugi Ban?",
+          "answer": "Shou Sugi Ban - senovinė japonų technika, kai mediena apdeginama (apanglinama), kad būtų apsaugota ir išryškėtų natūrali tekstūra. Tokiu būdu mediena tampa atsparesnė aplinkos poveikiui, kenkėjams ir atmosferos sąlygoms, o paviršius įgauna išskirtinę estetiką - gilius tonus ir unikalią faktūrą."
+        },
+        "02": {
+          "question": "Kaip prižiūrėti Shou Sugi Ban medieną?",
+          "answer": "Shou Sugi Ban danga paprastai yra mažai priežiūros reikalaujanti. Kasdien nieko daryti nereikia - užtenka kartais nuplauti dulkes ir nešvarumus švelniu vandens srautu (pvz., pagal poreikį ar sezoniškai). Venkite aukšto slėgio plovimo ir abrazyvinių priemonių - jos gali pažeisti paviršiaus struktūrą. Jei paviršius alyvuotas, alyvą dažniausiai pakanka atnaujinti kas ~2-5 metus (priklausomai nuo saulės, lietaus ir fasado orientacijos)."
+        },
+        "03": {
+          "question": "Kur galima naudoti degintos medienos produktus?",
+          "answer": "Deginta (yakisugi) mediena puikiai tinka ventiliuojamiems fasadams, sienų ir lubų apdailai, dekoratyvinėms pertvaroms, tvoroms, vartams bei įvairiems eksterjero akcentams. Interjere ji dažnai naudojama akcentinėms sienoms ir baldų detalėms - svarbu pasirinkti tinkamą apdailą (pvz., alyvą ar laką), kad paviršius neteptų ir būtų lengviau valomas. Lauko sąlygomis geriausią ilgaamžiškumą užtikrina teisingas konstrukcinis sprendimas: ventiliacija, tinkami tvirtinimai ir apsauga nuo nuolatinio vandens užsilaikymo."
+        },
+        "04": {
+          "question": "Kaip montuojama Shou Sugi Ban mediena?",
+          "answer": "Dažniausiai Shou Sugi Ban lentos montuojamos kaip ventiliuojamo fasado dailylentės ant tašų/karkaso, paliekant oro tarpą drėgmės išgarinimui. Rekomenduojama naudoti nerūdijančio plieno tvirtinimo elementus, laikytis gamintojo nurodytų tarpų plėtimuisi ir montuoti su teisingu vandens nubėgimu. Pjūvių vietas (galus) verta papildomai apsaugoti - alyvuoti ar sandarinti pagal pasirinktą sistemą. Prieš montuojant medieną svarbu tinkamai laikyti (sausai, vėdinamai) ir, jei reikia, iš anksto pragręžti tvirtinimo vietas, kad būtų išvengta skilimų."
+        },
+        "05": {
+          "question": "Ar Shou Sugi Ban tinka vidaus apdailai?",
+          "answer": "Taip - Shou Sugi Ban tinka interjerui (akcentinėms sienoms, luboms, nišoms, baldų detalėms). Vidaus apdailai rekomenduojame rinktis alyvuotą paviršių: teisingai apdorojus ir alyvavus, paviršius netepa ir niekas „nebyra“, o priežiūra paprasta."
+        },
+        "06": {
+          "question": "Ar Yakisugi tinka visiems klimatams?",
+          "answer": "Yakisugi sprendimai puikiai pasiteisina įvairiuose klimatuose, tačiau ilgaamžiškumas labiausiai priklauso nuo medienos rūšies, deginimo/šukavimo intensyvumo, pasirinktos apdailos ir konstrukcijos. Drėgname ar pajūrio klimate bei pietinėje fasado pusėje (didelė UV apkrova) apdailą gali tekti atnaujinti dažniau. Svarbiausia - ventiliuojamas montavimas, tinkamas vandens nuvedimas ir teisinga eksploatacija (kad vanduo neužsilaikytų ant paviršiaus)."
+        },
+        "07": {
+          "question": "Kokie yra standartiniai Shou Sugi Ban lentų matmenys?",
+          "answer": "Standartiniai fasadinių lentų plotiai dažniausiai yra 95-145 mm, o ilgiai - 3-6 m (priklausomai nuo profilio ir medienos rūšies). Konkrečius matmenis parenkame pagal pasirinktą profilį ir projektą - galimi ir nestandartiniai sprendimai."
+        }
+      }
+    }
+  },
+  "languageSwitcher": {
+    "toggleAria": "Pasirinkti kalbą",
+    "optionsAria": "Galimos kalbos"
+  },
+  "product": {
+    "spalva": "Spalva",
+    "spalvos": "Spalvos",
+    "apdaila": "Apdaila",
+    "dydis": "Dydis",
+    "matmenys": "Matmenys",
+    "kiekis": "Kiekis",
+    "kaina": "Kaina",
+    "kainaNuo": "Nuo",
+    "bazineKaina": "Bazinė kaina",
+    "bendrKaina": "Bendra kaina",
+    "aprasymas": "Aprašymas",
+    "specifikacijos": "Specifikacijos",
+    "ypatumai": "Ypatybės",
+    "medziaga": "Medžiaga",
+    "svoris": "Svoris",
+    "montavimas": "Montavimas",
+    "idetiIKrepseli": "Įdėti į krepšelį",
+    "pirktiDabar": "Pirkti dabar",
+    "sandely": "Sandėlyje",
+    "issemta": "Išparduota",
+    "prieinamas": "Prieinamas",
+    "isanksinis Uzsakymas": "Išankstinis užsakymas",
+    "greitaiPrieinamas": "Greitai prieinamas",
+    "nebegaminamas": "Nebegaminamas",
+    "ribotas Kiekis": "Ribotas kiekis",
+    "mazsKiekis": "Mažas kiekis",
+    "likoTik": "Liko tik {count}",
+    "ziuretiProdukta": "Žiūrėti produktą",
+    "susije Produktai": "Susiję produktai",
+    "rekomenduojami": "Rekomenduojami produktai",
+    "medienos Tipas": "Medienos tipas",
+    "kategorija": "Kategorija",
+    "kategorijos": "Kategorijos",
+    "sprendimai": "Sprendimai",
+    "pritaikymas": "Pritaikymas"
+  },
+  "productPage": {
+    "fromPrice": "Nuo {price} €/m²",
+    "back": "Atgal",
+    "photo": "Foto",
+    "view3d": "3D",
+    "relatedProducts": {
+      "title": "Panašūs produktai",
+      "viewAll": "Peržiūrėti visus produktus"
+    },
+    "toggleShowPhotoAria": "Rodyti nuotrauką",
+    "toggleShow3dAria": "Rodyti 3D vaizdą",
+    "thicknessLabel": "Storis",
+    "widthLabel": "Plotis",
+    "lengthLabel": "Ilgis",
+    "solutionsLabel": "Sprendimai",
+    "profilesLabel": "Profiliai",
+    "benefitsLabel": "Privalumai",
+    "descriptionFallback": "Produkto aprašymas ruošiamas.",
+    "itemAdded": "Produktas pridėtas į krepšelį",
+    "colorLabelInline": "Spalva:",
+    "selectColorPlaceholder": "Pasirinkite spalvą",
+    "ctaQuote": "Gauti pasiūlymą",
+    "ctaContact": "Susisiekti",
+    "solutions": {
+      "facade": "Fasadai",
+      "cladding": "Fasadai",
+      "fence": "Tvora",
+      "terrace": "Terasa",
+      "decking": "Lentos",
+      "interior": "Interjeras",
+      "tiles": "Plytelės"
+    },
+    "woodTypes": {
+      "spruce": "Eglė",
+      "larch": "Maumedis",
+      "thermo": "Termo"
+    },
+    "benefits": {
+      "aesthetics": {
+        "title": "GRAŽI NATŪRALI ESTETIKA",
+        "content": "Dėl ryškių raštų ir šiltų tonų deginta mediena suteikia modernų, bet kartu ir natūralų įvaizdį."
+      },
+      "eco": {
+        "title": "TVARU IR DRAUGIŠKA APLINKAI",
+        "content": "Ilgaamžė mediena ir natūralus apdorojimas padeda sumažinti priežiūros ir atnaujinimo poreikį."
+      },
+      "durability": {
+        "title": "IŠSKIRTINIS ATSPARUMAS",
+        "content": "Shou Sugi Ban technologija padidina atsparumą aplinkos poveikiui ir prailgina tarnavimo laiką."
+      },
+      "maintenance": {
+        "title": "MAŽA PRIEŽIŪRA IR ILGA TARNYBA",
+        "content": "Minimalus aptarnavimas ir ilgas eksploatacijos laikas - patogu tiek fasadams, tiek terasoms."
+      }
+    }
+  },
+  "cookieConsent": {
+    "title": "Slapukai",
+    "description": "Naudojame slapukus, kad užtikrintume svetainės veikimą ir (su Jūsų sutikimu) analizuotume naudojimą.",
+    "policyLink": "Slapukų politika",
+    "reject": "Atmesti",
+    "accept": "Sutinku",
+    "customize": "Nustatymai",
+    "save": "Išsaugoti",
+    "necessary": "Būtini",
+    "alwaysOn": "visada įjungti",
+    "analytics": "Analitiniai",
+    "analyticsHint": "padeda suprasti naudojimą",
+    "marketing": "Marketingo",
+    "marketingHint": "personalizuotai reklamai"
+  },
+  "checkout": {
+    "title": "Atsiskaitymas",
+    "contact": {
+      "title": "Kontaktinė informacija",
+      "haveAccountLogin": "Turite paskyrą? Prisijunkite",
+      "fullName": "Vardas, pavardė ",
+      "companyNameOptional": "Įmonės pavadinimas (nebūtina)",
+      "email": "El. paštas ",
+      "phone": "Tel. numeris "
+    },
+    "delivery": {
+      "title": "Pristatymo informacija",
+      "alternateTitle": "Kitas pristatymo adresas",
+      "country": "Šalis ",
+      "city": "Miestas ",
+      "address": "Adresas ",
+      "postalCode": "Pašto kodas ",
+      "deliverDifferentAddress": "Pristatyti kitu adresu?",
+      "notesOptional": "Pastabos užsakymui (nebūtina)"
+    },
+    "items": {
+      "title": "Prekės",
+      "hint": "Jei kaina priklauso nuo ilgio / pločio (m²), nurodykite matmenis milimetrais.",
+      "widthMm": "Plotis (mm)",
+      "lengthMm": "Ilgis (mm)"
+    },
+    "payment": {
+      "title": "Mokėjimo būdas",
+      "stripeCard": "Mokėjimo kortelė (Stripe)",
+      "paysera": "Paysera",
+      "cardNumber": "Kortelės numeris ",
+      "expiryDate": "Galiojimo data ",
+      "cvc": "CVC kodas ",
+      "paypalInfo": "Apmokėjimas vyks per PayPal - po pateikimo būsite nukreipti į PayPal langą.",
+      "paypalUnavailable": "Šiuo metu atsiskaityti per PayPal negalima.",
+      "payseraInfo": "Apmokėjimas vyks per Paysera - po pateikimo būsite nukreipti į Paysera langą.",
+      "saveInfo": "Išsaugoti šią informaciją kitam kartui",
+      "creditDebitCard": "Kreditinė / debetinė kortelė"
+    },
+    "terms": {
+      "agreeTo": "Sutinku su <terms>Taisyklėmis ir sąlygomis</terms> bei <privacy>Privatumo politika</privacy>",
+      "terms": "Taisyklėmis ir sąlygomis",
+      "privacy": "Privatumo politika",
+      "customMadeAcknowledgement": "Suprantu, kad individualiai gaminamų produktų negalima atšaukti, kai gamyba jau pradėta."
+    },
+    "termsAccordion": {
+      "termsTitle": "Taisyklės ir sąlygos",
+      "privacyTitle": "Privatumo politika",
+      "termsBody": "1. BENDROSIOS SĄLYGOS\nPateikdami užsakymą patvirtinate, kad susipažinote su šiomis sąlygomis ir sutinkate jų laikytis.\n\n2. UŽSAKYMO PATEIKIMAS\nUžsakymas laikomas pateiktu, kai užpildote atsiskaitymo formą ir patvirtinate apmokėjimą.\n\n3. KAINOS IR APMOKĖJIMAS\nVisos kainos pateikiamos eurais. Apmokėjimas vykdomas pasirinktu mokėjimo būdu.\n\n4. PRISTATYMAS\nPristatymo terminai ir kaina nurodomi užsakymo metu.\n\n5. GRĄŽINIMAS\nGrąžinimo sąlygos taikomos pagal galiojančius teisės aktus ir mūsų grąžinimo politiką.\n\n6. ATSAKOMYBĖ\nMes neatsakome už vėlavimus, atsiradusius dėl trečiųjų šalių (kurjerių, mokėjimo tiekėjų).\n\n7. KONTAKTAI\nJei turite klausimų, susisiekite per kontaktų puslapį.",
+      "privacyBody": "1. DUOMENŲ TVARKYMO TIKSLAS\nJūsų duomenys naudojami užsakymo vykdymui, pristatymui ir komunikacijai.\n\n2. KOKIUS DUOMENIS RENKAME\nKontaktiniai duomenys, pristatymo adresas, užsakymo informacija.\n\n3. DUOMENŲ SAUGOJIMAS\nDuomenis saugome tiek, kiek būtina užsakymo vykdymui ir teisinių prievolių įvykdymui.\n\n4. DUOMENŲ PERDAVIMAS\nDuomenys gali būti perduodami mokėjimo paslaugų teikėjams ir pristatymo partneriams.\n\n5. JŪSŲ TEISĖS\nTurite teisę susipažinti, taisyti ar prašyti ištrinti savo duomenis.\n\n6. KONTAKTAI\nDėl privatumo klausimų kreipkitės per kontaktų puslapį.",
+      "fullPolicyLink": "Peržiūrėti pilną tekstą"
+    },
+    "actions": {
+      "backToCart": "Grįžti į krepšelį",
+      "submitOrder": "Pateikti užsakymą",
+      "processing": "Vykdoma..."
+    },
+    "summary": {
+      "title": "Jūsų užsakymas ({count})",
+      "remove": "Pašalinti",
+      "subtotal": "Tarpinė suma",
+      "shipping": "Pristatymas",
+      "subtotalExVat": "Suma be PVM",
+      "vatAmount": "PVM ({rate}%)",
+      "total": "Viso",
+      "includingTaxes": "Įskaitant mokesčius",
+      "colorLabel": "Spalva:",
+      "finishLabel": "Apdaila:",
+      "profileLabel": "Profilis:",
+      "dimensions": "Matmenys: {widthMm}×{lengthMm} mm",
+      "quantity": "Kiekis: {count} vnt"
+    },
+    "coupon": {
+      "placeholder": "Įveskite nuolaidos kodą",
+      "apply": "Taikyti"
+    },
+    "success": {
+      "withNumber": "Užsakymas {orderNumber} sukurtas. Susisieksime su jumis dėl tolimesnių veiksmų.",
+      "withoutNumber": "Užsakymas sukurtas. Susisieksime su jumis dėl tolimesnių veiksmų.",
+      "passwordResetEmailSent": "Išsiuntėme el. laišką su slaptažodžio atnaujinimo nuoroda."
+    },
+    "errors": {
+      "orderCreateFailed": "Nepavyko sukurti užsakymo",
+      "orderIdMissing": "Nepavyko gauti užsakymo ID",
+      "paymentSessionFailed": "Nepavyko sukurti mokėjimo sesijos",
+      "paymentUrlMissing": "Negautas mokėjimo URL",
+      "generic": "Įvyko klaida. Bandykite dar kartą."
+    }
+  },
+  "orderConfirmationPage": {
+    "loading": "Kraunasi...",
+    "errorTitle": "Klaida",
+    "backHome": "Grįžti į pradžią",
+    "title": "Dėkojame už užsakymą!",
+    "messagePaid": "Jūsų mokėjimas buvo sėkmingai apdorotas. Netrukus gausite el. laišką su užsakymo patvirtinimu ir sąskaita faktūra.",
+    "messagePaysera": "Jūsų užsakymas sukurtas. Mokėjimą patvirtinsime, kai gausime Paysera patvirtinimą. Netrukus gausite el. laišką su užsakymo patvirtinimu.",
+    "paypalIdLabel": "PayPal ID",
+    "orderIdLabel": "Užsakymo ID",
+    "sessionIdLabel": "Sesijos ID",
+    "summaryTitle": "Užsakymo santrauka",
+    "summaryTotal": "Viso",
+    "summaryEmpty": "Užsakymo duomenų rasti nepavyko. Patikrinkite el. paštą dėl patvirtinimo.",
+    "variantLabel": "Variantas",
+    "qtyLabel": "Kiekis",
+    "priceLabel": "Kaina",
+    "nextStepsTitle": "Kas toliau?",
+    "nextStep1": "Užsakymas patvirtinamas po sėkmingo apmokėjimo. Individualių gaminių gamyba pradedama per 24-48 val., o JK sandėlyje esančios prekės išsiunčiamos per 2-3 darbo dienas.",
+    "nextStep2": "Pristatymas vykdomas visoje Didžiosios Britanijos žemyninėje dalyje. Į Šiaurės Airiją, Highlands ir salų teritorijas gali būti taikomi papildomi mokesčiai.",
+    "nextStep3": "Pristatymas vykdomas tik iki sklypo ribos (kerbside). Būkite pristatymo vietoje, apžiūrėkite prekes ir apie pažeidimus praneškite per 48 val. su nuotraukomis.",
+    "nextStep4": "Individualiai gaminamų produktų negalima atšaukti po gamybos pradžios. Standartinių (ne individualių) prekių atsisakyti galima per 14 dienų nuo pristatymo.",
+    "viewOrders": "Peržiūrėti užsakymus",
+    "continueShopping": "Tęsti apsipirkimą",
+    "supportTitle": "Turite klausimų apie užsakymą?",
+    "supportLink": "Susisiekite su mumis"
+  },
+  "products": {
+    "pavadinimas": "Produktai",
+    "visiProduk tai": "Visi produktai",
+    "produktuNera": "Produktų nerasta",
+    "produktuNeraAprasymas": "Pabandykite pakeisti filtrus arba paieškos žodžius",
+    "rodomRezultatai": "Rodoma {count} rezultatų",
+    "filtruoti": "Filtruoti pagal",
+    "rikiuoti": "Rikiuoti pagal",
+    "kainuDiapazonas": "Kainų diapazonas",
+    "minKaina": "Min. kaina",
+    "maxKaina": "Max. kaina",
+    "prieinamumas": "Prieinamumas",
+    "tikSandely": "Tik sandėlyje",
+    "isvalytiFiltrus": "Išvalyti visus filtrus",
+    "aktyvisFiltrai": "Aktyvūs filtrai",
+    "rikiuotiNaujausi": "Naujausi",
+    "rikiuotiSeniausi": "Seniausi",
+    "rikiuotiKainaMazai": "Kaina: Nuo mažiausios",
+    "rikiuotiKainaDideli": "Kaina: Nuo didžiausios",
+    "rikiuotiPavadinimasAZ": "Pavadinimas: A-Ž",
+    "rikiuotiPavadinimasZA": "Pavadinimas: Ž-A",
+    "elementuPuslapis": "Elementų puslapyje",
+    "egle": "Eglės mediena",
+    "maumedis": "Maumedžio mediena",
+    "pusispu": "Pušies mediena",
+    "lengvasAprasymas": "Lengva, bet stipri eglės mediena siūlo sklandų tekstūrą ir natūralų, švarų paviršių. Jos universalumas ir ilgaamžiškumas daro ją puikiu pasirinkimu tiek vidaus, tiek išorės pritaikymui."
+  },
+  "solutions": {
+    "pavadinimas": "Sprendimai",
+    "fasadai": "Fasadai",
+    "tvoroFenc": "Tvora",
+    "terasa": "Terasa",
+    "vidus": "Vidaus",
+    "isore": "Išorės",
+    "apdaila": "Apdaila",
+    "denginiai": "Denginiai",
+    "grindys": "Grindys"
+  },
+  "projects": {
+    "pavadinimas": "Projektai",
+    "visiProjektai": "Visi projektai",
+    "ziuretiProjekta": "Žiūrėti projektą",
+    "projektoDetaless": "Projekto detalės",
+    "vieta": "Vieta",
+    "metai": "Metai",
+    "klientas": "Klientas",
+    "architektas": "Architektas",
+    "naudoti Produktai": "Naudoti produktai",
+    "projektuNera": "Projektų nerasta"
+  },
+  "about": {
+    "pavadinimas": "Apie mus",
+    "apieYakiwood": "Apie Yakiwood",
+    "musulst Istorija": "Mūsų istorija",
+    "musuMisija": "Mūsų misija",
+    "musuVertybes": "Mūsų vertybės",
+    "musuKomanda": "Mūsų komanda",
+    "kodel Pasirinkti": "Kodėl pasirinkti mus",
+    "kokybe": "Kokybė",
+    "patirtis": "Patirtis",
+    "tvarumas": "Tvarumas",
+    "inovacijos": "Inovacijos",
+    "susisiekite": "Susisiekite su mumis",
+    "page": {
+      "heroTitle": "Apie mus",
+      "heroLead": "Yakiwood esame degintos medienos paruošimo ekspertai - specializuojamės fasadų, terasų, tvorų ir interjero sprendimuose. Sukaupta patirtis leidžia užtikrinti aukštą kokybę ir ilgaamžį rezultatą, taikant natūralų, laiko patikrintą medienos apdirbimo metodą.",
+      "heroBody": "Gaminame medieną, paruoštą pagal unikalią, laiko patikrintą japonišką medienos deginimo technologiją „Yakisugi“ (dar vadinamą „Shou Sugi Ban“). Tai vienas natūraliausių medienos paruošimo būdų, suteikiantis tiek apsauginę, tiek estetinę funkciją. Šimtmečius skaičiuojanti tradicija atsirado siekiant apsaugoti medieną nuo aplinkos poveikio. Degimas sutraukia medienos paviršiaus poras, todėl ji tampa tvirtesnė ir atsparesnė, kartu išlaikydama natūralumą, raštą ir spalvą.",
+      "videoAlt": "Yakiwood proceso vaizdo įrašas",
+      "videoAria": "Žiūrėti vaizdo įrašą",
+      "videoWatch": "Žiūrėti",
+
+      "foundationsEyebrow": "Mūsų pagrindai",
+      "foundationsTitlePrefix": "Vedami tradicijos, skatinami",
+      "foundationsTitleItalic": "tikslu",
+
+      "missionTitle": "Mūsų misija",
+      "missionBody": "Mūsų tikslas - padėti jums sukurti jaukią ir tvarią aplinką, naudojant Yakisugi (Shou Sugi Ban) - tradicinę japonišką medienos deginimo techniką, kuri sustiprina medienos apsaugą ir estetiką.",
+
+      "visionTitle": "Mūsų vizija",
+      "visionBody": "Tapti pirmaujančiu tvarių degintos medienos sprendimų tiekėju Lietuvoje ir už jos ribų, įkvepiant rinktis natūralias, ilgaamžes ir aplinkai draugiškas medžiagas architektūroje bei interjere. Siekiame puoselėti tradiciją ir kartu diegti inovacijas žalesnei ateičiai.",
+      "visionBodyMobile": "Tapti pirmaujančiu tvarių degintos medienos sprendimų tiekėju Lietuvoje ir už jos ribų, įkvepiant rinktis natūralias, ilgaamžes ir aplinkai draugiškas medžiagas. Puoselėjame tradiciją ir diegiame inovacijas žalesnei ateičiai.",
+
+      "promiseTitle": "Mūsų pažadas",
+      "promiseBody": "Nesvarbu, ar tai būtų fasadai, terasos, tvoros ar interjero sprendimai - degintos medienos apdaila suteikia šilumos, stiliaus ir ilgalaikę apsaugą jūsų namams bei aplinkai.",
+
+      "valuesTitle": "Mūsų vertybės",
+      "valueCraftsmanshipTitle": "Meistriškumas",
+      "valueCraftsmanshipBody": "Didžiuojamės savo darbu ir skiriame ypatingą dėmesį kiekvienai detalei, kad užtikrintume aukščiausią kokybę.",
+      "valueSustainabilityTitle": "Tvarumas",
+      "valueSustainabilityBody": "Tikime aplinkai draugiškais sprendimais, kurie saugo gamtą ir praturtina jūsų gyvenamąją erdvę.",
+      "valueAuthenticityTitle": "Autentiškumas",
+      "valueAuthenticityBody": "Gerbiame šimtmečių Yakisugi tradiciją ir pateikiame medieną, kuri išlaiko natūralų grožį bei tvirtumą.",
+      "valueCraftsmanshipBodyMobile": "Didžiuojamės savo darbu ir skiriame dėmesį kiekvienai detalei.",
+      "valueSustainabilityBodyMobile": "Tikime aplinkai draugiškais sprendimais, kurie saugo gamtą.",
+      "valueAuthenticityBodyMobile": "Gerbiame šimtmečių Yakisugi tradiciją.",
+
+      "foundationsBlurbA": "Degintos medienos gaminiai kuriami naudojant šimtmečius skaičiuojantį japonišką metodą, kuris natūraliai sustiprina ir konservuoja medieną sutraukdamas jos poras. Procesas didina ilgaamžiškumą, išlaikant natūralią tekstūrą, raštą ir spalvą.",
+      "foundationsBlurbB": "Mūsų meistrai dirba kruopščiai ir atsakingai, kad kiekviena detalė atitiktų aukščiausius standartus. Naudojame ilgaamžiškiausias medienos rūšis - eglę ir maumedį - bei impregnuojame natūraliais aliejais, kad išgautume išskirtines spalvas ir patikimą apsaugą.",
+
+      "processEyebrow": "Mūsų procesas",
+      "processTitlePrefix": "Degintos medienos",
+      "processTitleItalic": "menas:",
+      "processTitleSuffix": "mūsų procesas",
+      "processBodyA": "Deginta mediena išgaunama deginant medieną itin aukštoje temperatūroje specialioje krosnyje, sukuriant natūralų ir vaizdingą paviršių. Šis procesas suteikia unikalių tekstūrų ir spalvų, didina atsparumą drėgmei bei ugniai.",
+      "processBodyB": "Jei norite savo namams ar verslo erdvėms suteikti išskirtinę ir ekologišką apdailą, verta rinktis degintą medieną. Ji suteikia interjerui savitą, stilingą išvaizdą ir kartu prisideda prie aplinkos tausojimo.",
+      "processBodyMobile": "Deginta mediena išgaunama deginant medieną itin aukštoje temperatūroje specialioje krosnyje, sukuriant natūralų ir vaizdingą paviršių. Šis procesas suteikia unikalių tekstūrų ir spalvų, didina atsparumą drėgmei bei ugniai.",
+
+      "step1Title": "Medienos paruošimas",
+      "step1Body": "Pirmiausia paruošiamos lentos - pašalinamos dulkės ir nešvarumai.",
+      "step2Title": "Degimas ir šukavimas",
+      "step2Body": "Mediena įkaitinama iki labai aukštos temperatūros - taip lentai suteikiamos unikalios tekstūros ir spalvos.",
+      "step3Title": "Aliejavimas",
+      "step3Body": "Visiškai atvėsus, lenta apdorojama ir padengiama apsauginiu sluoksniu.",
+
+      "ctaTitlePrefix": "Pasiruošę",
+      "ctaTitleItalic": "kurti",
+      "ctaTitleSuffix": "su ugnimi?",
+      "ctaShopNow": "Pirkti dabar",
+      "ctaGetInTouch": "Susisiekti",
+
+      "modalLabel": "Vaizdo įrašas",
+      "modalCloseOverlay": "Uždaryti vaizdo įrašą",
+      "modalCloseButton": "Uždaryti",
+      "modalIframeTitle": "YouTube vaizdo įrašas",
+
+      "teamEyebrow": "Mūsų komanda",
+      "teamTitlePrefix": "Susipažinkite su",
+      "teamTitleItalic": "ekspertais",
+      "teamTitleSuffix": "už Yakiwood",
+      "teamMemberAlt": "Komandos narys",
+      "teamMemberName": "Vardas Pavardė",
+      "teamMemberRole": "Direktorius"
+    }
+  },
+  "contact": {
+    "pavadinimas": "Susisiekite su mumis",
+    "paantraste": "Reikia pagalbos? Palikite savo kontaktus, ir mūsų vadybininkas susisieks konsultacijai.",
+    "pilnasVardas": "Pilnas vardas",
+    "elektroninisPastas": "El. pašto adresas",
+    "telefona Numeris": "Telefono numeris",
+    "zinute": "Žinutė",
+    "tema": "Tema",
+    "imone": "Įmonė",
+    "siustiZinute": "Siųsti žinutę",
+    "paliктiPraasyma": "Palikti užklausą",
+    "siunčiama": "Siunčiama...",
+    "aciu": "Ačiū!",
+    "aciuZinute": "Netrukus susisieksime su jumis.",
+    "atsaikimasLaikas": "Paprastai atsakome per 24 valandas",
+    "privaloma": "Privalomas laukas",
+    "privalomasZymė": "*",
+    "netinkamasElPastas": "Netinkamas el. pašto adresas",
+    "netinkamasTelefonas": "Netinkamas telefono numeris",
+    "zinuteIsiusta": "Žinutė sėkmingai išsiųsta",
+    "zinuteKlaida": "Nepavyko išsiųsti žinutės. Bandykite dar kartą.",
+    "susisiekite": "Susisiekite",
+    "kontaktinInformacija": "Kontaktinė informacija",
+    "biuro Adresas": "Biuro adresas",
+    "darboValandos": "Darbo valandos",
+    "privatumo Sutikimas": "Sutinku, kad mano duomenys būtų tvarkomi tiesiogiai Yakiwood arba bendrinti su pardavimo agentu, esančiu mano rajone, pagal Yakiwood",
+    "privatumo Politika": "Privatumo politiką",
+
+    "title": "Susisiekite su mumis",
+    "subtitle": "Reikia pagalbos? Palikite savo kontaktus, ir mūsų vadybininkas susisieks konsultacijai.",
+    "fullName": "Vardas, pavardė",
+    "email": "El. pašto adresas",
+    "phone": "Telefono numeris",
+    "message": "Žinutė",
+    "subject": "Tema",
+    "company": "Įmonė",
+    "sendMessage": "Siųsti žinutę",
+    "leaveRequest": "Palikti užklausą",
+    "sending": "Siunčiama...",
+    "thankYou": "Ačiū!",
+    "thankYouMessage": "Netrukus susisieksime su jumis.",
+    "responseTime": "Paprastai atsakome per 24 valandas",
+    "required": "Privalomas laukas",
+    "requiredMark": "*",
+    "invalidEmail": "Netinkamas el. pašto adresas",
+    "invalidPhone": "Netinkamas telefono numeris",
+    "messageSent": "Žinutė sėkmingai išsiųsta",
+    "messageError": "Nepavyko išsiųsti. Bandykite dar kartą.",
+    "getInTouch": "Susisiekite",
+    "contactInfo": "Kontaktinė informacija",
+    "companyNameLabel": "Įmonės pavadinimas",
+    "addressLabel": "Adresas",
+    "companyCodeLabel": "Įmonės kodas",
+    "vatCodeLabel": "PVM kodas",
+    "emailLabel": "El. paštas",
+    "phoneLabel": "Telefonas",
+    "officeAddress": "Biuro adresas",
+    "businessHours": "Darbo valandos",
+    "privacyConsent": "Sutinku, kad mano duomenys būtų tvarkomi tiesiogiai Yakiwood arba bendrinami su pardavimo agentu, esančiu mano rajone, pagal Yakiwood",
+    "privacyPolicy": "Privatumo politiką",
+    "recaptchaRequired": "Patvirtinkite, kad nesate robotas."
+  },
+  "faq": {
+    "pavadinimas": "DUK",
+    "antraste": "Viskas, ką norėjote",
+    "antrasteKursyvu": "paklausti",
+    "antrastePatbaiga": "ir daugiau",
+    "klausimas1": "Kas yra Shou Sugi Ban?",
+    "atsakymas1": "Shou Sugi Ban yra senovinė japonų technika, apimanti medienos degimą, kad apsaugotų ir pagerinti jos natūralų grožį. Šis tradicinis metodas atsirado kaip būdas padaryti medieną atsparesnę gamtos veiksniams, įskaitant vabzdžius, ugnį ir oro poveikį. Procesas sukuria nuostabų estetiką, siūlydamas gilių juodų atspalvių derinį, unikalias tekstūras ir elegantišką, rustiškį išvaizdą, kuri traukia architektus ir namų savininkus.",
+    "klausimas2": "Kaip prižiūrėti Shou Sugi Ban medieną?",
+    "atsakymas2": "Priežiūros detalės čia...",
+    "klausimas3": "Kur galima naudoti apdegintės medienos produktus?",
+    "atsakymas3": "Naudojimo detalės čia...",
+    "klausimas4": "Kaip montuojamas Shou Sugi Ban?",
+    "atsakymas4": "Montavimo detalės čia...",
+    "klausimas5": "Ar Shou Sugi Ban tinka vidaus naudojimui?",
+    "atsakymas5": "Vidaus naudojimo detalės čia...",
+    "klausimas6": "Ar Yakisugi tinka visoms klimato zonoms?",
+    "atsakymas6": "Klimato detalės čia...",
+    "klausimas7": "Kokie standartiniai Shou Sugi Ban lentų matmenys?",
+    "atsakymas7": "Matmenų detalės čia...",
+    "klausumu Nera": "Dažnai užduodamų klausimų dar nėra"
+  },
+  "testimonials": {
+    "eyebrow": "atsiliepimai",
+    "pavadinimas": "Ką sako mūsų klientai",
+    "antraste": "Ką sako mūsų klientai",
+    "aria": {
+      "previous": "Ankstesnis atsiliepimas",
+      "next": "Kitas atsiliepimas"
+    },
+    "atsiliepimas1": {
+      "citata": "Apdeginta mediena puikiai papildė mūsų šiuolaikinio namo dizainą. Atrodo nuostabiai!",
+      "autorius": "Jonas K.",
+      "role": "Namų savininkas"
+    },
+    "atsiliepimas2": {
+      "citata": "Profesionali paslauga ir išskirtinė kokybė. Labai rekomenduoju!",
+      "autorius": "Mindaugas P.",
+      "role": "Architektas"
+    },
+    "atsiliepimas3": {
+      "citata": "Puikus meistriškumas ir dėmesys detalėms. Viršijo mūsų lūkesčius!",
+      "autorius": "Laura S.",
+      "role": "Interjero dizainerė"
+    }
+  },
+  "configurator": {
+    "pageTitle": "3D konfiguratorius",
+    "pageDescription": "Pasirinkite spalvą ir profilį, kad pamatytumėte produkto vaizdą 3D erdvėje.",
+    "loadError": "Nepavyko įkelti produktų.",
+    "fallbackNote": "Rodomas demonstracinis konfiguratorius, nes produktų duomenys nebuvo rasti.",
+    "demoExampleLabel": "Demo 3D (pavyzdys)",
+    "loadingModel": "Kraunamas 3D modelis...",
+    "controlsHint": "Naudokite pelę norėdami pasukti, priartinti ir perkelti",
+    "pauseRotation": "Sustabdyti sukimąsi",
+    "resumeRotation": "Įjungti sukimąsi",
+    "visualScaleNotice": "Pastaba: 3D peržiūroje ilgis rodomas sutrumpintai (vizualinis mastelis). Tikras gaminio ilgis — pagal pasirinktus mm.",
+    "colorLabel": "Spalva",
+    "profileLabel": "Profilis",
+    "selectColorAria": "Pasirinkti spalvą {name}",
+    "noteTitle": "Pastaba:",
+    "noteBody": "Tikroji spalva ir tekstūra gali šiek tiek skirtis nuo čia rodomos. Kiekviena lentelė yra unikali dėl natūralios medienos savybių.",
+    "basePriceLabel": "Bazinė kaina",
+
+    "pricingTitle": "Kaina",
+    "inputModeLabel": "Skaičiuoti pagal",
+    "inputModeBoards": "Lentomis",
+    "inputModeArea": "m²",
+    "quantityBoardsLabel": "Kiekis (lentomis)",
+    "targetAreaLabel": "Plotas (m²)",
+    "roundingNotice": "Suapvalinta iki {boards} lentų ({actualArea} m²)",
+    "unitPricePerM2Label": "Kaina už m²",
+    "unitPricePerBoardLabel": "Kaina už 1 lentą",
+    "totalAreaLabel": "Visas plotas",
+    "lineTotalLabel": "Suma",
+    "calculatingPrice": "Skaičiuojama kaina...",
+    "priceNotAvailable": "Kaina nerasta šiai konfigūracijai",
+    "pavadinimas": "3D produkto konfigūratorius",
+    "paantraste": "Pritaikykite savo produktą",
+    "spalva": "Spalva",
+    "apdaila": "Apdaila",
+    "dydis": "Dydis",
+    "pritaikymas": "Pritaikymas",
+    "peržiūra": "Peržiūra",
+    "idetiIKrepseli": "Įdėti į krepšelį",
+    "issaugotiKonfiguracija": "Išsaugoti konfigūraciją",
+    "ikrautiKonfiguracija": "Įkrauti konfigūraciją",
+    "atstatytiKonfiguracija": "Atstatyti konfigūraciją",
+    "suktiVaizdą": "Sukti vaizdą",
+    "priartinti": "Priartinti",
+    "nutolinti": "Nutolinti",
+    "ziurejimoRezimas": "Žiūrėjimo režimas",
+    "visoEkrano": "Visas ekranas",
+    "iseiti IsVisoEkrano": "Išeiti iš viso ekrano",
+    "addToCart": "Į krepšelį",
+    "downloadPdf": "Atsisiųsti PDF",
+    "downloadingPdf": "Generuojamas PDF...",
+    "downloadingPdfShort": "PDF...",
+    "downloadPng": "Atsisiųsti PNG",
+    "downloadingPng": "Generuojamas PNG...",
+    "downloadingPngShort": "PNG...",
+    "downloadJpg": "Atsisiųsti JPG",
+    "downloadingJpg": "Generuojamas JPG...",
+    "downloadingJpgShort": "JPG...",
+    "print": "Spausdinti",
+    "printing": "Ruošiama spaudai...",
+    "exportPdfSuccess": "PDF eksportas paruoštas",
+    "exportPngSuccess": "PNG eksportas paruoštas",
+    "exportJpgSuccess": "JPG eksportas paruoštas",
+    "printOpened": "Spaudos langas atidarytas",
+    "pdfError": "Nepavyko sugeneruoti PDF",
+    "imageExportError": "Nepavyko sugeneruoti vaizdo eksporto"
+  },
+  "newsletter": {
+    "pavadinimas": "Naujienlaiškis",
+    "antraste": "Būkite informuoti",
+    "aprasymas": "Prenumeruokite mūsų naujienlaiškį, kad gautumėte naujausią informaciją apie produktus, projektus ir naujienas",
+    "placeholderis": "Įveskite savo el. paštą",
+    "prenumeruoti": "Prenumeruoti",
+    "prenumeruojama": "Prenumeruojama...",
+    "prenumeruota": "Prenumeruota!",
+    "aciuPrenumerata": "Ačiū už prenumeratą!",
+    "jau Prenumeruota": "Jau esate prenumeruota",
+    "prenumeratos Klaida": "Nepavyko prenumeruoti. Bandykite dar kartą."
+  },
+  "cart": {
+    "pavadinimas": "Pirkinių krepšelis",
+    "title": "Pirkinių krepšelis",
+    "jasuKrepselis": "Jūsų krepšelis",
+    "yourCart": "Jūsų krepšelis",
+    "tuscčiasKrepselis": "Jūsų krepšelis tuščias",
+    "emptyCart": "Jūsų krepšelis tuščias",
+    "tuscias KrepselisAprasymas": "Pridėkite prekių, kad pradėtumėte",
+    "emptyCartDescription": "Pridėkite prekių, kad pradėtumėte",
+    "testi Pirkimus": "Tęsti pirkimus",
+    "continueShopping": "Tęsti apsipirkimą",
+    "ziuretiKrepseli": "Žiūrėti krepšelį",
+    "viewCart": "Žiūrėti krepšelį",
+    "atnaujintiKrepseli": "Atnaujinti krepšelį",
+    "updateCart": "Atnaujinti krepšelį",
+    "isvalytिKrepseli": "Išvalyti krepšelį",
+    "clearCart": "Išvalyti krepšelį",
+    "pasalintiProdukta": "Pašalinti produktą",
+    "removeItem": "Šalinti",
+    "kiekis": "Kiekis",
+    "quantity": "Kiekis",
+    "tarpinesuma": "Tarpinė suma",
+    "subtotal": "Tarpinė suma",
+    "viso": "Viso",
+    "total": "Viso",
+    "subtotalExVat": "Suma be PVM",
+    "vatAmount": "PVM ({rate}%)",
+    "pristatymas": "Pristatymas",
+    "shipping": "Pristatymas",
+    "pristatymasSkaiciuojamas": "Apskaičiuojamas kasos metu",
+    "shippingCalculated": "Apskaičiuojamas kasos metu",
+    "mokesčiai": "Mokesčiai",
+    "tax": "Mokesčiai",
+    "nuolaida": "Nuolaida",
+    "discount": "Nuolaida",
+    "kuponoKodas": "Kupono kodas",
+    "couponCode": "Kupono kodas",
+    "taikytiKupona": "Taikyti kuponą",
+    "applyCoupon": "Taikyti kuponą",
+    "pasalintiKupona": "Pašalinti kuponą",
+    "removeCoupon": "Pašalinti kuponą",
+    "pereiti IPirkima": "Pereiti į pirkimą",
+    "proceedToCheckout": "Pereiti į apmokėjimą",
+    "kasa": "Kasa",
+    "checkout": "Apmokėti",
+    "closeCart": "Uždaryti krepšelį",
+    "produktasPridedet": "Produktas pridėtas į krepšelį",
+    "itemAdded": "Produktas pridėtas į krepšelį",
+    "produktas Pasalintas": "Produktas pašalintas iš krepšelio",
+    "itemRemoved": "Produktas pašalintas iš krepšelio",
+    "krepselis Atnaujintas": "Krepšelis atnaujintas",
+    "itemUpdated": "Krepšelis atnaujintas",
+    "krepselioKlaida": "Krepšelio klaida",
+    "cartError": "Krepšelio klaida",
+    "netinkasKiekis": "Netinkamas kiekis",
+    "invalidQuantity": "Netinkamas kiekis",
+    "maksKiekis": "Pasiektas maksimalus kiekis",
+    "maxQuantity": "Pasiektas maksimalus kiekis",
+    "prekių": "prekių",
+    "items": "prekių",
+    "preке": "prekė",
+    "remove": "Šalinti",
+    "color": "Spalva:",
+    "finish": "Apdaila:",
+    "profile": "Profilis:",
+    "free": "Nemokamai",
+    "includingVat": "Įskaitant PVM",
+    "dimensions": "Matmenys:",
+    "boardArea": "Vienos lentos plotas",
+    "dimensionsNotSet": "Nenurodyta",
+    "widthMm": "Plotis (mm)",
+    "lengthMm": "Ilgis (mm)",
+    "dimensionsHint": "Įveskite matmenis, jei kaina skaičiuojama pagal m²."
+  },
+  "search": {
+    "paieska": "Paieška",
+    "paieskosPlaceholder": "Ieškoti produktų...",
+    "ieskoma": "Ieškoma...",
+    "paieskosRezultatai": "Paieškos rezultatai",
+    "rezultatuNera": "Rezultatų nerasta",
+    "rezultatuNera Uzklausu": "Rezultatų nerasta užklausai \"{query}\"",
+    "rodomRezultatar Uzklausu": "Rodomi rezultatai užklausai \"{query}\"",
+    "populariosP aiesk": "Populiarūs paieškos žodžiai",
+    "paskutinesP aiesk": "Paskutinės paieškos",
+    "isvalytPaieska": "Išvalyti paiešką",
+    "isvalytiIstorija": "Išvalyti istoriją"
+  },
+  "metadata": {
+    "contact": {
+      "title": "Kontaktai ir konsultacija",
+      "description": "Reikalinga pagalba? Palikite savo kontaktinius duomenis ir mūsų vadybininkas susisieks dėl konsultacijos.",
+      "ogTitle": "Kontaktai - Yakiwood"
+    },
+    "login": {
+      "title": "Prisijungimas",
+      "description": "Prisijunkite prie Yakiwood paskyros ir peržiūrėkite užsakymus, išsaugotus projektus bei paskyros nustatymus.",
+      "ogTitle": "Prisijungimas - Yakiwood"
+    },
+    "register": {
+      "title": "Registracija",
+      "description": "Sukurkite Yakiwood paskyrą, kad galėtumėte greičiau atsiskaityti, sekti užsakymus ir išsaugoti projektus.",
+      "ogTitle": "Registracija - Yakiwood"
+    },
+    "account": {
+      "title": "Mano paskyra",
+      "description": "Tvarkykite Yakiwood paskyrą, peržiūrėkite užsakymus, sąskaitas ir paskyros duomenis.",
+      "ogTitle": "Mano paskyra - Yakiwood"
+    },
+    "about": {
+      "title": "Apie mus ir Shou Sugi Ban",
+      "description": "Sužinokite apie Yakiwood - ekspertus Shou Sugi Ban degintos medienos gamyboje (pristatymas į Jungtinę Karalystę).",
+      "ogTitle": "Apie mus - Yakiwood"
+    },
+    "products": {
+      "title": "Produktai - Shou Sugi Ban Degintas Medis",
+      "description": "Atraskite mūsų Shou Sugi Ban degintos medienos produktų asortimentą - lentos, plytelės ir fasadinės dangos.",
+      "ogTitle": "Produktai - Shou Sugi Ban - Yakiwood"
+    },
+    "solutions": {
+      "title": "Sprendimai - Shou Sugi Ban Panaudojimai",
+      "description": "Tyrinėkite įvairius Shou Sugi Ban medienos panaudojimus - nuo fasadų iki interjero.",
+      "ogTitle": "Sprendimai - Yakiwood"
+    },
+    "projects": {
+      "title": "Projektai - Shou Sugi Ban Pavyzdžiai",
+      "description": "Peržiūrėkite mūsų atliktų Shou Sugi Ban projektų portfelį ir įkvėpkite savo projektui.",
+      "ogTitle": "Projektai - Yakiwood"
+    },
+    "news": {
+      "title": "Naujienos apie Shou Sugi Ban",
+      "description": "Skaitykite naujausias naujienas apie Shou Sugi Ban, mūsų projektus ir medienos apdorojimo naujienas.",
+      "ogTitle": "Naujienos - Yakiwood"
+    },
+    "blog": {
+      "title": "Straipsniai - Shou Sugi Ban įžvalgos",
+      "description": "Skaitykite straipsnius apie degintą medieną, dizaino pasirinkimus, priežiūrą ir projektų planavimą.",
+      "ogTitle": "Straipsniai - Yakiwood"
+    },
+    "faq": {
+      "title": "DUK apie Shou Sugi Ban medieną",
+      "description": "Dažnai užduodami klausimai apie Shou Sugi Ban medienos produktus, priežiūrą ir montavimą.",
+      "ogTitle": "DUK - Yakiwood"
+    },
+    "configurator3d": {
+      "title": "3D konfiguratorius Shou Sugi Ban",
+      "description": "Konfigūruokite produktą 3D erdvėje: pasirinkite spalvą ir profilį, kad pamatytumėte rezultatą.",
+      "ogTitle": "3D konfiguratorius - Yakiwood"
+    },
+    "checkout": {
+      "title": "Atsiskaitymas",
+      "description": "Užbaikite Yakiwood užsakymą, peržiūrėkite krepšelį ir pateikite pristatymo bei apmokėjimo informaciją.",
+      "ogTitle": "Atsiskaitymas - Yakiwood"
+    },
+    "orderConfirmation": {
+      "title": "Užsakymas patvirtintas",
+      "description": "Peržiūrėkite patvirtinto Yakiwood užsakymo informaciją ir tolesnius pristatymo žingsnius.",
+      "ogTitle": "Užsakymas patvirtintas - Yakiwood"
+    },
+    "forgotPassword": {
+      "title": "Pamiršote slaptažodį",
+      "description": "Atkurkite Yakiwood paskyros slaptažodį ir gaukite naujo slaptažodžio nuorodą el. paštu.",
+      "ogTitle": "Slaptažodžio atkūrimas - Yakiwood"
+    },
+    "resetPassword": {
+      "title": "Naujas slaptažodis",
+      "description": "Nustatykite naują Yakiwood paskyros slaptažodį ir grįžkite prie savo užsakymų bei paskyros valdymo.",
+      "ogTitle": "Naujas slaptažodis - Yakiwood"
+    },
+    "euProjects": {
+      "title": "ES projektai",
+      "description": "Susipažinkite su Yakiwood įgyvendinamais ir Europos Sąjungos finansuojamais projektais.",
+      "ogTitle": "ES projektai - Yakiwood"
+    },
+    "cookiePolicy": {
+      "title": "Slapukų politika",
+      "description": "Sužinokite, kaip Yakiwood naudoja slapukus, kokie duomenys renkami ir kaip galite valdyti savo pasirinkimus.",
+      "ogTitle": "Slapukų politika - Yakiwood"
+    },
+    "policies": {
+      "title": "Politikos",
+      "description": "Peržiūrėkite Yakiwood pristatymo, apmokėjimo, grąžinimo ir naudojimosi taisyklių politiką.",
+      "ogTitle": "Politikos - Yakiwood"
+    },
+    "shippingPolicy": {
+      "title": "Pristatymo politika",
+      "description": "Sužinokite Yakiwood pristatymo terminus, teritorijas, kerbside pristatymo sąlygas ir logistikos informaciją.",
+      "ogTitle": "Pristatymo politika - Yakiwood"
+    },
+    "refundPolicy": {
+      "title": "Grąžinimo politika",
+      "description": "Peržiūrėkite Yakiwood grąžinimo, atsisakymo ir brokuotų prekių taisykles pagal taikomus teisės aktus.",
+      "ogTitle": "Grąžinimo politika - Yakiwood"
+    },
+    "termsPolicy": {
+      "title": "Taisyklės ir sąlygos",
+      "description": "Susipažinkite su Yakiwood taisyklėmis ir sąlygomis dėl užsakymų, individualios gamybos, pristatymo ir atsakomybės.",
+      "ogTitle": "Taisyklės ir sąlygos - Yakiwood"
+    },
+    "home": {
+      "title": "Yakiwood - Shou Sugi Ban Degintas Medis Jungtinėje Karalystėje",
+      "description": "Aukščiausios kokybės Shou Sugi Ban degintos medienos produktai (pristatymas į JK). Fasadai, interjeras, terasa - ekologiški ir ilgaamžiški sprendimai.",
+      "ogTitle": "Yakiwood - Shou Sugi Ban degintas medis",
+      "ogAlt": "Yakiwood - Shou Sugi Ban degintas medis"
+    }
+  },
+  "admin": {
+    "breadcrumb": {
+      "home": "Pradžia",
+      "admin": "Administravimas",
+      "dashboard": "Skydelis",
+      "products": "Produktai",
+      "projects": "Projektai",
+      "posts": "Straipsniai",
+      "seo": "SEO",
+      "emailTemplates": "El. pašto šablonai",
+      "orders": "Užsakymai",
+      "inventory": "Atsargos",
+      "options": "Parinktys",
+      "backups": "Backupai",
+      "new": "Naujas",
+      "edit": "Redaguoti"
+    },
+    "main": {
+      "title": "Administravimo skydas",
+      "subtitle": "Tvarkykite produktus, projektus ir straipsnius",
+      "loadSampleProducts": "Įkelti pavyzdinius produktus",
+      "sampleProductsLoaded": "{count} produktai įkelti!"
+    },
+    "tabs": {
+      "dashboard": "Skydelis",
+      "products": "Produktai",
+      "projects": "Projektai",
+      "posts": "Straipsniai",
+      "orders": "Užsakymai",
+      "inventory": "Atsargos",
+      "options": "Parinktys",
+      "backups": "Backupai",
+      "users": "Vartotojai",
+      "chatbot": "Chatbot",
+      "seo": "SEO",
+      "emailTemplates": "El. pašto šablonai",
+      "badgeNew": "naujas"
+    },
+    "ui": {
+      "noFileSelected": "Nepasirinktas failas",
+      "add": "Pridėti",
+      "close": "Uždaryti",
+      "cancel": "Atšaukti",
+      "addNewEllipsis": "Pridėti naują…"
+    },
+    "dashboard": {
+      "filters": {
+        "title": "Filtrai",
+        "timePeriod": "Laikotarpis",
+        "status": "Statusas",
+        "allTime": "Visas laikotarpis",
+        "today": "Šiandien",
+        "lastWeek": "Praėjusi savaitė",
+        "lastMonth": "Praėjęs mėnuo",
+        "allOrders": "Visi užsakymai"
+      },
+      "quickActions": {
+        "manageOrders": "Tvarkyti užsakymus",
+        "manageOrdersSubtitle": "Peržiūrėti ir keisti užsakymo būseną",
+        "inventory": "Atsargos",
+        "inventorySubtitle": "Valdyti sandėlio likučius",
+        "products": "Produktai",
+        "productsSubtitle": "Pridėti ir redaguoti produktus",
+        "projects": "Projektai",
+        "projectsSubtitle": "Rodyti portfolio"
+      },
+      "stats": {
+        "todayOrders": "Šiandienos užsakymai",
+        "totalOrders": "Viso užsakymų",
+        "totalOrdersSubtitle": "{currency}{revenue} pajamų",
+        "pending": "Laukia",
+        "pendingSubtitle": "laukia apdorojimo",
+        "completed": "Įvykdyta",
+        "completedSubtitle": "sėkmingai",
+        "products": "Produktai",
+        "productsSubtitle": "kataloge",
+        "lowStock": "Mažos atsargos",
+        "lowStockSubtitle": "< 10 vnt.",
+        "avgOrder": "Vid. užsakymas",
+        "conversion": "Konversija",
+        "conversionSubtitle": "įvykdyta"
+      },
+      "topProducts": {
+        "title": "Populiariausi produktai",
+        "empty": "Nėra pardavimų duomenų",
+        "table": {
+          "product": "Produktas",
+          "sold": "Parduota",
+          "revenue": "Pajamos"
+        }
+      },
+      "recentOrders": {
+        "title": "Naujausi užsakymai",
+        "allOrders": "Visi užsakymai",
+        "empty": "Nėra užsakymų",
+        "table": {
+          "order": "Užsakymas",
+          "customer": "Klientas",
+          "date": "Data",
+          "total": "Suma",
+          "status": "Statusas"
+        }
+      },
+      "orderStatus": {
+        "pending": "Laukia",
+        "processing": "Vykdoma",
+        "completed": "Įvykdyta",
+        "cancelled": "Atšaukta"
+      },
+      "units": "vnt."
+    },
+    "projects": {
+      "actions": {
+        "addProject": "Pridėti projektą",
+        "import": "Importuoti",
+        "export": "Eksportuoti",
+        "regenerateSlugs": "Atnaujinti slug'us",
+        "migrateLtTexts": "Atnaujinti LT tekstus",
+        "edit": "Redaguoti",
+        "delete": "Ištrinti",
+        "save": "Išsaugoti"
+      }
+    },
+    "productForm": {
+      "validation": {
+        "nameRequired": "Pavadinimas privalomas",
+        "slugRequired": "Slug privalomas",
+        "slugFormat": "Slug turi būti tik mažosios raidės, skaičiai ir brūkšneliai",
+        "categoryRequired": "Kategorija privaloma",
+        "usageRequired": "Pritaikymas privalomas",
+        "woodRequired": "Medienos tipas privalomas",
+        "basePricePositive": "Kaina turi būti teigiama"
+      }
+    },
+    "posts": {
+      "title": "Įrašai",
+      "subtitle": "Kurkite ir tvarkykite tinklaraščio straipsnius LT/EN",
+      "new": "Naujas įrašas",
+      "save": "Išsaugoti",
+      "delete": "Ištrinti",
+      "noticeSaved": "Išsaugota.",
+      "noticeDeleted": "Ištrinta.",
+      "listTitle": "Įrašai ({count})",
+      "empty": "Įrašų dar nėra.",
+      "untitled": "Be pavadinimo",
+      "editorTitle": "Redaguoti įrašą",
+      "addSection": "Pridėti skyrių",
+      "removeSection": "Pašalinti skyrių",
+      "sectionsEmpty": "Skyrių dar nėra.",
+      "status": {
+        "published": "Publikuota",
+        "draft": "Juodraštis"
+      },
+      "fields": {
+        "titleLt": "Pavadinimas (LT)",
+        "titleEn": "Pavadinimas (EN)",
+        "slugLt": "Slug (LT)",
+        "slugEn": "Slug (EN)",
+        "excerptLt": "Trumpas aprašymas (LT)",
+        "excerptEn": "Trumpas aprašymas (EN)",
+        "summaryLt": "Įžanga (LT)",
+        "summaryEn": "Įžanga (EN)",
+        "bodyLt": "Tekstas (LT)",
+        "bodyEn": "Tekstas (EN)",
+        "sections": "Skyriai",
+        "sectionHeadingLt": "Skyriaus antraštė (LT)",
+        "sectionHeadingEn": "Skyriaus antraštė (EN)",
+        "sectionBodyLt": "Skyriaus tekstas (LT)",
+        "sectionBodyEn": "Skyriaus tekstas (EN)",
+        "calloutLt": "Citata (LT)",
+        "calloutEn": "Citata (EN)",
+        "closingLt": "Pabaiga (LT)",
+        "closingEn": "Pabaiga (EN)",
+        "categoryLt": "Kategorija (LT)",
+        "categoryEn": "Kategorija (EN)",
+        "author": "Autorius",
+        "date": "Data",
+        "readTime": "Skaitymo laikas (min.)",
+        "published": "Publikuota"
+      },
+      "placeholders": {
+        "titleLt": "pvz., Degintos medienos menas",
+        "titleEn": "e.g., The art of burning",
+        "slugLt": "pvz., deginta-mediena-fasadui",
+        "slugEn": "e.g., charred-wood-facades",
+        "excerptLt": "Trumpa santrauka lietuviškai",
+        "excerptEn": "Short summary in English",
+        "summaryLt": "Įžanginis paragrafas lietuviškai",
+        "summaryEn": "Intro paragraph in English",
+        "bodyLt": "Atskirti pastraipas tuščia eilute",
+        "bodyEn": "Separate paragraphs with a blank line",
+        "hero": "Nuotraukos URL arba įkelkite",
+        "imageUrl": "Įklijuokite nuotraukos URL"
+      },
+      "images": {
+        "hero": "Pagrindinė nuotrauka",
+        "gallery": "Galerijos nuotraukos",
+        "feature": "Papildomos nuotraukos",
+        "upload": "Įkelti",
+        "addUrl": "Pridėti URL"
+      },
+      "errors": {
+        "loadFailed": "Nepavyko įkelti įrašų.",
+        "saveFailed": "Nepavyko išsaugoti įrašo.",
+        "deleteFailed": "Nepavyko ištrinti įrašo.",
+        "titleLtRequired": "Reikalingas lietuviškas pavadinimas.",
+        "titleEnRequired": "Reikalingas angliškas pavadinimas.",
+        "slugLtRequired": "Reikalingas lietuviškas slug.",
+        "slugEnRequired": "Reikalingas angliškas slug."
+      },
+      "importSuccess": "Sėkmingai importuota įrašų: {count}",
+      "importError": "Nepavyko importuoti įrašų. Patikrinkite JSON formatą."
+    },
+    "productsDemo": {
+      "noticeLine1": "Pastaba: šis /admin puslapis yra demo ir produktus saugo tik šiame naršyklės lange (localStorage).",
+      "noticeLine2": "Realūs produktai (Supabase) kuriami per /admin/products/new.",
+      "openProducts": "Atidaryti produktus",
+      "createRealProduct": "Kurti realų produktą",
+      "addNewProduct": "Pridėti produktą",
+      "fields": {
+        "name": "Produkto pavadinimas *",
+        "slug": "Slug (URL) *",
+        "description": "Aprašymas",
+        "basePrice": "Bazinė kaina (EUR) *",
+        "salePrice": "Akcijos kaina (EUR)",
+        "inStock": "Sandėlyje",
+        "usage": "Pritaikymas",
+        "wood": "Mediena",
+        "profile": "Profilis",
+        "color": "Spalva",
+        "thickness": "Storis (mm)",
+        "width": "Plotis (mm)",
+        "length": "Ilgis (mm)"
+      },
+      "placeholders": {
+        "name": "Juoda maumedžio fasado lenta",
+        "slug": "juoda-maumedzio-fasado-lenta",
+        "description": "Įveskite produkto aprašymą…",
+        "woodCustom": "Įveskite medienos pavadinimą",
+        "colorCustom": "Įveskite spalvos pavadinimą"
+      },
+      "usage": {
+        "facade": "Fasadas",
+        "terrace": "Terasa",
+        "interior": "Interjeras",
+        "fence": "Tvora"
+      },
+      "wood": {
+        "spruce": "Eglė",
+        "larch": "Maumedis",
+        "thermo": "Termo"
+      },
+      "colors": {
+        "natural": "Natural",
+        "carbonLight": "Carbon Light",
+        "carbonDark": "Carbon Dark",
+        "brown": "Brown",
+        "graphite": "Graphite",
+        "latte": "Latte",
+        "silver": "Silver",
+        "black": "Black"
+      }
+    },
+    "seo": {
+      "title": "SEO Valdymas",
+      "subtitle": "Stebėkite ir optimizuokite savo svetainės paieškos sistemų našumą",
+      "scanning": "Skenuojami puslapiai...",
+      "scanningProgress": "Skenuojama: {current} ({done}/{total})...",
+      "stats": {
+        "totalPages": "Iš viso puslapių",
+        "averageScore": "Vidutinis balas",
+        "goodSeo": "Geras SEO",
+        "needsWork": "Reikia darbo"
+      },
+      "filters": {
+        "all": "Visi Puslapiai",
+        "good": "Geri",
+        "warning": "Įspėjimai",
+        "errors": "Klaidos"
+      },
+      "table": {
+        "page": "Puslapis",
+        "title": "Pavadinimas",
+        "score": "Balas",
+        "issues": "Problemos",
+        "actions": "Veiksmai",
+        "noTitle": "Nėra pavadinimo"
+      },
+      "actions": {
+        "viewDetails": "Peržiūrėti detaliai",
+        "edit": "Redaguoti",
+        "exportJson": "Eksportuoti JSON",
+        "rescan": "Perskenuoti",
+        "exportFixes": "Eksportuoti taisymus"
+      },
+      "editor": {
+        "label": "Redaktorius",
+        "on": "Įjungtas",
+        "off": "Išjungtas",
+        "toggleTitle": "Perjungti SEO redaktorių",
+        "modalTitle": "Redaguoti SEO",
+        "loadingOverride": "Kraunamas koregavimas…",
+        "overrideTitle": "Koregavimas",
+        "overrideMeta": "canonical_path: {path} • locale: {locale}",
+        "updatedLabel": "Atnaujinta",
+        "enabled": "Įjungta",
+        "basic": "Pagrindiniai",
+        "title": "Pavadinimas",
+        "description": "Aprašymas",
+        "canonicalUrl": "Kanoninis URL (nebūtina)",
+        "robotsIndex": "Robots index",
+        "robotsFollow": "Robots follow",
+        "robots": {
+          "inherit": "Paveldėti",
+          "index": "index",
+          "noindex": "noindex",
+          "follow": "follow",
+          "nofollow": "nofollow"
+        },
+        "openGraph": "Open Graph",
+        "ogTitle": "OG pavadinimas",
+        "ogDescription": "OG aprašymas",
+        "ogImage": "OG paveikslėlio URL",
+        "twitter": "Twitter",
+        "twitterTitle": "Twitter pavadinimas",
+        "twitterDescription": "Twitter aprašymas",
+        "twitterImage": "Twitter paveikslėlio URL",
+        "save": "Išsaugoti",
+        "saving": "Saugoma…",
+        "deleteOverride": "Ištrinti koregavimą",
+        "close": "Uždaryti",
+        "preview": "Peržiūra",
+        "noticeSaved": "Išsaugota. Perskenuokite, kad atsinaujintų balai.",
+        "noticeDeleted": "Koregavimas ištrintas.",
+        "confirmDelete": "Ar tikrai norite ištrinti šį koregavimą?"
+      },
+      "errors": {
+        "noSession": "Nėra prisijungimo sesijos",
+        "scanFailed": "Nepavyko nuskenuoti puslapių",
+        "noPaths": "Nerasta puslapių skenavimui.",
+        "scanTimeout": "Skenavimas užtruko per ilgai. Bandykite dar kartą (arba sumažinkite puslapių kiekį).",
+        "fixFailed": "Nepavyko sugeneruoti taisymų",
+        "loadOverrideFailed": "Nepavyko įkelti koregavimo",
+        "saveOverrideFailed": "Nepavyko išsaugoti koregavimo",
+        "deleteOverrideFailed": "Nepavyko ištrinti koregavimo"
+      },
+      "notScannedYet": "Dar neatliktas SEO skenavimas. Spauskite \"Perskenuoti\".",
+      "noPages": "Nėra puslapių atitinkančių pasirinktą filtrą",
+      "seoScore": "SEO Balas",
+      "preview": {
+        "googleTitle": "Google paieškos peržiūra",
+        "facebookTitle": "Facebook / Open Graph peržiūra",
+        "twitterTitle": "Twitter kortelės peržiūra",
+        "searchSocialTitle": "Paieška ir socialinės peržiūros",
+        "seoScoreLabel": "SEO balas",
+        "issuesFoundLabel": "Problemos",
+        "seoIssuesTitle": "SEO problemos",
+        "noIssues": "SEO problemų nerasta - puiku!",
+        "titleLabel": "Pavadinimas",
+        "descriptionLabel": "Aprašymas",
+        "ogTitleLabel": "OG pavadinimas",
+        "ogDescriptionLabel": "OG aprašymas",
+        "twitterTitleLabel": "Twitter pavadinimas",
+        "twitterDescriptionLabel": "Twitter aprašymas",
+        "imageLabel": "Paveikslėlis",
+        "imageMissing": "Trūksta paveikslėlio",
+        "descriptionMissing": "Trūksta aprašymo",
+        "untitledPage": "Puslapis be pavadinimo",
+        "untitled": "Be pavadinimo",
+        "fields": {
+          "title": "Pavadinimas",
+          "description": "Aprašymas",
+          "openGraph": "Open Graph",
+          "openGraphTitle": "Open Graph pavadinimas",
+          "openGraphDescription": "Open Graph aprašymas",
+          "openGraphImages": "Open Graph paveikslėlis",
+          "openGraphType": "Open Graph tipas",
+          "twitter": "Twitter",
+          "twitterCard": "Twitter kortelė",
+          "twitterTitle": "Twitter pavadinimas",
+          "twitterDescription": "Twitter aprašymas",
+          "canonical": "Kanoninis URL",
+          "robots": "Robots"
+        }
+      }
+    },
+    "emailTemplates": {
+      "title": "El. pašto šablonai",
+      "subtitle": "El. prekybos el. pašto šablonų valdymas ir peržiūra",
+      "availableTemplates": "Prieinami šablonai",
+      "categories": {
+        "transactional": "Sandoriai",
+        "marketing": "Rinkodara",
+        "customerService": "Klientų aptarnavimas"
+      },
+      "subjectLine": "Temos eilutė:",
+      "htmlPreview": "HTML Peržiūra",
+      "actions": {
+        "sendTest": "Siųsti bandomąjį",
+        "copyHtml": "Kopijuoti HTML"
+      },
+      "sampleData": "Pavyzdiniai duomenys",
+      "selectTemplate": "Pasirinkite šabloną",
+      "selectTemplateDescription": "Pasirinkite el. pašto šabloną iš sąrašo peržiūrai"
+    },
+    "products": {
+      "title": "Produktų valdymas",
+      "subtitle": "Valdykite produktus, variantas ir atsargas",
+      "newProduct": "Naujas produktas",
+      "newProductDesc": "Sukurkite naują produktą su variantais",
+      "editProduct": "Redaguoti produktą",
+      "editProductDesc": "Atnaujinkite produkto informaciją ir variantas",
+      "list": {
+        "searchPlaceholder": "Ieškoti produktų…",
+        "newProductButton": "Sukurti naują prekę",
+        "filters": {
+          "allCategories": "Visos kategorijos",
+          "allUsage": "Visi pritaikymai",
+          "allStatuses": "Visi statusai",
+          "statusActivePlural": "Aktyvūs",
+          "statusInactivePlural": "Neaktyvūs"
+        },
+        "bulk": {
+          "selected": "Pasirinkta: {count}",
+          "publish": "Publikuoti",
+          "unpublish": "Nuimti",
+          "delete": "Ištrinti",
+          "deleteConfirm": "Ar tikrai norite ištrinti {count} produktų?"
+        },
+        "table": {
+          "product": "Produktas",
+          "category": "Kategorija",
+          "usage": "Pritaikymas",
+          "price": "Kaina",
+          "stock": "Atsargos",
+          "status": "Statusas",
+          "actions": "Veiksmai",
+          "noImage": "Nėra"
+        },
+        "rowActions": {
+          "edit": "Redaguoti",
+          "preview": "Peržiūra",
+          "duplicate": "Dubliuoti",
+          "delete": "Ištrinti"
+        },
+        "statusBadge": {
+          "active": "Aktyvus",
+          "inactive": "Neaktyvus"
+        },
+        "empty": {
+          "noneFound": "Produktų nerasta",
+          "noneYet": "Dar nėra produktų"
+        },
+        "deleteModal": {
+          "title": "Patvirtinti trynimą",
+          "body": "Ar tikrai norite ištrinti šį produktą? Jis bus pažymėtas kaip neaktyvus.",
+          "cancel": "Atšaukti",
+          "confirm": "Ištrinti",
+          "confirming": "Trinamas…"
+        },
+        "errors": {
+          "deleteFailed": "Klaida trinant produktą",
+          "bulkDeleteFailed": "Klaida trinant produktus",
+          "statusFailed": "Klaida keičiant būseną",
+          "duplicateFailed": "Klaida dubliuojant produktą"
+        }
+      },
+      "form": {
+        "sections": {
+          "photo": "Nuotrauka",
+          "photoLibrary": "Nuotraukų biblioteka",
+          "basicInfo": "Pagrindinė informacija",
+          "publishing": "Publikavimas",
+          "pricingInventory": "Kaina ir atsargos",
+          "dimensions": "Matmenys",
+          "variants": "Variantai",
+          "boardArea": "Vienos lentos plotas",
+          "urlPreview": "URL peržiūra",
+          "quickStats": {
+            "variants": "Variantų:",
+            "status": "Statusas:"
+          }
+        },
+        "fields": {
+          "nameLt": "Pavadinimas (LT) *",
+          "nameEn": "Pavadinimas (EN)",
+          "slug": "Slug *",
+          "slugLt": "Slug (LT) *",
+          "slugEn": "Slug (EN) *",
+          "descriptionLt": "Aprašymas (LT)",
+          "descriptionEn": "Aprašymas (EN)",
+          "usage": "Pritaikymas *",
+          "category": "Kategorija *",
+          "woodType": "Medienos tipas *",
+          "basePrice": "Bazinė kaina (EUR) *",
+          "stockQuantity": "Atsargos (vnt.)",
+          "sku": "SKU kodas",
+          "width": "Plotis (mm)",
+          "height": "Aukštis (mm)",
+          "depth": "Gylis (mm)",
+          "thickness": "Storis (mm)",
+          "length": "Ilgis (mm)",
+          "weight": "Svoris (kg)",
+          "status": "Statusas"
+        },
+        "placeholders": {
+          "nameLt": "Pvz., Deginta eglės dailylentė",
+          "nameEn": "Pvz., Burnt Spruce Cladding",
+          "slug": "pvz-deginta-egles-dailylente",
+          "slugLt": "pvz-degintos-medienos-dailylente-fasadui-maumedis-natural",
+          "slugEn": "pvz-shou-sugi-ban-for-facade-larch-natural",
+          "descriptionLt": "Produkto aprašymas lietuvių kalba…",
+          "descriptionEn": "Product description in English…",
+          "selectUsage": "Pasirinkite pritaikymą",
+          "selectCategory": "Pasirinkite kategoriją",
+          "selectWoodType": "Pasirinkite medienos tipą",
+          "selectUsageFirst": "Pirma pasirinkite pritaikymą",
+          "basePrice": "0.00",
+          "stockQuantity": "0",
+          "sku": "SKU-001",
+          "number": "0"
+        },
+        "validation": {
+          "nameRequired": "Pavadinimas privalomas",
+          "slugRequired": "Slug privalomas",
+          "slugFormat": "Slug turi būti tik mažosios raidės, skaičiai ir brūkšneliai",
+          "colorRequired": "Pasirinkite bent vieną spalvą",
+          "categoryRequired": "Kategorija privaloma",
+          "usageRequired": "Pritaikymas privalomas",
+          "usageInvalid": "Leidžiama tik: fasadas arba terasa",
+          "woodRequired": "Medienos tipas privalomas",
+          "woodInvalid": "Leidžiama tik: eglė, maumedis arba termo",
+          "basePriceRequired": "Bazinė kaina privaloma",
+          "basePriceNumber": "Įveskite kainą skaičiumi",
+          "basePricePositive": "Kaina turi būti teigiama",
+          "widthRequired": "Plotis privalomas",
+          "heightRequired": "Storis privalomas",
+          "depthRequired": "Ilgis privalomas",
+          "numberExpected": "Įveskite skaičių",
+          "integerExpected": "Įveskite sveikąjį skaičių",
+          "numberMinZero": "Reikšmė negali būti neigiama"
+        },
+        "errors": {
+          "saveFailed": "Klaida išsaugant produktą",
+          "deleteFailed": "Klaida trinant produktą",
+          "slugEnMissing": "Duomenų bazėje trūksta `products.slug_en`. Pritaikykite migraciją: {path}",
+          "dimensionsMissing": "Duomenų bazėje trūksta produkto matmenų laukų (`products.width/height/depth`). Pritaikykite migraciją: {path}",
+          "inventoryFieldsMissing": "Duomenų bazėje trūksta sandėlio laukų (`products.sku`, `products.stock_quantity`, `products.usage_type`). Pritaikykite migraciją: {path}",
+          "notAuthorized": "Neturite teisių kurti/keisti produktus. Prisijunkite su administratoriaus paskyra.",
+          "slugTaken": "Toks Slug (LT) jau egzistuoja. Pakeiskite Slug.",
+          "slugEnTaken": "Toks Slug (EN) jau egzistuoja. Pakeiskite Slug.",
+          "skuTaken": "Toks SKU jau naudojamas. Pakeiskite SKU arba palikite tuščią."
+        },
+        "options": {
+          "categories": {
+            "cladding": "Fasadai",
+            "decking": "Lentos",
+            "interior": "Interjeras",
+            "tiles": "Plytelės"
+          },
+          "woodTypes": {
+            "pine": "Pušis",
+            "spruce": "Eglė",
+            "oak": "Ąžuolas",
+            "larch": "Maumedis",
+            "thermo": "Termo"
+          },
+          "usageTypes": {
+            "facade": "Fasadui",
+            "terrace": "Terasai",
+            "interior": "Interjerui",
+            "fence": "Tvoroms"
+          },
+          "status": {
+            "draft": "Juodraštis",
+            "published": "Publikuotas"
+          },
+          "statusHelp": {
+            "draft": "Produktas matomas tik administratoriams",
+            "published": "Produktas matomas visiems lankytojams"
+          }
+        },
+        "image": {
+          "previewAlt": "Peržiūra",
+          "noPhoto": "Nėra nuotraukos",
+          "chooseFromLibrary": "Rinktis iš bibliotekos",
+          "hideLibrary": "Slėpti biblioteką",
+          "remove": "Pašalinti"
+        },
+        "photoLibrary": {
+          "help": "Čia pasirenkate jau įkeltas globalias nuotraukas (pvz. spruce + black) iš /admin/options.",
+          "wood": "Mediena",
+          "color": "Spalva",
+          "noColors": "Nėra spalvų (catalog_options)",
+          "missingSchemaTitle": "Trūksta duomenų bazės lentelių",
+          "missingSchemaBody": "Supabase neranda `catalog_options` / `product_assets`. Paleiskite migraciją: {path} (Supabase Dashboard → SQL Editor), tada perkraukite puslapį.",
+          "missingSchemaEnvHint": "Jei migraciją jau paleidote, patikrinkite ar `.env.local` `NEXT_PUBLIC_SUPABASE_URL` rodo į tą patį Supabase projektą.",
+          "refresh": "Atnaujinti",
+          "refreshing": "Kraunama…",
+          "noneFound": "Nerasta nuotraukų šiam deriniui.",
+          "any": "bet kuri"
+        },
+        "variants": {
+          "add": "+ Pridėti variantą",
+          "empty": "Dar nėra variantų. Pridėkite spalvas ar apdailos variantus.",
+          "typeLabelColor": "Spalva",
+          "typeLabelFinish": "Apdaila",
+          "typeLabelProfile": "Profilis",
+          "edit": "Redaguoti",
+          "delete": "Ištrinti"
+        },
+        "variantModal": {
+          "titleNew": "Naujas variantas",
+          "titleEdit": "Redaguoti variantą",
+          "fields": {
+            "name": "Pavadinimas *",
+            "type": "Tipas *",
+            "hex": "Spalvos kodas (HEX)",
+            "image": "Nuotraukos URL",
+            "priceAdjustment": "Kainos koregavimas (EUR)",
+            "description": "Aprašymas",
+            "available": "Variantas prieinamas užsakymui"
+          },
+          "placeholders": {
+            "name": "Pvz., Natūrali deginta",
+            "hex": "#161616",
+            "image": "https://...",
+            "priceAdjustment": "0.00",
+            "description": "Papildomas aprašymas…"
+          },
+          "typeOptions": {
+            "color": "Spalva",
+            "finish": "Apdaila",
+            "profile": "Profilis"
+          },
+          "priceHelp": "Teigiama reikšmė prideda, neigiama atima nuo bazinės kainos",
+          "buttons": {
+            "cancel": "Atšaukti",
+            "save": "Išsaugoti"
+          }
+        },
+        "buttons": {
+          "saving": "Išsaugoma…",
+          "create": "Sukurti produktą",
+          "save": "Išsaugoti pakeitimus",
+          "cancel": "Atšaukti",
+          "deleteProduct": "Ištrinti produktą"
+        },
+        "deleteModal": {
+          "title": "Patvirtinti trynimą",
+          "body": "Ar tikrai norite visam laikui ištrinti šį produktą? Šio veiksmo negalima atšaukti.",
+          "cancel": "Atšaukti",
+          "confirm": "Ištrinti",
+          "confirming": "Trinamas…"
+        }
+      },
+      "profile": {
+        "selectPlaceholder": "Pasirinkite profilį",
+        "addNewOption": "+ Pridėti naują profilį",
+        "enterNamePlaceholder": "Įveskite profilio pavadinimą",
+        "addButton": "Pridėti",
+        "cancelButton": "Atšaukti",
+        "existsMessage": "Profilis jau egzistuoja",
+        "addedMessage": "Profilis pridėtas!"
+      },
+      "profileOptions": {
+        "half_taper_45": "Pusė špunto 45",
+        "half_taper_45_deg": "Pusė špunto 45°",
+        "rectangle": "Stačiakampis",
+        "rhombus": "Rombas"
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "Pagrindinis",
+    "products": "Produktai",
+    "projects": "Projektai"
+  },
+  "productsPage": {
+    "title": "Produktai",
+    "searchLabel": "Paieška",
+    "searchPlaceholder": "Ieškoti produkto",
+    "filtersUsage": "Pritaikymas",
+    "filtersWood": "Mediena",
+    "filtersColor": "Spalva",
+    "filtersProfile": "Profilis",
+    "filtersPrice": "Kaina",
+    "filtersSize": "Išmatavimai",
+    "filtersWidth": "Plotis",
+    "filtersLength": "Ilgis",
+    "filtersToggle": "Filtrai",
+    "filtersAny": "Visi",
+    "filtersAll": "Visi produktai",
+    "filtersEmpty": "Nėra pasirinkimų",
+    "colorFilterLabel": "Spalva",
+    "colorFilterAll": "Visos spalvos",
+    "profileFilterLabel": "Profilis",
+    "profileFilterAll": "Visi profiliai",
+    "priceFilterAll": "Visos kainos",
+    "priceFilters": {
+      "under100": "Iki 100 €/m²",
+      "between100And150": "100–150 €/m²",
+      "between150And200": "150–200 €/m²",
+      "above200": "200+ €/m²"
+    },
+    "usageFilters": {
+      "all": "Visi sprendimai",
+      "facade": "Fasadų sistemos",
+      "terrace": "Terasų sistemos",
+      "interior": "Interjero sprendimai",
+      "fence": "Tvorų sprendimai"
+    },
+    "woodFilters": {
+      "all": "Visa mediena",
+      "spruce": "Deginta eglė",
+      "larch": "Degintas maumedis",
+      "thermo": "Termo"
+    },
+    "errorTitle": "Nepavyko įkelti produktų",
+    "errorHelp": "Daugiau informacijos rasite konsolėje.",
+    "errorContactLink": "Susisiekite",
+    "errorContactSuffix": "jei problema kartojasi.",
+    "retry": "Bandyti dar kartą",
+    "emptyTitle": "Produktų kol kas nėra",
+    "emptyDescriptionPrefix": "Produktai bus pridėti netrukus. Jei turite klausimų,",
+    "emptyContactLink": "susisiekite",
+    "emptyDescriptionSuffix": ".",
+    "fromPrice": "Nuo {price} €/m²",
+    "loadMore": "Rodyti daugiau"
+  },
+  "productDetail": {
+    "validationSelectColor": "Prašome pasirinkti spalvą",
+    "validationSelectProfile": "Prašome pasirinkti profilį",
+    "addToCartError": "Klaida pridedant į krepšelį. Bandykite dar kartą.",
+    "addedToCart": "Pridėta į krepšelį",
+    "descriptionFallback": "Produkto aprašymas ruošiama.",
+    "colorLabel": "Spalva:",
+    "colorPlaceholder": "Pasirinkite spalvą",
+    "profileLabel": "Profilis",
+    "quantityLabel": "Kiekis m²",
+    "helpPrefix": "Nerandate ko ieškote?",
+    "helpLink": "Susisiekite",
+    "adding": "Pridedama...",
+    "addToCart": "Į krepšelį",
+    "mobilePcs": "vnt.",
+    "mobileTotal": "Viso:"
+  },
+  "productGallery": {
+    "imageUnavailable": "Nuotrauka neprieinama",
+    "zoomHint": "Spustelėkite, kad priartintumėte",
+    "previousImage": "Ankstesnė nuotrauka",
+    "nextImage": "Kita nuotrauka",
+    "close": "Uždaryti"
+  },
+  "productTabs": {
+    "description": "Aprašymas",
+    "specifications": "Specifikacijos",
+    "installation": "Montavimas",
+    "reviews": "Atsiliepimai",
+    "infoPreparing": "Informacija ruošiama.",
+    "technicalNotesTitle": "Techninės pastabos:",
+    "technicalNote1": "Medžiagos natūralumas: kiekviena lentelė yra unikali",
+    "technicalNote2": "Spalvos atspalvis gali skirtis nuo nuotraukose matyto",
+    "technicalNote3": "Rekomenduojama laikyti sausoje, vėdinamoje patalpoje",
+    "installationSoon": "Montavimo instrukcijos bus pridėtos greitai.",
+    "noReviews": "Atsiliepimų kol kas nėra",
+    "beFirst": "Būkite pirmas, kuris pasidalins savo nuomone apie šį produktą",
+    "writeReviewSoon": "Rašyti atsiliepimą (netrukus)"
+  },
+  "relatedProducts": {
+    "title": "Panašūs produktai",
+    "view": "Peržiūrėti",
+    "from": "nuo",
+    "viewAll": "Peržiūrėti visus produktus"
+  },
+  "adminUsers": {
+    "title": "Vartotojai",
+    "subtitle": "Tvarkykite vartotojus, roles, valdytojus ir nuolaidas",
+    "loading": "Kraunasi...",
+    "refresh": "Atnaujinti",
+    "roles": {
+      "user": "Vartotojas",
+      "manager": "Valdytojas",
+      "admin": "Administratorius",
+      "partner": "Partneris"
+    },
+    "breadcrumbs": {
+      "home": "Pradžia",
+      "admin": "Administravimas",
+      "users": "Vartotojai"
+    },
+    "notConfigured": {
+      "title": "Supabase nesukonfigūruotas",
+      "body": "Norint naudoti administravimo funkcijas, reikia sukonfigūruoti Supabase aplinkos kintamuosius."
+    },
+    "users": {
+      "title": "Vartotojai",
+      "email": "El. paštas",
+      "role": "Rolė",
+      "permissions": "Matomos sritys",
+      "actions": "Veiksmai",
+      "empty": "Vartotojų nerasta",
+      "emptyFiltered": "Pagal pasirinktą filtrą vartotojų nerasta",
+      "autoSave": "Išsaugoma automatiškai",
+      "groups": {
+        "partnersAndStaff": "Partneriai ir komanda",
+        "partnersAndStaffHelp": "Čia rodomi partneriai, valdytojai ir administratoriai.",
+        "buyers": "Pirkėjai",
+        "buyersHelp": "Čia rodomi pirkėjai ir paprasti paskyrų vartotojai be administravimo teisių."
+      }
+    },
+    "filters": {
+      "searchLabel": "Paieška",
+      "searchPlaceholder": "Ieškoti pagal el. paštą, vardą ar rolę",
+      "roleLabel": "Rodyti",
+      "options": {
+        "all": "Visi vartotojai",
+        "partnersAndStaff": "Partneriai ir komanda",
+        "buyers": "Tik pirkėjai"
+      }
+    },
+    "help": {
+      "rolesTitle": "Ką gali kiekviena rolė",
+      "permissionsTitle": "Ką reiškia leidimų lygiai",
+      "roles": {
+        "user": "negali pasiekti administravimo skilčių.",
+        "manager": "mato tik priskirtas sritis ir atlieka tik leistus veiksmus.",
+        "admin": "turi pilną prieigą prie visų administravimo sričių ir veiksmų."
+      },
+      "permissions": {
+        "none": "sritis paslepiama ir vartotojas jos neatidarys.",
+        "view": "vartotojas gali atidaryti puslapį ir peržiūrėti duomenis, bet negali jų keisti.",
+        "manage": "vartotojas gali peržiūrėti ir atlikti keitimus per admin sąsają bei API."
+      },
+      "enforcementNote": "Teisės tikrinamos ne tik meniu, bet ir pačiuose admin puslapiuose bei API kvietimuose."
+    },
+    "create": {
+      "title": "Sukurti vartotoją",
+      "email": "El. paštas",
+      "password": "Slaptažodis",
+      "fullName": "Vardas Pavardė",
+      "permissionsLabel": "Valdomos admin sritys",
+      "visibilityHelp": "Pažymėkite, kurias administravimo sritis valdytojas apskritai matys meniu ir galės atsidaryti.",
+      "actionsLabel": "Galimi veiksmai",
+      "actionsHelp": "Kiekvienai matomai sričiai parinkite, ar vartotojas tik peržiūrės, ar galės atlikti pakeitimus.",
+      "permissionsHelp": "Kiekvienai sričiai pasirinkite, ar vartotojas jos nematys, tik matys, ar galės pilnai valdyti. Skydelis lieka matomas automatiškai.",
+      "submit": "Sukurti"
+    },
+    "permissions": {
+      "fullAccess": "Pilna administratoriaus prieiga",
+      "managerSelected": "Valdytojas matys tik priskirtas sritis, o veiksmus atliks pagal pasirinktą leidimo lygį.",
+      "managerEmpty": "Valdytojas kol kas matys tik administravimo skydelį.",
+      "noAdminAccess": "Admin skiltis nepriskirta",
+      "visibilityHelp": "Čia pasirenkate, kurios sritys bus matomos ir apskritai prieinamos konkrečiam valdytojui.",
+      "actionsHelp": "Čia nustatote, ar matomoje srityje leidžiama tik peržiūra, ar ir keitimai.",
+      "levels": {
+        "none": "Nerodyti",
+        "view": "Tik matyti",
+        "manage": "Valdyti"
+      }
+    },
+    "discounts": {
+      "title": "Rolių nuolaidos",
+      "help": "Nustatykite nuolaidą pagal rolę (procentinė arba fiksuota suma).",
+      "role": "Rolė",
+      "type": "Tipas",
+      "types": {
+        "percent": "Procentinė",
+        "fixed": "Fiksuota suma"
+      },
+      "valuePercent": "Reikšmė (%)",
+      "valueFixed": "Reikšmė (€)",
+      "active": "Aktyvi",
+      "save": "Išsaugoti nuolaidą",
+      "createRole": {
+        "title": "Sukurti rolę",
+        "label": "Naujos rolės pavadinimas",
+        "placeholder": "pvz. partneris",
+        "button": "Sukurti rolę",
+        "errors": {
+          "invalidRole": "Neteisingas rolės pavadinimas. Naudokite raides, skaičius, _ arba -, iki 64 simbolių.",
+          "roleExists": "Rolė jau egzistuoja - pasirinkta esama rolė."
+        }
+      }
+    },
+    "errors": {
+      "noSession": "Nėra aktyvios sesijos",
+      "loadUsers": "Nepavyko įkelti vartotojų",
+      "loadDiscounts": "Nepavyko įkelti nuolaidų",
+      "generic": "Kažkas nepavyko. Bandykite vėl.",
+      "updateRole": "Nepavyko atnaujinti rolės",
+      "createUser": "Nepavyko sukurti vartotojo",
+      "invalidDiscount": "Neteisinga nuolaidos reikšmė",
+      "invalidPercent": "Procentai turi būti nuo 0 iki 100",
+      "saveDiscount": "Nepavyko išsaugoti nuolaidos"
+    }
+  },
+  "adminChatbot": {
+    "title": "Chatbot",
+    "subtitle": "Valdykite pokalbius, žinių bazę ir GPT mokymą",
+    "tabs": {
+      "sessions": "Sesijos",
+      "faq": "Žinių bazė",
+      "ai": "AI",
+      "training": "Mokymas"
+    },
+    "breadcrumbs": {
+      "home": "Pradžia",
+      "admin": "Administravimas",
+      "chatbot": "Chatbot"
+    },
+    "common": {
+      "refresh": "Atnaujinti",
+      "loading": "Kraunama...",
+      "new": "Naujas",
+      "save": "Išsaugoti",
+      "saving": "Saugoma...",
+      "delete": "Ištrinti",
+      "deleting": "Trinama..."
+    },
+    "roles": {
+      "user": "Klientas",
+      "assistant": "Asistentas",
+      "system": "Sistema"
+    },
+    "sessions": {
+      "title": "Chatbot sesijos",
+      "empty": "Kol kas nėra sesijų.",
+      "conversationTitle": "Pokalbis",
+      "pickSession": "Pasirink sesiją kairėje.",
+      "eventsCount": "{count} įvyk."
+    },
+    "faq": {
+      "title": "Žinių bazė (Klausimai ir atsakymai)",
+      "empty": "Kol kas nėra įrašų.",
+      "importDefaults": "Įkelti numatytus klausimus",
+      "importing": "Įkeliama...",
+      "statusEnabled": "Įjungta",
+      "statusDisabled": "Išjungta",
+      "editTitle": "Įrašo redagavimas",
+      "noticeSaved": "Išsaugota.",
+      "noticeCreated": "Sukurta.",
+      "noticeDeleted": "Ištrinta.",
+      "noticeImported": "Įkelta: {count} įrašų."
+    },
+    "ai": {
+      "title": "GPT / OpenAI nustatymai",
+      "subtitle": "Būsena ir valdomi nustatymai",
+      "empty": "Nepavyko nuskaityti konfigūracijos.",
+      "statusTitle": "Būsena",
+      "configured": "OPENAI_API_KEY",
+      "useOpenAI": "CHATBOT_USE_OPENAI",
+      "openAiMode": "CHATBOT_OPENAI_MODE",
+      "model": "OPENAI_CHAT_MODEL",
+      "minConfidence": "Min. pasitikėjimas (fallback)",
+      "temperature": "Temperatūra",
+      "source": "Šaltinis",
+      "yes": "Taip",
+      "no": "Ne",
+      "note": "API raktas niekada nerodomas UI. OPENAI_API_KEY valdoma per .env.local; kiti nustatymai gali būti valdomi per Admin (jei sukonfigūruotas Supabase).",
+      "settingsTitle": "Nustatymai",
+      "noticeSaved": "Išsaugota.",
+      "promptTitle": "Mokymo promptas",
+      "promptLt": "LT prompt",
+      "promptEn": "EN prompt",
+      "set": "Nustatyta",
+      "notSet": "Nėra",
+      "defaultPrompt": "Naudojamas numatytas prompt (neperrašyta env kintamaisiais).",
+      "envTitle": "Env pavyzdys (.env.local)"
+    },
+
+    "training": {
+      "title": "GPT mokymas",
+      "subtitle": "Eksportuokite žinių bazę į fine-tune formatą ir (pasirinktinai) paleiskite fine-tune",
+      "exportTitle": "Duomenų eksportas",
+      "exportNote": "Sugeneruoja JSONL failą iš žinių bazės įrašų (klausimas → atsakymas).",
+      "exportJsonl": "Eksportuoti JSONL",
+      "locale": "Kalba",
+      "fineTuneTitle": "Fine-tune (pasirinktinai)",
+      "fineTuneNote": "Fine-tune paleidimas per admin UI yra išjungtas pagal nutylėjimą (dėl kaštų). Įjunkite CHATBOT_ENABLE_FINE_TUNE_ADMIN=true.",
+      "baseModel": "Bazinis modelis",
+      "startFineTune": "Pradėti fine-tune",
+      "starting": "Paleidžiama...",
+      "refreshStatus": "Atnaujinti būseną",
+      "jobId": "Job ID",
+      "status": "Būsena",
+      "statusValue": "Status",
+      "fineTunedModel": "Fine-tuned model"
+    },
+
+    "dbSetup": {
+      "title": "Duomenų bazės paruošimas",
+      "subtitle": "Jei trūksta lentelių, įklijuokite SQL į Supabase SQL Editor, tada vykdykite schema reload.",
+      "copySessions": "Kopijuoti sesijų lentelių SQL",
+      "copyFaq": "Kopijuoti FAQ lentelės SQL",
+      "copySettings": "Kopijuoti settings SQL",
+      "copyReload": "Kopijuoti reload schema",
+      "copied": "SQL nukopijuotas.",
+      "copyFailed": "Nepavyko nukopijuoti SQL."
+    },
+    "form": {
+      "enabled": "Įjungta",
+      "order": "Eiliškumas",
+      "locale": "Kalba",
+      "question": "Klausimas",
+      "answer": "Atsakymas",
+      "keywords": "Raktažodžiai (atskirti kableliais)",
+      "suggestions": "Pasiūlymai (atskirti kableliais)",
+      "id": "ID: {id}",
+      "newEntry": "Naujas įrašas",
+      "placeholders": {
+        "question": "Įvesk klausimą",
+        "answer": "Įvesk atsakymą",
+        "keywords": "pvz.: pristatymas, kainos, garantija",
+        "suggestions": "pvz.: Parodyk produktus, Susisiekime, Kainų skaičiuoklė"
+      }
+    },
+    "errors": {
+      "noAdminSession": "Nėra aktyvios admin sesijos.",
+      "parseResponse": "Nepavyko nuskaityti serverio atsakymo (HTTP {status}).",
+      "requestFailed": "Užklausa nepavyko (HTTP {status}).",
+      "supabaseNotConfigured": "Supabase nesukonfigūruotas (.env.local trūksta NEXT_PUBLIC_SUPABASE_URL ir/ar SUPABASE_SERVICE_ROLE_KEY).",
+      "supabaseMissingTable": "Trūksta Supabase DB lentelės: public.{table}. Paleisk migracijas iš supabase/migrations ir Supabase SQL Editor'e įvykdyk: select pg_notify('pgrst','reload schema');",
+      "loadEventsFailed": "Nepavyko užkrauti įvykių.",
+      "loadFaqFailed": "Nepavyko užkrauti žinių bazės įrašų.",
+      "importFailed": "Nepavyko įkelti numatytų klausimų.",
+      "saveFailed": "Nepavyko išsaugoti.",
+      "deleteFailed": "Nepavyko ištrinti.",
+      "questionRequired": "Klausimas yra privalomas.",
+      "answerRequired": "Atsakymas yra privalomas."
+    }
+  },
+  "solutionsPage": {
+    "title": "Sprendimai",
+    "faqLabel": "Dažnai užduodami klausimai",
+    "productsTitle": "Produktai",
+    "nav": {
+      "facades": "Fasadai",
+      "terraces": "Terasos",
+      "interior": "Interjeras",
+      "fences": "Tvoros"
+    },
+    "cta": {
+      "getOffer": "Pirkti dabar",
+      "seeProjects": "Projektai",
+      "viewProducts": "Žiūrėti produktus",
+      "seeInteriors": "Žiūrėti interjerus",
+      "seeFences": "Žiūrėti tvoras"
+    },
+    "products": {
+      "graphiteSpruce": {
+        "name": "Grafito Eglė",
+        "profile": "ROMBAS PROFILIS · 95×3000 mm",
+        "usage": "Fasadų sistemos · Deginta eglė"
+      },
+      "graphiteLarch": {
+        "name": "Grafito Maumedis",
+        "profile": "ROMBAS PROFILIS · 145×3600 mm",
+        "usage": "Fasadų sistemos · Degintas maumedis"
+      },
+      "latteSpruce": {
+        "name": "Latte Eglė",
+        "profile": "PUSĖ ŠPUNTO 45° PROFILIS · 95×3000 mm",
+        "usage": "Fasadų sistemos · Deginta eglė"
+      },
+      "latteLarch": {
+        "name": "Latte Maumedis",
+        "profile": "ROMBAS PROFILIS · 145×3600 mm",
+        "usage": "Fasadų sistemos · Degintas maumedis"
+      }
+    },
+    "facades": {
+      "eyebrow": "Fasadai",
+      "title": {
+        "prefix": "Sukurti",
+        "italic": "ilgaamžiškumui",
+        "suffix": "lauke"
+      },
+      "description": "Vėdinamo fasado sprendimas su deginta mediena, pritaikytas Baltijos klimatui: ilgaamžė apdaila, lengva priežiūra ir aiški, šiuolaikiška architektūrinė išraiška.",
+      "intro": "Deginta mediena fasadui suteikia ne tik išskirtinį charakterį, bet ir praktišką apsaugą lauko sąlygomis. Tai sprendimas, kuriame natūralumas dera su ilgaamžiškumu ir šiuolaikine architektūra.",
+      "detail": "Tinkamai paruošta ir sumontuota deginta mediena gerai atlaiko drėgmės, saulės ir temperatūrų kaitos poveikį. Ventiliuojamo fasado sistemoje ji išlaiko stabilumą, o sodri tekstūra ir gilus tonas leidžia sukurti solidų, ilgai aktualų vaizdą.",
+      "faqSubtitle": "Jei ieškote fasado, kuris būtų ir estetiškas, ir praktiškas eksploatuoti, deginta mediena leidžia suderinti išraiškingą išvaizdą su ilgaamže apsauga.",
+      "specs": {
+        "thickness": { "label": "Storis", "value": "18/20 mm" },
+        "wood": { "label": "Mediena", "value": "Maumedis / Eglė" },
+        "finish": { "label": "Apdaila", "value": "Matinė, UV stabili" }
+      },
+      "images": {
+        "topLeft": "Fasado projekto detalė",
+        "topRight": "Deginta mediena fasadui",
+        "wide": "Fasado lentos tekstūra"
+      },
+      "badges": {
+        "epd": "Aplinkosaugos produkto deklaracija",
+        "fsc": "Atsakingas miškų valdymas",
+        "uv": "Atsparumas blukimui"
+      },
+      "badgesLabels": {
+        "epd": "Tvarumas",
+        "fsc": "Kilmė",
+        "uv": "Atsparumas"
+      },
+      "faq": {
+        "1": {
+          "title": "Kodėl fasadams verta rinktis degintą medieną?",
+          "content": "Deginta mediena fasadams vertinama dėl išskirtinės išvaizdos ir natūralaus atsparumo aplinkos poveikiui. Apdegtas paviršius padeda geriau apsaugoti medieną nuo drėgmės, UV spindulių ir biologinių pažeidėjų, todėl fasadas ilgiau išlaiko tiek estetiką, tiek funkcionalumą."
+        },
+        "2": {
+          "title": "Degintos medienos fasado privalumai",
+          "content": "Pagrindiniai privalumai yra ilgaamžiškumas, mažesni priežiūros poreikiai ir vizualinis išskirtinumas. Tinkamai apdorota deginta mediena padeda sumažinti drėgmės, pelėsio, grybelių ir kenkėjų poveikį, o fasadas įgauna sodrią, architektūriškai stiprią tekstūrą."
+        },
+        "3": {
+          "title": "Populiariausios medienos rūšys fasado apdailai",
+          "content": "Fasadų apdailai dažniausiai pasirenkama eglė, maumedis, pušis ar termiškai modifikuota mediena. Skirtingos rūšys pasižymi nevienodu tankiu, tekstūra ir stabilumu, todėl tinkamiausias pasirinkimas priklauso nuo projekto vietos, norimos estetikos ir planuojamo eksploatavimo intensyvumo."
+        },
+        "4": {
+          "title": "Degintos medienos fasado montavimo procesas",
+          "content": "Ilgaamžį rezultatą lemia ne tik mediena, bet ir teisingas montavimas. Svarbu parinkti tinkamą tvirtinimo sprendimą, užtikrinti ventiliuojamą oro tarpą, apsaugoti konstrukcinius mazgus nuo užsistovinčio vandens ir naudoti konkrečiai sistemai pritaikytas detales."
+        },
+        "5": {
+          "title": "Degintos medienos fasado kainų aspektai",
+          "content": "Nors pradinis biudžetas gali būti didesnis nei standartinės apdailos, degintos medienos vertė atsiskleidžia per visą naudojimo laiką. Ilgesnis tarnavimas, retesnė priežiūra ir mažesnis poreikis atnaujinti dangą dažnai leidžia pasiekti palankesnę ilgalaikę eksploatacijos kainą."
+        }
+      }
+    },
+    "terraces": {
+      "eyebrow": "Terasos",
+      "title": {
+        "prefix": "Sukurta",
+        "italic": "komfortui",
+        "suffix": "lauke"
+      },
+      "description": "Degintos medienos terasa išsiskiria natūralia tekstūra, jaukiu pojūčiu vaikštant basomis ir geru atsparumu sezoniniams pokyčiams lauko sąlygomis.",
+      "intro": "Deginta mediena terasoms suteikia daugiau nei vizualinį išskirtinumą. Ji padeda kurti ilgaamžę, malonią naudoti lauko dangą, kuri dera tiek prie modernaus namo, tiek prie natūralesnės aplinkos.",
+      "detail": "Tinkamai paruoštos terasinės lentos išlieka stabilesnės veikiamos drėgmės ir temperatūrų svyravimų, o jų paviršius išlaiko ryškų, gyvą charakterį. Tokia terasa tinka poilsio zonoms, prie baseinų, pirčių ar kitoms vietoms, kur svarbi ir estetika, ir kasdienis komfortas.",
+      "faqSubtitle": "Jei norite terasos, kuri būtų maloni naudoti kasdien ir kartu išlaikytų išskirtinę išvaizdą daugelį sezonų, deginta mediena yra vienas stipriausių pasirinkimų.",
+      "specs": {
+        "use": { "label": "Paskirtis", "value": "Terasos / deniai" },
+        "feel": { "label": "Pojūtis", "value": "Natūrali tekstūra, stabili" },
+        "care": { "label": "Priežiūra", "value": "Lengva" }
+      },
+      "images": {
+        "topLeft": "Terasos denio apdaila",
+        "topRight": "Terasos projektas",
+        "wide": "Denio detalė"
+      },
+      "badges": {
+        "grip": "Neslystantis paviršius",
+        "drain": "Ventiliuojama sistema",
+        "season": "Atspari oro sąlygoms"
+      },
+      "badgesLabels": {
+        "grip": "Sukibimas",
+        "drain": "Drenažas",
+        "season": "Atsparumas"
+      },
+      "faq": {
+        "1": {
+          "title": "Kodėl verta rinktis degintą medieną terasai?",
+          "content": "Deginta mediena terasai leidžia suderinti natūralų vaizdą, ilgaamžiškumą ir mažesnius priežiūros poreikius. Apdorotas paviršius geriau atlaiko drėgmę, saulę ir biologinius pažeidėjus, o terasa įgauna išskirtinę, architektūriškai vientisą išvaizdą."
+        },
+        "2": {
+          "title": "Ar deginta mediena tinka prie baseino?",
+          "content": "Taip, tinkamai parinkta ir įrengta deginta mediena puikiai tinka prie baseinų ar kitų drėgnesnių zonų. Ji vertinama dėl malonaus paviršiaus, gero sukibimo ir atsparumo nuolatiniam drėgmės poveikiui, tačiau galutinis rezultatas visada priklauso ir nuo taisyklingai įrengto pagrindo bei ventiliacijos."
+        },
+        "3": {
+          "title": "Kaip prižiūrėti degintą terasą?",
+          "content": "Kasdienė priežiūra paprasta: pakanka reguliariai pašalinti dulkes, smėlį ir kitus nešvarumus. Prireikus galima atnaujinti apsauginį sluoksnį pagal naudojimo intensyvumą, o stipraus slėgio plovimo geriau vengti, kad nebūtų pažeista paviršiaus struktūra."
+        },
+        "4": {
+          "title": "Koks degintos terasos tarnavimo laikas?",
+          "content": "Tinkamai sumontuota ir prižiūrima degintos medienos terasa gali tarnauti kelis dešimtmečius. Tikslų tarnavimo laiką lemia medienos rūšis, konstrukciniai sprendimai, aplinkos sąlygos ir eksploatavimo intensyvumas, tačiau lyginant su įprasta lauko mediena, jos ilgaamžiškumo potencialas paprastai yra didesnis."
+        },
+        "5": {
+          "title": "Ar galima derinti skirtingas spalvas terasoje?",
+          "content": "Taip, terasoje galima derinti skirtingus tonus, deginimo intensyvumą ar net kelis profilius, jei to reikalauja architektūrinė idėja. Toks sprendimas padeda išryškinti zonas, laiptus ar poilsio erdves ir suteikia projektui daugiau individualumo."
+        }
+      }
+    },
+    "interior": {
+      "eyebrow": "Interjeras",
+      "title": {
+        "prefix": "Suteikite",
+        "italic": "gilumą",
+        "suffix": "viduje"
+      },
+      "description": "Degintos medienos apdaila interjerui suteikia šilumos, kontrasto ir išraiškingos tekstūros akcentinėms sienoms, luboms bei individualioms detalėms.",
+      "intro": "Interjere deginta mediena veikia ne tik kaip apdailos medžiaga, bet ir kaip nuotaiką kuriantis elementas. Ji padeda erdvei suteikti gylio, natūralumo ir subtilios prabangos pojūtį.",
+      "detail": "Vidaus apdailai skirta deginta mediena paruošiama taip, kad paviršius būtų estetiškas, malonus liesti ir tinkamas kasdieniam naudojimui. Ji puikiai dera su betonu, metalu, akmeniu, stiklu ir šviesiomis plokštumomis, todėl lengvai prisitaiko tiek prie modernaus, tiek prie jaukesnio interjero krypties.",
+      "faqSubtitle": "Jei norite interjere daugiau charakterio, šilumos ir natūralios tekstūros, deginta mediena leidžia išgauti ryškų, bet neperkrautą rezultatą.",
+      "specs": {
+        "applications": { "label": "Pritaikymas", "value": "Sienos / lubos" },
+        "look": { "label": "Išvaizda", "value": "Sodri tekstūra, matinė" },
+        "design": { "label": "Dizainas", "value": "Individualūs raštai" }
+      },
+      "images": {
+        "topLeft": "Interjero sienų plokštės",
+        "topRight": "Interjero projekto detalė",
+        "wide": "Plokštės tekstūros detalė"
+      },
+      "badges": {
+        "text": "Malonus liesti",
+        "warm": "Natūrali atmosfera",
+        "detail": "Architektūrinė apdaila"
+      },
+      "badgesLabels": {
+        "text": "Tekstūra",
+        "warm": "Šiluma",
+        "detail": "Apdaila"
+      },
+      "faq": {
+        "1": {
+          "title": "Ar deginta mediena tinka vidaus erdvėms?",
+          "content": "Taip, interjerui skirta deginta mediena yra specialiai paruošiama vidaus naudojimui. Paviršius stabilizuojamas, sumažinamas birių anglies dalelių kiekis, o galutinė apdaila pritaikoma taip, kad medžiaga būtų tinkama sienoms, luboms ar baldų detalėms."
+        },
+        "2": {
+          "title": "Kokioms patalpoms tinka deginta mediena?",
+          "content": "Ji tinka svetainėms, miegamiesiems, darbo kambariams, restoranams, viešbučiams ir kitoms reprezentacinėms erdvėms. Dažniausiai deginta mediena naudojama akcentinėms sienoms, luboms, nišoms ar individualioms baldų detalėms, o drėgnesnėse zonose sprendimas parenkamas pagal konkrečias sąlygas."
+        },
+        "3": {
+          "title": "Ar deginta mediena skleidžia kvapą?",
+          "content": "Šviežiai sumontuota mediena gali turėti lengvą, trumpalaikį degintos medienos kvapą, tačiau tinkamai užbaigta apdaila jo beveik nepalieka. Daugeliu atvejų kvapas greitai susilpnėja ir netampa juntama kasdienio naudojimo problema."
+        },
+        "4": {
+          "title": "Kaip prižiūrėti degintą medieną interjere?",
+          "content": "Priežiūra paprasta: dažniausiai pakanka sausos arba vos drėgnos šluostės dulkėms nuvalyti. Agresyvių chemikalų ar abrazyvių priemonių reikėtų vengti, o apsauginį sluoksnį verta atnaujinti pagal paviršiaus apkrovą ir naudojimo intensyvumą."
+        },
+        "5": {
+          "title": "Ar galima derinti degintą medieną su kitomis medžiagomis?",
+          "content": "Deginta mediena ypač gerai dera su betonu, metalu, stiklu, akmeniu ir natūraliais audiniais. Tamsi, tekstūriška plokštuma gali tapti stipriu kontrasto elementu, tačiau lygiai taip pat ji tinka ir ramesniems, natūralesniems interjerams, kai siekiama daugiau gylio bei medžiagiškumo."
+        }
+      }
+    },
+    "fences": {
+      "eyebrow": "Tvoros",
+      "title": {
+        "prefix": "Tvora su",
+        "italic": "charakteriu",
+        "suffix": "ir ilgaamžiškumu"
+      },
+      "description": "Degintos medienos tvora suteikia sklypui privatumo, aiškią architektūrinę liniją ir ilgaamžį paviršių, kuriam reikia mažiau priežiūros.",
+      "intro": "Tvora iš degintos medienos atlieka daugiau nei apsauginę funkciją. Ji tampa svarbia viso sklypo architektūros dalimi, padedančia sukurti vientisą, solidų ir išbaigtą aplinkos vaizdą.",
+      "detail": "Deginimo procesas padeda apsaugoti medieną nuo drėgmės, kenkėjų ir saulės poveikio, todėl tvora ilgiau išlaiko stabilumą ir estetinę kokybę. Tinkamai parinktas profilis, konstrukcija ir apdaila leidžia pritaikyti sprendimą tiek minimalistinei, tiek natūralesnei aplinkai.",
+      "faqSubtitle": "Jei ieškote tvoros, kuri derintų privatumą, ilgaamžiškumą ir išskirtinę estetiką, deginta mediena leidžia pasiekti stiprų rezultatą be perteklinės priežiūros.",
+      "specs": {
+        "purpose": { "label": "Paskirtis", "value": "Privatumas / ribos" },
+        "build": { "label": "Konstrukcija", "value": "Tvirta ir stabili" },
+        "finish": { "label": "Apdaila", "value": "Išskirtinė deginta išvaizda" }
+      },
+      "images": {
+        "topLeft": "Deginta medienos tvora",
+        "topRight": "Tvoros projektas",
+        "wide": "Tvoros detalė"
+      },
+      "badges": {
+        "long": "Patvarumas dešimtmečiams",
+        "clean": "Minimalistinis siluetas",
+        "care": "Maža priežiūra"
+      },
+      "badgesLabels": {
+        "long": "Ilgaamžiškumas",
+        "clean": "Siluetas",
+        "care": "Priežiūra"
+      },
+      "faq": {
+        "1": {
+          "title": "Kuo deginta medienos tvora pranašesnė už įprastą?",
+          "content": "Palyginti su įprasta medine tvora, deginta mediena išsiskiria didesniu atsparumu aplinkos poveikiui, ilgesniu tarnavimo potencialu ir mažesniais priežiūros poreikiais. Be to, ji suteikia projektui išraiškingą, architektūriškai brandų vaizdą, kurio nepasieksite standartine impregnuota mediena."
+        },
+        "2": {
+          "title": "Koks degintos tvoros tarnavimo laikas?",
+          "content": "Tinkamai suprojektuota, sumontuota ir prižiūrima degintos medienos tvora gali tarnauti kelis dešimtmečius. Tikslus ilgaamžiškumas priklauso nuo medienos rūšies, konstrukcijos, kontakto su gruntu, drėgmės apkrovų ir bendrų montavimo sprendimų."
+        },
+        "3": {
+          "title": "Ar reikia dažyti degintą tvorą?",
+          "content": "Dažyti jos nebūtina kaip įprastos tvoros, tačiau galutinis priežiūros lygis priklauso nuo norimo vizualinio rezultato. Jei siekiama ilgiau išlaikyti sodrų toną, galima periodiškai atnaujinti alyvą ar kitą apsauginę apdailą; jei ne, paviršius natūraliai kinta ir laikui bėgant įgauna ramesnį atspalvį."
+        },
+        "4": {
+          "title": "Kokie tvoros stiliaus variantai galimi?",
+          "content": "Galimi horizontalūs, vertikalūs, tankesni ar atviresni sprendimai, taip pat kombinacijos su metalu ar kitomis medžiagomis. Tvoros ritmas, aukštis, lentų profilis ir tarpai gali būti pritaikomi prie namo architektūros, sklypo reljefo ir pageidaujamo privatumo lygio."
+        },
+        "5": {
+          "title": "Ar deginta tvora atlaiko lietuvišką klimatą?",
+          "content": "Taip, deginta mediena gerai tinka Lietuvos ir viso Baltijos regiono klimatui. Ji efektyviai susidoroja su drėgme, saule, šalčiu ir temperatūrų kaita, tačiau geriausias rezultatas pasiekiamas tada, kai kartu užtikrinami teisingi konstrukciniai mazgai ir kokybiškas montavimas."
+        }
+      }
+    }
+  }
+}

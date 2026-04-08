@@ -1,0 +1,39 @@
+import Solutions from '@/app/solutions/page';
+import type { Metadata } from 'next';
+import { getOgImage } from '@/lib/og-image';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { canonicalUrl } from '@/lib/seo/canonical';
+import { applySeoOverride } from '@/lib/seo/overrides';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('metadata.solutions');
+  const locale = await getLocale();
+  const currentLocale = locale === 'lt' ? 'lt' : 'en';
+  const canonical = canonicalUrl('/solutions', currentLocale);
+
+  const metadata: Metadata = {
+    title: t('title'),
+    description: t('description'),
+    openGraph: {
+      title: t('ogTitle'),
+      description: t('description'),
+      url: canonical,
+      type: 'website',
+      siteName: 'Yakiwood',
+      images: [{ url: getOgImage('solutions'), width: 1200, height: 630, alt: t('ogTitle') }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('ogTitle'),
+      description: t('description'),
+      images: [getOgImage('solutions')],
+    },
+    alternates: {
+      canonical,
+    },
+  };
+
+  return applySeoOverride(metadata, new URL(canonical).pathname, currentLocale);
+}
+
+export default Solutions;
