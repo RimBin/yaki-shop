@@ -1,4 +1,4 @@
-# Atsakymai į prašymą „Tolimesniam įdiegto sprendimo vertinimui”
+﻿# Atsakymai į prašymą „Tolimesniam įdiegto sprendimo vertinimui”
 
 Šiame faile pateikiami visi atsakymai į vertintojo klausimus vienoje vietoje. Dokumente sujungti:
 
@@ -29,15 +29,15 @@ Dizaino darbai šiame projekte neapsiribojo vien Figma failų peržiūra. Reikė
   <tbody>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Dizaino tokenų taikymas projekte</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/design-system.ts">code/lib/design-system.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/design-system.ts">code/lib/design-system.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Figma resursų sąrašai ir priskyrimai</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/assets/figma-assets.ts">code/lib/assets/figma-assets.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/assets/figma-assets.ts">code/lib/assets/figma-assets.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Automatizuotas resursų atsisiuntimo procesas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/scripts/download-assets.py">code/scripts/download-assets.py</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="scripts/download-assets.py">code/scripts/download-assets.py</a></td>
     </tr>
   </tbody>
 </table>
@@ -60,27 +60,27 @@ Dizaino darbai šiame projekte neapsiribojo vien Figma failų peržiūra. Reikė
   <tbody>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Projekto bazinio domeno ir alternatyvių URL logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/seo/site.ts">code/lib/seo/site.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/seo/site.ts">code/lib/seo/site.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Atsiskaitymo API naudojamas tas pats projekto domenas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Lokalizuotų maršrutų konfigūracija</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/i18n/routing.ts">code/i18n/routing.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="i18n/routing.ts">code/i18n/routing.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Lokalizuotų kelių atitikmenys</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/i18n/paths.ts">code/i18n/paths.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="i18n/paths.ts">code/i18n/paths.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">PDF generavimo sluoksnyje naudojamas tas pats projekto kontekstas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/configurator/pdf-generator.ts">code/lib/configurator/pdf-generator.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/configurator/pdf-generator.ts">code/lib/configurator/pdf-generator.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Bendra aplikacijos struktūra viename projekte</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/layout.tsx">code/app/layout.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/layout.tsx">code/app/layout.tsx</a></td>
     </tr>
   </tbody>
 </table>
@@ -128,39 +128,39 @@ Individualiai kurta:
   <tbody>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Naudojamų technologijų ir bibliotekų sudėtis</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/package.json">code/package.json</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="package.json">code/package.json</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Lokalizuoto maršrutizavimo įdiegimas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/i18n/routing.ts">code/i18n/routing.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="i18n/routing.ts">code/i18n/routing.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Individualus administravimo modulis (straipsniai)</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/admin/posts/page.tsx">code/app/admin/posts/page.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/admin/posts/page.tsx">code/app/admin/posts/page.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Individualus administravimo kliento sprendimas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/admin/PostsAdminClient.tsx">code/components/admin/PostsAdminClient.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/admin/PostsAdminClient.tsx">code/components/admin/PostsAdminClient.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Individualus administravimo modulis (projektai)</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/admin/projects/page.tsx">code/app/admin/projects/page.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/admin/projects/page.tsx">code/app/admin/projects/page.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Individualus administravimo kliento sprendimas (projektai)</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/admin/ProjectsAdminClient.tsx">code/components/admin/ProjectsAdminClient.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/admin/ProjectsAdminClient.tsx">code/components/admin/ProjectsAdminClient.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">TVS duomenų struktūros migracijos</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/supabase/migrations/20260303_cms_posts_projects.sql">code/supabase/migrations/20260303_cms_posts_projects.sql</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="supabase/migrations/20260303_cms_posts_projects.sql">code/supabase/migrations/20260303_cms_posts_projects.sql</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Individuali krepšelio logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/cart/store.ts">code/lib/cart/store.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/cart/store.ts">code/lib/cart/store.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Individualus 3D konfigūratoriaus sluoksnis</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/Konfiguratorius3D.tsx">code/components/Konfiguratorius3D.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/Konfiguratorius3D.tsx">code/components/Konfiguratorius3D.tsx</a></td>
     </tr>
   </tbody>
 </table>
@@ -230,7 +230,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/lib/design-system.ts">code/lib/design-system.ts</a>, <a href="code/components/shared/PageLayout.tsx">code/components/shared/PageLayout.tsx</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="lib/design-system.ts">code/lib/design-system.ts</a>, <a href="components/shared/PageLayout.tsx">code/components/shared/PageLayout.tsx</a></p>
 
 ### 4.2 Svetainės mobilumo užtikrinimas
 
@@ -275,7 +275,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/components/products/ProductsPageClient.tsx">code/components/products/ProductsPageClient.tsx</a>, <a href="code/e2e/smoke.spec.ts">code/e2e/smoke.spec.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="components/products/ProductsPageClient.tsx">code/components/products/ProductsPageClient.tsx</a>, <a href="e2e/smoke.spec.ts">code/e2e/smoke.spec.ts</a></p>
 
 ### 4.3 Puslapių struktūros kūrimas
 
@@ -320,7 +320,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/i18n/paths.ts">code/i18n/paths.ts</a>, <a href="code/i18n/routing.ts">code/i18n/routing.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="i18n/paths.ts">code/i18n/paths.ts</a>, <a href="i18n/routing.ts">code/i18n/routing.ts</a></p>
 
 ### 4.4 Elektroninės komercijos modulio įdiegimas
 
@@ -375,7 +375,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a>, <a href="code/app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a>, <a href="app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></p>
 
 ### 4.5 Parduotuvės filtrų konfigūracija
 
@@ -410,7 +410,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/components/shared/SearchBar.tsx">code/components/shared/SearchBar.tsx</a>, <a href="code/components/products/ProductsPageClient.tsx">code/components/products/ProductsPageClient.tsx</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="components/shared/SearchBar.tsx">code/components/shared/SearchBar.tsx</a>, <a href="components/products/ProductsPageClient.tsx">code/components/products/ProductsPageClient.tsx</a></p>
 
 ### 4.6 Mokėjimų būdų įdiegimas
 
@@ -450,7 +450,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/app/api/paysera/init/route.ts">code/app/api/paysera/init/route.ts</a>, <a href="code/app/api/webhooks/stripe/route.ts">code/app/api/webhooks/stripe/route.ts</a>, <a href="code/app/api/webhooks/paysera/route.ts">code/app/api/webhooks/paysera/route.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="app/api/paysera/init/route.ts">code/app/api/paysera/init/route.ts</a>, <a href="app/api/webhooks/stripe/route.ts">code/app/api/webhooks/stripe/route.ts</a>, <a href="app/api/webhooks/paysera/route.ts">code/app/api/webhooks/paysera/route.ts</a></p>
 
 ### 4.7 Integracijos su išorinėmis sistemomis
 
@@ -490,7 +490,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/lib/newsletter/providers.ts">code/lib/newsletter/providers.ts</a>, <a href="code/app/api/newsletter/route.ts">code/app/api/newsletter/route.ts</a>, <a href="code/components/GoogleAnalytics.tsx">code/components/GoogleAnalytics.tsx</a>, <a href="code/components/layout/DeferredGlobals.tsx">code/components/layout/DeferredGlobals.tsx</a>, <a href="code/app/api/analytics/vitals/route.ts">code/app/api/analytics/vitals/route.ts</a>, <a href="code/app/admin/chatbot/page.tsx">code/app/admin/chatbot/page.tsx</a>, <a href="code/app/api/admin/chatbot-openai/route.ts">code/app/api/admin/chatbot-openai/route.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="lib/newsletter/providers.ts">code/lib/newsletter/providers.ts</a>, <a href="app/api/newsletter/route.ts">code/app/api/newsletter/route.ts</a>, <a href="components/GoogleAnalytics.tsx">code/components/GoogleAnalytics.tsx</a>, <a href="components/layout/DeferredGlobals.tsx">code/components/layout/DeferredGlobals.tsx</a>, <a href="app/api/analytics/vitals/route.ts">code/app/api/analytics/vitals/route.ts</a>, <a href="app/admin/chatbot/page.tsx">code/app/admin/chatbot/page.tsx</a>, <a href="app/api/admin/chatbot-openai/route.ts">code/app/api/admin/chatbot-openai/route.ts</a></p>
 
 ### 4.8 Daugiakalbiškumo įdiegimas
 
@@ -530,7 +530,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/i18n/paths.ts">code/i18n/paths.ts</a>, <a href="code/i18n/routing.ts">code/i18n/routing.ts</a>, <a href="code/messages/lt.json">code/messages/lt.json</a>, <a href="code/messages/en.json">code/messages/en.json</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="i18n/paths.ts">code/i18n/paths.ts</a>, <a href="i18n/routing.ts">code/i18n/routing.ts</a>, <a href="messages/lt.json">code/messages/lt.json</a>, <a href="messages/en.json">code/messages/en.json</a></p>
 
 ### 4.9 Turinio valdymo sistemos įdiegimas
 
@@ -575,7 +575,7 @@ Pateikite originaliai sukurto kodo statistiką ir prieigą prie projekto program
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/app/admin/posts/page.tsx">code/app/admin/posts/page.tsx</a>, <a href="code/components/admin/PostsAdminClient.tsx">code/components/admin/PostsAdminClient.tsx</a>, <a href="code/app/admin/projects/page.tsx">code/app/admin/projects/page.tsx</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="app/admin/posts/page.tsx">code/app/admin/posts/page.tsx</a>, <a href="components/admin/PostsAdminClient.tsx">code/components/admin/PostsAdminClient.tsx</a>, <a href="app/admin/projects/page.tsx">code/app/admin/projects/page.tsx</a></p>
 
 ### 4.10 Vidinis SEO
 
@@ -617,7 +617,7 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/app/admin/seo/page.tsx">code/app/admin/seo/page.tsx</a>, <a href="code/app/api/admin/seo/scan/route.ts">code/app/api/admin/seo/scan/route.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="app/admin/seo/page.tsx">code/app/admin/seo/page.tsx</a>, <a href="app/api/admin/seo/scan/route.ts">code/app/api/admin/seo/scan/route.ts</a></p>
 
 ### 4.11 Saugumo priemonių įdiegimas
 
@@ -657,7 +657,7 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/next.config.ts">code/next.config.ts</a>, <a href="code/proxy.ts">code/proxy.ts</a>, <a href="code/app/admin/backups/page.tsx">code/app/admin/backups/page.tsx</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="next.config.ts">code/next.config.ts</a>, <a href="proxy.ts">code/proxy.ts</a>, <a href="app/admin/backups/page.tsx">code/app/admin/backups/page.tsx</a></p>
 
 ### 4 skyriaus papildomi įrodymai
 
@@ -671,63 +671,63 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
   <tbody>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Bendras puslapių karkasas ir išdėstymo logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/shared/PageLayout.tsx">code/components/shared/PageLayout.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/shared/PageLayout.tsx">code/components/shared/PageLayout.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Katalogo ir filtravimo logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/products/ProductsPageClient.tsx">code/components/products/ProductsPageClient.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/products/ProductsPageClient.tsx">code/components/products/ProductsPageClient.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Krepšelio logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/cart/store.ts">code/lib/cart/store.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/cart/store.ts">code/lib/cart/store.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Užsakymo kūrimo serverio logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Atsiskaitymo eigos serverio logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Stripe mokėjimo patvirtinimų apdorojimas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/webhooks/stripe/route.ts">code/app/api/webhooks/stripe/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/webhooks/stripe/route.ts">code/app/api/webhooks/stripe/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Paysera mokėjimo patvirtinimų apdorojimas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/webhooks/paysera/route.ts">code/app/api/webhooks/paysera/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/webhooks/paysera/route.ts">code/app/api/webhooks/paysera/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Lokalizuotų kelių žemėlapis</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/i18n/paths.ts">code/i18n/paths.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="i18n/paths.ts">code/i18n/paths.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Lokalizuotų maršrutų konfigūracija</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/i18n/routing.ts">code/i18n/routing.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="i18n/routing.ts">code/i18n/routing.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Administravimo modulis (straipsniai)</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/admin/posts/page.tsx">code/app/admin/posts/page.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/admin/posts/page.tsx">code/app/admin/posts/page.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Administravimo modulis (projektai)</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/admin/projects/page.tsx">code/app/admin/projects/page.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/admin/projects/page.tsx">code/app/admin/projects/page.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">SEO administravimo modulis</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/admin/seo/page.tsx">code/app/admin/seo/page.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/admin/seo/page.tsx">code/app/admin/seo/page.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">SEO skenavimo API maršrutas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/admin/seo/scan/route.ts">code/app/api/admin/seo/scan/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/admin/seo/scan/route.ts">code/app/api/admin/seo/scan/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Saugumo antraštės ir taisyklės</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/next.config.ts">code/next.config.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="next.config.ts">code/next.config.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Prieigų kontrolė per užklausų apdorojimą</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/proxy.ts">code/proxy.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="proxy.ts">code/proxy.ts</a></td>
     </tr>
   </tbody>
 </table>
@@ -778,7 +778,7 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/lib/models.ts">code/lib/models.ts</a>, <a href="code/public/models/products/index.json">code/public/models/products/index.json</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="lib/models.ts">code/lib/models.ts</a>, <a href="public/models/products/index.json">code/public/models/products/index.json</a></p>
 
 ### 5.2 Produktų vizualizacija
 
@@ -838,7 +838,7 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/components/Konfiguratorius3D.tsx">code/components/Konfiguratorius3D.tsx</a>, <a href="code/components/configurator/ConfiguratorPage.tsx">code/components/configurator/ConfiguratorPage.tsx</a>, <a href="code/lib/configurator/pdf-generator.ts">code/lib/configurator/pdf-generator.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="components/Konfiguratorius3D.tsx">code/components/Konfiguratorius3D.tsx</a>, <a href="components/configurator/ConfiguratorPage.tsx">code/components/configurator/ConfiguratorPage.tsx</a>, <a href="lib/configurator/pdf-generator.ts">code/lib/configurator/pdf-generator.ts</a></p>
 
 ### 5.3 Duomenų sujungimas su sistemomis
 
@@ -883,7 +883,7 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
     </tr>
   </tbody>
 </table>
-<p><strong>&#302;rodymai:</strong> <a href="code/app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a>, <a href="code/app/api/checkout/route.ts">code/app/api/checkout/route.ts</a>, <a href="code/lib/inventory/finalize-paid-order.ts">code/lib/inventory/finalize-paid-order.ts</a></p>
+<p><strong>&#302;rodymai:</strong> <a href="app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a>, <a href="app/api/checkout/route.ts">code/app/api/checkout/route.ts</a>, <a href="lib/inventory/finalize-paid-order.ts">code/lib/inventory/finalize-paid-order.ts</a></p>
 
 ### 5 skyriaus papildomi įrodymai
 
@@ -897,43 +897,43 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
   <tbody>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Modelių parinkimo logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/models.ts">code/lib/models.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/models.ts">code/lib/models.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">GLB modelių indeksas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/public/models/products/index.json">code/public/models/products/index.json</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="public/models/products/index.json">code/public/models/products/index.json</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">3D konfigūratoriaus komponentas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/Konfiguratorius3D.tsx">code/components/Konfiguratorius3D.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/Konfiguratorius3D.tsx">code/components/Konfiguratorius3D.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Konfigūravimo puslapio logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/configurator/ConfiguratorPage.tsx">code/components/configurator/ConfiguratorPage.tsx</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/configurator/ConfiguratorPage.tsx">code/components/configurator/ConfiguratorPage.tsx</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Konfigūratoriaus būsenų valdymas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/components/configurator/useConfiguratorState.ts">code/components/configurator/useConfiguratorState.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="components/configurator/useConfiguratorState.ts">code/components/configurator/useConfiguratorState.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">PDF / vaizdo eksporto logika</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/configurator/pdf-generator.ts">code/lib/configurator/pdf-generator.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/configurator/pdf-generator.ts">code/lib/configurator/pdf-generator.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Konfigūracijos perdavimas į užsakymą</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/orders/create/route.ts">code/app/api/orders/create/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Konfigūracijos perdavimas į atsiskaitymą</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/checkout/route.ts">code/app/api/checkout/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Mokėjimo patvirtinimo apdorojimas</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/app/api/webhooks/stripe/route.ts">code/app/api/webhooks/stripe/route.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="app/api/webhooks/stripe/route.ts">code/app/api/webhooks/stripe/route.ts</a></td>
     </tr>
     <tr bgcolor="#ffffff">
       <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;">Atsargų užbaigimo logika po apmokėjimo</td>
-      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="code/lib/inventory/finalize-paid-order.ts">code/lib/inventory/finalize-paid-order.ts</a></td>
+      <td bgcolor="#ffffff" style="border:1px solid #d0d7de; padding:8px;"><a href="lib/inventory/finalize-paid-order.ts">code/lib/inventory/finalize-paid-order.ts</a></td>
     </tr>
   </tbody>
 </table>
@@ -942,7 +942,7 @@ Svarbus paaiškinimas: SEO administravimo lange pradžioje gali būti rodomi nul
 
 ## 6) Kodo prieiga ir statistika
 
-Visa peržiūrai pateikta originalaus kodo kopija yra kataloge [code](code).
+Visa peržiūrai pateikta originalaus kodo kopija yra kataloge [code](.).
 
 Šioje kopijoje yra:
 
@@ -960,7 +960,7 @@ Didžiausios sritys:
 1. `data` – 3 038 eil.
 1. `supabase` – 2 116 eil.
 
-Vaizdinės konfigūracijos daliai šioje pateiktoje kopijoje priskirti 27 šaltinio failai, kurių bendra apimtis yra 8 999 eilutės, taip pat 139 GLB modelių failai kataloge [code/public/models/products](code/public/models/products).
+Vaizdinės konfigūracijos daliai šioje pateiktoje kopijoje priskirti 27 šaltinio failai, kurių bendra apimtis yra 8 999 eilutės, taip pat 139 GLB modelių failai kataloge [code/public/models/products\](public/models/products).
 
 Dėl saugumo ir komercinės informacijos apsaugos nuolatinė Git ar FTP prieiga neteikiama. Techniniam vertinimui pateikta pilna archyvinė kodo kopija, leidžianti patikrinti apimtį, struktūrą ir vientisumą.
 
@@ -969,3 +969,5 @@ Dėl saugumo ir komercinės informacijos apsaugos nuolatinė Git ar FTP prieiga 
 
 Pateiktame sprendime buvo kuriama ne standartinė „iš dėžės” parduotuvė, o individualus e. komercijos ir vaizdinės konfigūracijos sprendimas sukurtas ir pritaikytas konkrečiam projektui.
 Darbų apimtys apima ne tik dizainą ar pavienių funkcijų įjungimą, bet ir visą veikiančio sprendimo sukūrimą: architektūrą, lokalizaciją, administravimą, katalogo logiką, filtrus, krepšelį, atsiskaitymą, mokėjimus, atsargas, SEO, saugumą, 3D konfigūratorių ir jo integraciją į užsakymo procesą.
+
+
